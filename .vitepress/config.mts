@@ -65,13 +65,6 @@ export default defineConfig({
           { text: '工程化实战', link: '/guide/go-advanced-engineering' },
         ]
       },
-      {
-        text: '出海游戏站',
-        items: [
-          { text: '教程总览', link: '/game-site/' },
-          { text: 'SEO 基础', link: '/game-site/seo-basics' },
-        ]
-      },
     ],
     sidebar: [
       {
@@ -160,39 +153,6 @@ export default defineConfig({
           { text: '类型系统与泛型', link: '/guide/go-advanced-types' },
           { text: '并发模式与工程实践', link: '/guide/go-advanced-concurrency' },
           { text: '工程化实战', link: '/guide/go-advanced-engineering' },
-        ]
-      },
-      {
-        text: '🎮 出海游戏站',
-        collapsed: false,
-        items: [
-          { text: '教程总览', link: '/game-site/' },
-          { text: 'SEO 基础概念', link: '/game-site/seo-basics' },
-          { text: '关键词调研', link: '/game-site/keyword-research' },
-          { text: '第一个实验项目', link: '/game-site/first-project' },
-          { text: '技术栈与实现', link: '/game-site/tech-stack' },
-          { text: '数据闭环与诊断', link: '/game-site/data-loop' },
-          { text: '广告接入', link: '/game-site/ads-monetization' },
-          { text: '30 天实践计划', link: '/game-site/30-day-plan' },
-          { text: '成本控制与自动化', link: '/game-site/costs-automation' },
-          { text: '📋 关键词调研模板', link: '/game-site/keyword-template' },
-          {
-            text: '💬 群友实战经验',
-            collapsed: true,
-            items: [
-              { text: '总览', link: '/game-site/community/' },
-              { text: 'AdSense 审核实录', link: '/game-site/community/adsense-stories' },
-              { text: '工具站 vs 内容站', link: '/game-site/community/tool-vs-content' },
-              { text: '改版代价与维护', link: '/game-site/community/update-risks' },
-              { text: 'SEO 收录与排名', link: '/game-site/community/seo-stories' },
-              { text: '关键词实战', link: '/game-site/community/keyword-stories' },
-              { text: '外链建设', link: '/game-site/community/backlink-stories' },
-              { text: '赚钱与变现', link: '/game-site/community/monetization-stories' },
-              { text: 'Bing 流量', link: '/game-site/community/bing-traffic' },
-              { text: 'AI 辅助建站', link: '/game-site/community/ai-building' },
-              { text: '避坑指南', link: '/game-site/community/pitfalls' },
-            ]
-          },
         ]
       },
     ],
