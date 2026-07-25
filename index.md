@@ -3,7 +3,7 @@ layout: home
 
 hero:
   name: 全栈知识站
-  text: Python · Go · Node.js · NestJS
+  text: Python · Go · Node.js · NestJS · Java
   tagline: 写给有前端经验、正在补全栈能力的 AI 应用开发者。从语法到框架，从面试到生产。
   image:
     src: /logo.svg
@@ -18,6 +18,9 @@ hero:
     - theme: alt
       text: NestJS 完全指南
       link: /guide/nestjs-intro
+    - theme: alt
+      text: ☕ Java 快速入门
+      link: /guide/java-learning-path
 
 features:
   - icon: 🐍
@@ -41,6 +44,9 @@ features:
   - icon: 🔵
     title: Go 语言入门
     details: 面向 JS/Python 开发者的 Go 快速迁移。静态类型、编译型、内置 goroutine+channel 并发模型，从语法到 HTTP 服务一步到位。
+  - icon: ☕
+    title: Java 快速入门
+    details: 面向 TS/Node.js/NestJS/Python 开发者的 Java 教程。用类比消除陌生感，从环境搭建到 Spring Boot 实战，11 章覆盖面试与开发。
 ---
 
 ## 学习路径
@@ -86,6 +92,14 @@ Docker 与部署 → Redis 深入 → 消息队列
 Go 快速入门 → 类型系统与泛型 → 并发模式与工程实践 → 工程化实战
 ```
 
+### ☕ Java（企业级后端方向）
+
+```
+Java 去陌生化 → 核心语法 → 数据结构 → 理解 Java 工程
+  → Spring Boot 入门 → 数据库基础 → 登录与鉴权
+  → 调用 Python Agent → 实战项目 → 阅读项目方法 → 招聘判断
+```
+
 ## 各章内容速览
 
 | 模块 | 章节数 | 核心内容 |
@@ -99,3 +113,4 @@ Go 快速入门 → 类型系统与泛型 → 并发模式与工程实践 → �
 | **Docker 与部署** | 1 章 | 容器化 / docker-compose / nginx / PM2 / CI/CD |
 | **基础设施** | 2 章 | Redis 深入 / 消息队列 |
 | **Go** | 4 章 | 快速入门 → 类型与泛型 → 并发模式 → 工程化实战 |
+| **☕ Java** | 11 章 | 去陌生化 → 语法 → 数据结构 → 工程 → Spring Boot → 数据库 → 鉴权 → 调用 Python → 实战 → 阅读项目 → 招聘判断 |

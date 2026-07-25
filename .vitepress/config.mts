@@ -65,6 +65,23 @@ export default defineConfig({
           { text: '工程化实战', link: '/guide/go-advanced-engineering' },
         ]
       },
+      {
+        text: '☕ Java',
+        items: [
+          { text: '学习路线', link: '/guide/java-learning-path' },
+          { text: '1. Java 去陌生化', link: '/guide/java-intro' },
+          { text: '2. Java 核心语法', link: '/guide/java-core-syntax' },
+          { text: '3. 常用数据结构', link: '/guide/java-data-structures' },
+          { text: '4. 理解 Java 工程', link: '/guide/java-engineering' },
+          { text: '5. Spring Boot 入门', link: '/guide/java-springboot-intro' },
+          { text: '6. 数据库基础', link: '/guide/java-database' },
+          { text: '7. 登录与鉴权', link: '/guide/java-auth' },
+          { text: '8. 调用 Python Agent', link: '/guide/java-call-python' },
+          { text: '9. 实战项目', link: '/guide/java-project-practice' },
+          { text: '10. 阅读陌生项目', link: '/guide/java-reading-project' },
+          { text: '11. 招聘要求判断', link: '/guide/java-job-requirements' },
+        ]
+      },
     ],
     sidebar: [
       {
@@ -153,6 +170,24 @@ export default defineConfig({
           { text: '类型系统与泛型', link: '/guide/go-advanced-types' },
           { text: '并发模式与工程实践', link: '/guide/go-advanced-concurrency' },
           { text: '工程化实战', link: '/guide/go-advanced-engineering' },
+        ]
+      },
+      {
+        text: '☕ Java 快速入门',
+        collapsed: false,
+        items: [
+          { text: '学习路线', link: '/guide/java-learning-path' },
+          { text: '1. Java 去陌生化', link: '/guide/java-intro' },
+          { text: '2. Java 核心语法', link: '/guide/java-core-syntax' },
+          { text: '3. 常用数据结构', link: '/guide/java-data-structures' },
+          { text: '4. 理解 Java 工程', link: '/guide/java-engineering' },
+          { text: '5. Spring Boot 入门', link: '/guide/java-springboot-intro' },
+          { text: '6. 数据库基础', link: '/guide/java-database' },
+          { text: '7. 登录与鉴权', link: '/guide/java-auth' },
+          { text: '8. 调用 Python Agent', link: '/guide/java-call-python' },
+          { text: '9. 实战项目', link: '/guide/java-project-practice' },
+          { text: '10. 阅读陌生项目', link: '/guide/java-reading-project' },
+          { text: '11. 招聘要求判断', link: '/guide/java-job-requirements' },
         ]
       },
     ],
