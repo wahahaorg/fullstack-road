@@ -1,11 +1,12 @@
 import { defineConfig } from 'vitepress'
+import { withMermaid } from 'vitepress-plugin-mermaid'
 
 const repoName = process.env.GITHUB_REPOSITORY?.split('/')[1]
 const isUserOrOrgPage = repoName?.endsWith('.github.io')
 const githubPagesBase =
   process.env.GITHUB_ACTIONS && repoName && !isUserOrOrgPage ? `/${repoName}/` : '/'
 
-export default defineConfig({
+export default withMermaid(defineConfig({
   title: '全栈知识站',
   description: 'Python · Go · Node.js · NestJS — 写给前端工程师的全栈学习路径',
   lang: 'zh-CN',
@@ -209,4 +210,4 @@ export default defineConfig({
       text: '最后更新'
     }
   }
-})
+}))
