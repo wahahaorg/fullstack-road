@@ -53,6 +53,7 @@ export default withMermaid(defineConfig({
         text: '运维',
         items: [
           { text: 'Docker 与部署', link: '/guide/docker-deployment' },
+          { text: 'Worker 与异步任务', link: '/guide/background-worker' },
           { text: 'Redis 深入', link: '/guide/redis-deep' },
           { text: '消息队列', link: '/guide/message-queue' },
         ]
@@ -159,6 +160,7 @@ export default withMermaid(defineConfig({
         text: '📦 基础设施',
         collapsed: false,
         items: [
+          { text: 'Worker 与异步任务', link: '/guide/background-worker' },
           { text: 'Redis 深入', link: '/guide/redis-deep' },
           { text: '消息队列', link: '/guide/message-queue' },
         ]
