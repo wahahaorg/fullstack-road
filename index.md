@@ -10,6 +10,9 @@ hero:
     alt: 全栈知识站
   actions:
     - theme: brand
+      text: 🧭 打开知识地图
+      link: /guide/knowledge-map
+    - theme: brand
       text: Python 快速入门
       link: /guide/python-intro
     - theme: alt
@@ -51,7 +54,19 @@ features:
 
 ## 学习路径
 
-根据你的目标选择方向：
+本站已有 47 篇笔记。你可以先打开[全栈知识地图](/guide/knowledge-map)，按目标、技术栈与能力层级找到最短路径；也可以直接选择下面的方向。
+
+### 按当前任务进入
+
+| 我现在想做什么 | 从这里开始 | 继续深入 |
+|---|---|---|
+| 从前端转向 Python 后端 | [Python 快速入门](/guide/python-intro) | [FastAPI + MySQL 项目](/guide/fastapi-mysql-project) |
+| 准备 Node.js / NestJS 面试 | [Node.js 运行时](/guide/node-runtime) | [NestJS 架构概览](/guide/nestjs-intro) |
+| 接手 Java / Spring Boot 项目 | [Java 学习路线](/guide/java-learning-path) | [阅读陌生项目](/guide/java-reading-project) |
+| 处理慢接口、重复任务和并发写入 | [后端思维补齐](/guide/backend-thinking) | [并发、事务与一致性](/guide/concurrency-transaction) |
+| 把服务部署到生产环境 | [Docker 与部署](/guide/docker-deployment) | [Worker 与异步任务](/guide/background-worker) |
+
+## 分方向学习
 
 ### 🐍 Python 全栈后端（FastAPI 方向）
 

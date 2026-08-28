@@ -8,7 +8,7 @@ const githubPagesBase =
 
 export default withMermaid(defineConfig({
   title: '全栈知识站',
-  description: 'Python · Go · Node.js · NestJS — 写给前端工程师的全栈学习路径',
+  description: 'Python · Go · Node.js · NestJS · Java — 写给前端与 AI 应用开发者的全栈学习路径',
   lang: 'zh-CN',
   base: process.env.VITEPRESS_BASE ?? githubPagesBase,
   cleanUrls: true,
@@ -19,6 +19,7 @@ export default withMermaid(defineConfig({
     siteTitle: '全栈知识站',
     nav: [
       { text: '首页', link: '/' },
+      { text: '知识地图', link: '/guide/knowledge-map' },
       {
         text: 'Python',
         items: [
@@ -87,6 +88,15 @@ export default withMermaid(defineConfig({
     ],
     sidebar: [
       {
+        text: '🧭 开始这里',
+        collapsed: false,
+        items: [
+          { text: '全栈知识地图', link: '/guide/knowledge-map' },
+          { text: '这套教程怎么学', link: '/guide/learning-path' },
+          { text: '后端思维补齐', link: '/guide/backend-thinking' },
+        ]
+      },
+      {
         text: '🐍 Python 语法',
         collapsed: false,
         items: [
@@ -99,8 +109,6 @@ export default withMermaid(defineConfig({
         text: '⚡ FastAPI 开发',
         collapsed: false,
         items: [
-          { text: '学习路线', link: '/guide/learning-path' },
-          { text: '后端思维补齐', link: '/guide/backend-thinking' },
           { text: 'FastAPI 基础', link: '/guide/fastapi-basics' },
           { text: 'FastAPI + MySQL 项目结构', link: '/guide/fastapi-mysql-project' },
           { text: 'FastAPI 进阶', link: '/guide/fastapi-advanced' },
@@ -195,8 +203,12 @@ export default withMermaid(defineConfig({
       },
     ],
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/' }
+      { icon: 'github', link: 'https://github.com/wahahaorg/fullstack-road' }
     ],
+    editLink: {
+      pattern: 'https://github.com/wahahaorg/fullstack-road/edit/main/:path',
+      text: '在 GitHub 上编辑此页'
+    },
     search: {
       provider: 'local'
     },
