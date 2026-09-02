@@ -79,16 +79,50 @@ export default withMermaid(defineConfig({
       {
         text: 'NestJS',
         items: [
-          { text: '简介与架构', link: '/guide/nestjs-intro' },
-          { text: '依赖注入', link: '/guide/nestjs-di' },
+          {
+            text: '核心原理',
+            items: [
+              { text: '简介与架构', link: '/guide/nestjs-intro' },
+              { text: '装饰器体系', link: '/guide/nestjs-decorators' },
+              { text: '元数据与 Reflector', link: '/guide/nestjs-metadata-reflector' },
+              { text: '依赖注入', link: '/guide/nestjs-di' },
+              { text: '动态模块与配置', link: '/guide/nestjs-dynamic-module' },
+            ]
+          },
+          {
+            text: 'AOP 与数据',
+            items: [
+              { text: '请求生命周期', link: '/guide/nestjs-pipeline' },
+              { text: 'RxJS 与 Interceptor', link: '/guide/nestjs-rxjs-interceptor' },
+              { text: '参数校验与异常', link: '/guide/nestjs-validation-filter' },
+              { text: 'DTO 与 Swagger', link: '/guide/nestjs-dto' },
+              { text: 'TypeORM 实战', link: '/guide/nestjs-database' },
+              { text: 'Prisma', link: '/guide/nestjs-prisma' },
+            ]
+          },
+          {
+            text: '工程与架构',
+            items: [
+              { text: '认证与登录状态', link: '/guide/nestjs-auth' },
+              { text: '授权与三方登录', link: '/guide/nestjs-authorization' },
+              { text: '日志与可观测性', link: '/guide/nestjs-logging' },
+              { text: '实时通信', link: '/guide/nestjs-realtime' },
+              { text: '微服务与 gRPC', link: '/guide/nestjs-microservice' },
+              { text: '项目架构蓝图', link: '/guide/nestjs-project-blueprint' },
+            ]
+          },
         ]
       },
       {
         text: '运维',
         items: [
           { text: 'Docker 与部署', link: '/guide/docker-deployment' },
+          { text: 'Dockerfile 进阶', link: '/guide/dockerfile-practice' },
+          { text: 'Compose 与进程守护', link: '/guide/docker-compose-network' },
+          { text: 'Nginx 流量治理', link: '/guide/nginx-core' },
           { text: 'Worker 与异步任务', link: '/guide/background-worker' },
           { text: 'Redis 深入', link: '/guide/redis-deep' },
+          { text: 'Redis 实战场景', link: '/guide/redis-practice' },
           { text: '消息队列', link: '/guide/message-queue' },
         ]
       },
@@ -182,11 +216,13 @@ export default withMermaid(defineConfig({
         ]
       },
       {
-        text: '🗄️ MySQL 与建模',
+        text: '🗄️ 数据库与建模',
         collapsed: false,
         items: [
           { text: '表结构设计', link: '/guide/mysql-table-design' },
           { text: 'SQL 基础与查询', link: '/guide/sql-basics' },
+          { text: 'SQL 进阶与查询优化', link: '/guide/mysql-advanced' },
+          { text: 'MongoDB 与 Mongoose', link: '/guide/mongodb-mongoose' },
         ]
       },
       {
@@ -211,17 +247,60 @@ export default withMermaid(defineConfig({
         ]
       },
       {
-        text: '🏗️ NestJS',
+        text: '🏗️ NestJS 核心原理',
         collapsed: false,
         items: [
           { text: '简介与架构概览', link: '/guide/nestjs-intro' },
           { text: '装饰器体系', link: '/guide/nestjs-decorators' },
+          { text: '元数据与 Reflector', link: '/guide/nestjs-metadata-reflector' },
           { text: '依赖注入', link: '/guide/nestjs-di' },
-          { text: '请求管道', link: '/guide/nestjs-pipeline' },
-          { text: '认证与授权', link: '/guide/nestjs-auth' },
-          { text: 'DTO 与 Swagger', link: '/guide/nestjs-dto' },
-          { text: '数据库操作', link: '/guide/nestjs-database' },
-          { text: '进阶特性', link: '/guide/nestjs-advanced' },
+          { text: '动态模块与配置管理', link: '/guide/nestjs-dynamic-module' },
+        ]
+      },
+      {
+        text: '🔀 NestJS 请求处理',
+        collapsed: false,
+        items: [
+          { text: '请求生命周期与 AOP', link: '/guide/nestjs-pipeline' },
+          { text: 'RxJS 与 Interceptor 实战', link: '/guide/nestjs-rxjs-interceptor' },
+          { text: '参数校验与异常处理', link: '/guide/nestjs-validation-filter' },
+        ]
+      },
+      {
+        text: '📦 NestJS 接口与数据',
+        collapsed: false,
+        items: [
+          { text: 'DTO、序列化与 Swagger', link: '/guide/nestjs-dto' },
+          { text: '数据库操作（TypeORM）', link: '/guide/nestjs-database' },
+          { text: 'Prisma：另一种 ORM 思路', link: '/guide/nestjs-prisma' },
+          { text: 'GraphQL：另一种接口契约', link: '/guide/nestjs-graphql' },
+        ]
+      },
+      {
+        text: '🔐 NestJS 认证授权',
+        collapsed: false,
+        items: [
+          { text: '认证与登录状态', link: '/guide/nestjs-auth' },
+          { text: '授权模型与三方登录', link: '/guide/nestjs-authorization' },
+        ]
+      },
+      {
+        text: '🛠️ NestJS 工程实践',
+        collapsed: false,
+        items: [
+          { text: '文件上传与大文件处理', link: '/guide/nestjs-file-upload' },
+          { text: '日志与可观测性', link: '/guide/nestjs-logging' },
+          { text: '定时任务与事件驱动', link: '/guide/nestjs-schedule-events' },
+          { text: '生产环境清单', link: '/guide/nestjs-advanced' },
+        ]
+      },
+      {
+        text: '🌐 NestJS 通信与架构',
+        collapsed: false,
+        items: [
+          { text: '实时通信：WebSocket 与 SSE', link: '/guide/nestjs-realtime' },
+          { text: '微服务与跨语言通信', link: '/guide/nestjs-microservice' },
+          { text: '项目架构蓝图', link: '/guide/nestjs-project-blueprint' },
         ]
       },
       {
@@ -229,6 +308,9 @@ export default withMermaid(defineConfig({
         collapsed: false,
         items: [
           { text: 'Docker 与部署', link: '/guide/docker-deployment' },
+          { text: 'Dockerfile 进阶', link: '/guide/dockerfile-practice' },
+          { text: 'Compose、网络与进程守护', link: '/guide/docker-compose-network' },
+          { text: 'Nginx：反向代理与流量治理', link: '/guide/nginx-core' },
         ]
       },
       {
@@ -237,6 +319,7 @@ export default withMermaid(defineConfig({
         items: [
           { text: 'Worker 与异步任务', link: '/guide/background-worker' },
           { text: 'Redis 深入', link: '/guide/redis-deep' },
+          { text: 'Redis 实战：五个业务场景', link: '/guide/redis-practice' },
           { text: '消息队列', link: '/guide/message-queue' },
         ]
       },

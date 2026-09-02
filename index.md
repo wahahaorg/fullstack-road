@@ -46,7 +46,7 @@ features:
     details: 事件循环、Stream、模块系统、async/await、错误处理，覆盖 2026 年最新面试高频题，附 7 个实战练习。
   - icon: 🏗️
     title: NestJS 工程实践
-    details: 从装饰器体系到 DI/IoC，从 JWT 鉴权到 TypeORM 事务，60 道面试题全面覆盖，剔除过时内容。
+    details: 20 章完整体系。从装饰器与元数据底层，到 DI、动态模块、AOP 五件套，再到 TypeORM/Prisma、鉴权、微服务与 gRPC 跨语言调用。
   - icon: 🗄️
     title: MySQL 与并发一致性
     details: 表结构设计、SQL 查询优化、事务隔离级别、分布式锁，从业务场景出发，不只是背概念。
@@ -125,10 +125,13 @@ Node 运行时与事件循环 → 模块系统（CJS/ESM）
 ### 🏗️ NestJS 工程能力
 
 ```
-NestJS 简介与架构 → 装饰器体系 → 依赖注入
-  → 请求管道（Middleware/Guard/Interceptor/Pipe）
-  → 认证与授权（JWT）→ DTO 与 Swagger
-  → 数据库操作（TypeORM）→ 进阶特性
+核心原理：简介与架构 → 装饰器体系 → 元数据与 Reflector
+  → 依赖注入 → 动态模块与配置管理
+请求处理：请求生命周期与 AOP → RxJS 与 Interceptor → 参数校验与异常
+接口与数据：DTO 与 Swagger → TypeORM → Prisma → GraphQL
+认证授权：认证与登录状态 → 授权模型与三方登录
+工程实践：文件上传 → 日志与可观测性 → 定时任务与事件 → 生产环境清单
+通信与架构：实时通信 → 微服务与 gRPC → 项目架构蓝图
 ```
 
 ### 🐳 部署与基础设施（所有方向通用）
@@ -161,11 +164,11 @@ Java 去陌生化 → 核心语法 → 数据结构 → 理解 Java 工程
 | **🔍 RAG 检索** | 4 章 | 入库链路（解析·切分·元数据）/ 混合检索（BM25+向量+RRF+Rerank）/ 引用溯源与拒答降级 / 多模态文档与区域级引用 |
 | **Python** | 3 章 | 基础语法、类与 OOP、异步、类型系统 |
 | **FastAPI** | 4 章 | 基础 → 项目结构 → 进阶（测试/中间件/WebSocket） |
-| **MySQL** | 2 章 | 建模 + SQL 查询 |
+| **数据库与建模** | 4 章 | 表结构设计 / SQL 基础 / SQL 进阶与查询优化 / MongoDB 与 Mongoose |
 | **并发事务** | 2 章 | 事务原理 + 综合练习 |
 | **Node.js** | 7 章 | 运行时 / 模块 / 异步 / Stream / HTTP / 性能 / 实战 |
-| **NestJS** | 8 章 | 介绍 / 装饰器 / DI / 管道 / 鉴权 / DTO / 数据库 / 进阶 |
-| **Docker 与部署** | 1 章 | 容器化 / docker-compose / nginx / PM2 / CI/CD |
-| **基础设施** | 3 章 | Worker 与异步任务 / Redis 深入 / 消息队列 |
+| **NestJS** | 20 章 | 核心原理（架构·装饰器·元数据·DI·动态模块）/ 请求处理（生命周期·RxJS·校验异常）/ 接口与数据（DTO·TypeORM·Prisma·GraphQL）/ 认证授权 / 工程实践（上传·日志·定时任务·生产清单）/ 通信与架构（实时·微服务·项目蓝图） |
+| **Docker 与部署** | 4 章 | 容器化与部署 / Dockerfile 进阶 / Compose 与进程守护 / Nginx 流量治理 |
+| **基础设施** | 4 章 | Worker 与异步任务 / Redis 深入 / Redis 实战场景 / 消息队列 |
 | **Go** | 4 章 | 快速入门 → 类型与泛型 → 并发模式 → 工程化实战 |
 | **☕ Java** | 11 章 | 去陌生化 → 语法 → 数据结构 → 工程 → Spring Boot → 数据库 → 鉴权 → 调用 Python → 实战 → 阅读项目 → 招聘判断 |

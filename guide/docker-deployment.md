@@ -90,7 +90,7 @@ CMD ["node", "dist/main.js"]
 
 ### .dockerignore（防止把不需要的文件打包进镜像）
 
-```dockerignore
+```text
 node_modules
 .git
 .gitignore

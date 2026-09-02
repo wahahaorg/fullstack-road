@@ -20,7 +20,7 @@ description: 按目标、技术栈与能力层级浏览全栈知识站的全部�
 | 做自然语言取数（Text2SQL） | [Text2SQL 与 Schema Linking](./agent-text2sql) | [SQL 基础与查询](./sql-basics) → [评测方法](./agent-eval) | 一条生成受约束、执行有兜底的取数链路 |
 | 前端转 Python 后端 | [Python 快速入门](./python-intro) | [FastAPI 基础](./fastapi-basics) → [项目结构](./fastapi-mysql-project) | 一个分层清晰、可连接 MySQL 的 API |
 | 强化 Node.js 面试 | [Node.js 运行时](./node-runtime) | [异步编程](./node-async) → [性能与稳定性](./node-perf) → [实战练习](./node-practice) | 能从运行时原理解释线上问题 |
-| 系统掌握 NestJS | [NestJS 架构概览](./nestjs-intro) | [依赖注入](./nestjs-di) → [请求管道](./nestjs-pipeline) → [认证授权](./nestjs-auth) | 一套可维护的企业级接口骨架 |
+| 系统掌握 NestJS | [NestJS 架构概览](./nestjs-intro) | [依赖注入](./nestjs-di) → [请求生命周期](./nestjs-pipeline) → [认证与登录状态](./nestjs-auth) → [项目架构蓝图](./nestjs-project-blueprint) | 一套可维护的企业级接口骨架 |
 | 转向 Java / Spring Boot | [Java 学习路线](./java-learning-path) | [核心语法](./java-core-syntax) → [理解工程](./java-engineering) → [Spring Boot](./java-springboot-intro) | 能读懂并参与 Java 后端项目 |
 | 学习 Go 高并发服务 | [Go 快速入门](./go-intro) | [类型与泛型](./go-advanced-types) → [并发模式](./go-advanced-concurrency) → [工程化](./go-advanced-engineering) | 能写并解释并发 HTTP 服务 |
 | 补齐数据库与一致性 | [后端思维补齐](./backend-thinking) | [表结构设计](./mysql-table-design) → [SQL](./sql-basics) → [事务与一致性](./concurrency-transaction) | 能设计数据模型并处理并发写入 |
@@ -48,7 +48,7 @@ description: 按目标、技术栈与能力层级浏览全栈知识站的全部�
 ### 2. Web 框架与接口设计
 
 - **FastAPI**：[基础](./fastapi-basics) · [MySQL 项目结构](./fastapi-mysql-project) · [生产级进阶](./fastapi-advanced)
-- **NestJS**：[架构](./nestjs-intro) · [装饰器](./nestjs-decorators) · [依赖注入](./nestjs-di) · [请求管道](./nestjs-pipeline) · [DTO 与 Swagger](./nestjs-dto)
+- **NestJS**：[架构](./nestjs-intro) · [装饰器](./nestjs-decorators) · [元数据与 Reflector](./nestjs-metadata-reflector) · [依赖注入](./nestjs-di) · [动态模块](./nestjs-dynamic-module) · [请求生命周期](./nestjs-pipeline) · [RxJS 与 Interceptor](./nestjs-rxjs-interceptor) · [校验与异常](./nestjs-validation-filter) · [DTO 与 Swagger](./nestjs-dto) · [TypeORM](./nestjs-database) · [Prisma](./nestjs-prisma) · [GraphQL](./nestjs-graphql) · [文件上传](./nestjs-file-upload) · [日志](./nestjs-logging) · [定时任务与事件](./nestjs-schedule-events) · [实时通信](./nestjs-realtime) · [微服务](./nestjs-microservice) · [生产清单](./nestjs-advanced) · [项目蓝图](./nestjs-project-blueprint)
 - **Spring Boot**：[框架入门](./java-springboot-intro) · [数据库](./java-database) · [鉴权](./java-auth) · [调用 Python Agent](./java-call-python)
 - **Node 原生能力**：[HTTP 与 BFF](./node-http) · [性能与稳定性](./node-perf)
 
@@ -57,11 +57,11 @@ description: 按目标、技术栈与能力层级浏览全栈知识站的全部�
 - **建模与查询**：[MySQL 表结构设计](./mysql-table-design) · [SQL 基础与查询](./sql-basics)
 - **一致性**：[并发、事务与一致性](./concurrency-transaction) · [Redis 深入](./redis-deep)
 - **异步系统**：[Worker 与异步任务](./background-worker) · [消息队列](./message-queue)
-- **认证授权**：[NestJS 认证与授权](./nestjs-auth) · [Java 登录与鉴权](./java-auth)
+- **认证授权**：[NestJS 认证与登录状态](./nestjs-auth) · [授权模型与三方登录](./nestjs-authorization) · [Java 登录与鉴权](./java-auth)
 
 ### 4. 工程、部署与实战
 
-- **部署**：[Docker 与部署](./docker-deployment)
+- **部署**：[Docker 与部署](./docker-deployment) · [Dockerfile 进阶](./dockerfile-practice) · [Compose 与进程守护](./docker-compose-network) · [Nginx 流量治理](./nginx-core)
 - **完整项目**：[FastAPI + MySQL 项目](./fastapi-mysql-project) · [Java 学习时间记录系统](./java-project-practice)
 - **代码阅读**：[阅读陌生 Java 项目](./java-reading-project)
 - **练习与面试**：[综合练习](./exercises) · [Node.js 实战练习](./node-practice) · [Java 招聘要求判断](./java-job-requirements)
