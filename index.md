@@ -33,8 +33,8 @@ hero:
 
 features:
   - icon: 🤖
-    title: Agent 工程
-    details: LangGraph 状态机与 Checkpoint、Tool Calling 与工具安全分级、Multi-Agent 编排与人工兜底、MCP 协议。从能跑到能上生产的那段路。
+    title: Agent 工程与生产化
+    details: 从 LangGraph、Tool Calling、Multi-Agent 编排到安全、可观测性、预算熔断和评测，串起从能跑到稳定上线的完整路径。
   - icon: 🔍
     title: RAG 检索
     details: 解析与层级切分、元数据设计、BM25 + 向量双路召回、RRF 融合与 Rerank 精排、引用溯源与拒答降级，附评测方法。
@@ -42,11 +42,8 @@ features:
     title: Python 语法 + FastAPI
     details: 面向 JS 开发者的 Python 快速迁移，配合 FastAPI + SQLAlchemy 2.x + Pydantic v2 的生产级用法。
   - icon: 🟢
-    title: Node.js 深度原理
-    details: 事件循环、Stream、模块系统、async/await、错误处理，覆盖 2026 年最新面试高频题，附 7 个实战练习。
-  - icon: 🏗️
-    title: NestJS 工程实践
-    details: 20 章完整体系。从装饰器与元数据底层，到 DI、动态模块、AOP 五件套，再到 TypeORM/Prisma、鉴权、微服务与 gRPC 跨语言调用。
+    title: Node.js 与 NestJS 后端
+    details: 从事件循环、Stream、模块系统和错误处理，进阶到 NestJS 的 DI、AOP、数据层、鉴权、微服务与项目架构。
   - icon: 🗄️
     title: MySQL 与并发一致性
     details: 表结构设计、SQL 查询优化、事务隔离级别、分布式锁，从业务场景出发，不只是背概念。
@@ -114,17 +111,13 @@ Python 语法入门 → 深入理解类 → Python 工程进阶 → FastAPI 基�
   → 并发事务 → 综合练习
 ```
 
-### 🟢 Node.js 全栈（面试强化）
+### 🟢 Node.js 与 NestJS 后端
 
 ```
 Node 运行时与事件循环 → 模块系统（CJS/ESM）
   → 异步编程与错误处理 → Stream 与 Buffer
   → HTTP 与 BFF → 性能与稳定性 → 综合场景练习
-```
 
-### 🏗️ NestJS 工程能力
-
-```
 核心原理：简介与架构 → 装饰器体系 → 元数据与 Reflector
   → 依赖注入 → 动态模块与配置管理
 请求处理：请求生命周期与 AOP → RxJS 与 Interceptor → 参数校验与异常
@@ -159,15 +152,12 @@ Java 去陌生化 → 核心语法 → 数据结构 → 理解 Java 工程
 
 | 模块 | 章节数 | 核心内容 |
 |---|---|---|
-| **🤖 Agent 工程** | 8 章 | 能力阶梯与 ReAct / 范式与框架选型 / LangGraph 状态机与 Checkpoint / Tool Calling 与 MCP / Multi-Agent 与 HITL / SSE 流式 / Text2SQL / 评测方法 |
-| **🛡️ Agent 生产化** | 4 章 | Prompt 注入攻防与守护栏 / 可观测性与成本性能 / 预算熔断与断点续跑 / 上下文工程与长任务 |
+| **🤖 Agent 工程与生产化** | 12 章 | 范式与编排 / Tool Calling 与 MCP / 流式与 Text2SQL / 安全守护栏 / 可观测性 / 可靠性 / 上下文工程 / 评测 |
 | **🔍 RAG 检索** | 4 章 | 入库链路（解析·切分·元数据）/ 混合检索（BM25+向量+RRF+Rerank）/ 引用溯源与拒答降级 / 多模态文档与区域级引用 |
-| **Python** | 3 章 | 基础语法、类与 OOP、异步、类型系统 |
-| **FastAPI** | 4 章 | 基础 → 项目结构 → 进阶（测试/中间件/WebSocket） |
+| **Python 与 FastAPI** | 6 章 | Python 语法、类与工程化 → FastAPI 基础、MySQL 项目与进阶 |
 | **数据库与建模** | 4 章 | 表结构设计 / SQL 基础 / SQL 进阶与查询优化 / MongoDB 与 Mongoose |
 | **并发事务** | 2 章 | 事务原理 + 综合练习 |
-| **Node.js** | 7 章 | 运行时 / 模块 / 异步 / Stream / HTTP / 性能 / 实战 |
-| **NestJS** | 21 章 | 核心原理（架构·装饰器·元数据·DI·动态模块）/ 请求处理（生命周期·RxJS·校验异常）/ 接口与数据（DTO·TypeORM·Prisma·GraphQL）/ 认证授权 / 工程实践（上传·日志·定时任务·生产清单）/ 通信与架构（实时·微服务·项目蓝图） |
+| **Node.js 与 NestJS** | 28 章 | Node.js 运行时与编程模型 → NestJS 核心、请求处理、数据认证、工程与架构 |
 | **Docker 与部署** | 4 章 | 容器化与部署 / Dockerfile 进阶 / Compose 与进程守护 / Nginx 流量治理 |
 | **基础设施** | 4 章 | Worker 与异步任务 / Redis 深入 / Redis 实战场景 / 消息队列 |
 | **Go** | 4 章 | 快速入门 → 类型与泛型 → 并发模式 → 工程化实战 |

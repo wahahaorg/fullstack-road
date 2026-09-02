@@ -23,29 +23,34 @@ export default withMermaid(defineConfig({
       { text: '首页', link: '/' },
       { text: '知识地图', link: '/guide/knowledge-map' },
       {
-        text: '🤖 Agent',
+        text: 'AI 工程',
         items: [
-          { text: 'Agent 工程总览', link: '/guide/agent-intro' },
-          { text: '范式与框架选型', link: '/guide/agent-patterns' },
-          { text: 'LangGraph 状态机', link: '/guide/agent-langgraph' },
-          { text: 'Tool Calling 与 MCP', link: '/guide/agent-tool-calling' },
-          { text: 'Multi-Agent 与人工兜底', link: '/guide/agent-multi-agent' },
-          { text: 'SSE 流式', link: '/guide/agent-streaming' },
-          { text: 'Text2SQL', link: '/guide/agent-text2sql' },
-          { text: 'Agent 评测', link: '/guide/agent-eval' },
+          {
+            text: 'Agent 工程',
+            items: [
+              { text: '工程总览', link: '/guide/agent-intro' },
+              { text: '范式与框架选型', link: '/guide/agent-patterns' },
+              { text: 'LangGraph 状态机', link: '/guide/agent-langgraph' },
+              { text: 'Tool Calling 与 MCP', link: '/guide/agent-tool-calling' },
+              { text: 'Multi-Agent 与人工兜底', link: '/guide/agent-multi-agent' },
+              { text: 'SSE 流式', link: '/guide/agent-streaming' },
+              { text: 'Text2SQL', link: '/guide/agent-text2sql' },
+            ]
+          },
+          {
+            text: '生产化',
+            items: [
+              { text: 'Prompt 注入攻防', link: '/guide/agent-security' },
+              { text: '可观测性、成本与性能', link: '/guide/agent-observability' },
+              { text: '生产可靠性', link: '/guide/agent-reliability' },
+              { text: '上下文工程', link: '/guide/agent-context' },
+              { text: 'Agent 与 RAG 评测', link: '/guide/agent-eval' },
+            ]
+          },
         ]
       },
       {
-        text: '🛡️ 生产化',
-        items: [
-          { text: 'Prompt 注入攻防', link: '/guide/agent-security' },
-          { text: '可观测性、成本与性能', link: '/guide/agent-observability' },
-          { text: '生产可靠性', link: '/guide/agent-reliability' },
-          { text: '上下文工程', link: '/guide/agent-context' },
-        ]
-      },
-      {
-        text: '🔍 RAG',
+        text: 'RAG',
         items: [
           { text: 'RAG 入库链路', link: '/guide/rag-pipeline' },
           { text: '混合检索与 Rerank', link: '/guide/rag-retrieval' },
@@ -54,60 +59,47 @@ export default withMermaid(defineConfig({
         ]
       },
       {
-        text: 'Python',
-        items: [
-          { text: '语法入门', link: '/guide/python-intro' },
-          { text: '深入理解类', link: '/guide/python-class' },
-          { text: '工程进阶', link: '/guide/python-engineering' },
-        ]
-      },
-      {
-        text: 'FastAPI',
-        items: [
-          { text: 'FastAPI 基础', link: '/guide/fastapi-basics' },
-          { text: 'FastAPI 进阶', link: '/guide/fastapi-advanced' },
-        ]
-      },
-      {
-        text: 'Node.js',
-        items: [
-          { text: '运行时原理', link: '/guide/node-runtime' },
-          { text: '模块系统', link: '/guide/node-module-system' },
-          { text: '异步与错误处理', link: '/guide/node-async' },
-        ]
-      },
-      {
-        text: 'NestJS',
+        text: 'Python 后端',
         items: [
           {
-            text: '核心原理',
+            text: 'Python',
             items: [
-              { text: '简介与架构', link: '/guide/nestjs-intro' },
-              { text: '装饰器体系', link: '/guide/nestjs-decorators' },
-              { text: '元数据与 Reflector', link: '/guide/nestjs-metadata-reflector' },
-              { text: '依赖注入', link: '/guide/nestjs-di' },
-              { text: '动态模块与配置', link: '/guide/nestjs-dynamic-module' },
+              { text: '语法入门', link: '/guide/python-intro' },
+              { text: '深入理解类', link: '/guide/python-class' },
+              { text: '工程进阶', link: '/guide/python-engineering' },
             ]
           },
           {
-            text: 'AOP 与数据',
+            text: 'FastAPI',
             items: [
+              { text: '基础', link: '/guide/fastapi-basics' },
+              { text: 'MySQL 项目实战', link: '/guide/fastapi-mysql-project' },
+              { text: '进阶', link: '/guide/fastapi-advanced' },
+            ]
+          },
+        ]
+      },
+      {
+        text: 'Node 后端',
+        items: [
+          {
+            text: 'Node.js',
+            items: [
+              { text: '运行时原理', link: '/guide/node-runtime' },
+              { text: '模块系统', link: '/guide/node-module-system' },
+              { text: '异步与错误处理', link: '/guide/node-async' },
+              { text: 'Stream 与 Buffer', link: '/guide/node-stream' },
+              { text: 'HTTP 与 BFF', link: '/guide/node-http' },
+            ]
+          },
+          {
+            text: 'NestJS',
+            items: [
+              { text: '核心原理', link: '/guide/nestjs-intro' },
               { text: '请求生命周期', link: '/guide/nestjs-pipeline' },
-              { text: 'RxJS 与 Interceptor', link: '/guide/nestjs-rxjs-interceptor' },
-              { text: '参数校验与异常', link: '/guide/nestjs-validation-filter' },
-              { text: 'DTO 与 Swagger', link: '/guide/nestjs-dto' },
-              { text: 'TypeORM 实战', link: '/guide/nestjs-database' },
-              { text: 'Prisma', link: '/guide/nestjs-prisma' },
-            ]
-          },
-          {
-            text: '工程与架构',
-            items: [
-              { text: '认证与登录状态', link: '/guide/nestjs-auth' },
-              { text: '授权与三方登录', link: '/guide/nestjs-authorization' },
-              { text: '日志与可观测性', link: '/guide/nestjs-logging' },
-              { text: '实时通信', link: '/guide/nestjs-realtime' },
-              { text: '微服务与 gRPC', link: '/guide/nestjs-microservice' },
+              { text: '数据与接口', link: '/guide/nestjs-dto' },
+              { text: '认证与授权', link: '/guide/nestjs-auth' },
+              { text: '工程与通信', link: '/guide/nestjs-advanced' },
               { text: '项目架构蓝图', link: '/guide/nestjs-project-blueprint' },
             ]
           },
@@ -136,7 +128,7 @@ export default withMermaid(defineConfig({
         ]
       },
       {
-        text: '☕ Java',
+        text: 'Java',
         items: [
           { text: '学习路线', link: '/guide/java-learning-path' },
           { text: '1. Java 去陌生化', link: '/guide/java-intro' },
@@ -164,32 +156,38 @@ export default withMermaid(defineConfig({
         ]
       },
       {
-        text: '🤖 Agent 工程',
-        collapsed: false,
+        text: '🤖 AI 工程',
+        collapsed: true,
         items: [
-          { text: 'Agent 工程总览', link: '/guide/agent-intro' },
-          { text: 'Agent 范式与框架选型', link: '/guide/agent-patterns' },
-          { text: 'LangGraph 状态机与 Checkpoint', link: '/guide/agent-langgraph' },
-          { text: 'Tool Calling、工具安全与 MCP', link: '/guide/agent-tool-calling' },
-          { text: 'Multi-Agent 编排、路由与人工兜底', link: '/guide/agent-multi-agent' },
-          { text: 'SSE 流式与阶段事件协议', link: '/guide/agent-streaming' },
-          { text: 'Text2SQL 与 Schema Linking', link: '/guide/agent-text2sql' },
-          { text: 'Agent 与 RAG 评测方法', link: '/guide/agent-eval' },
-        ]
-      },
-      {
-        text: '🛡️ Agent 生产化',
-        collapsed: false,
-        items: [
-          { text: 'Prompt 注入攻防与守护栏', link: '/guide/agent-security' },
-          { text: '可观测性、成本与性能', link: '/guide/agent-observability' },
-          { text: '生产可靠性：预算与熔断', link: '/guide/agent-reliability' },
-          { text: '上下文工程与长任务', link: '/guide/agent-context' },
+          {
+            text: 'Agent 工程',
+            collapsed: false,
+            items: [
+              { text: '工程总览', link: '/guide/agent-intro' },
+              { text: '范式与框架选型', link: '/guide/agent-patterns' },
+              { text: 'LangGraph 状态机与 Checkpoint', link: '/guide/agent-langgraph' },
+              { text: 'Tool Calling、工具安全与 MCP', link: '/guide/agent-tool-calling' },
+              { text: 'Multi-Agent 编排与人工兜底', link: '/guide/agent-multi-agent' },
+              { text: 'SSE 流式与事件协议', link: '/guide/agent-streaming' },
+              { text: 'Text2SQL 与 Schema Linking', link: '/guide/agent-text2sql' },
+            ]
+          },
+          {
+            text: '生产化与评测',
+            collapsed: true,
+            items: [
+              { text: 'Prompt 注入攻防与守护栏', link: '/guide/agent-security' },
+              { text: '可观测性、成本与性能', link: '/guide/agent-observability' },
+              { text: '生产可靠性：预算与熔断', link: '/guide/agent-reliability' },
+              { text: '上下文工程与长任务', link: '/guide/agent-context' },
+              { text: 'Agent 与 RAG 评测方法', link: '/guide/agent-eval' },
+            ]
+          },
         ]
       },
       {
         text: '🔍 RAG 检索',
-        collapsed: false,
+        collapsed: true,
         items: [
           { text: 'RAG 入库链路', link: '/guide/rag-pipeline' },
           { text: '混合检索：BM25 + 向量 + RRF', link: '/guide/rag-retrieval' },
@@ -198,26 +196,32 @@ export default withMermaid(defineConfig({
         ]
       },
       {
-        text: '🐍 Python 语法',
-        collapsed: false,
+        text: '🐍 Python 后端',
+        collapsed: true,
         items: [
-          { text: 'Python 快速入门', link: '/guide/python-intro' },
-          { text: '深入理解类', link: '/guide/python-class' },
-          { text: 'Python 工程进阶', link: '/guide/python-engineering' },
-        ]
-      },
-      {
-        text: '⚡ FastAPI 开发',
-        collapsed: false,
-        items: [
-          { text: 'FastAPI 基础', link: '/guide/fastapi-basics' },
-          { text: 'FastAPI + MySQL 项目结构', link: '/guide/fastapi-mysql-project' },
-          { text: 'FastAPI 进阶', link: '/guide/fastapi-advanced' },
+          {
+            text: 'Python 语言',
+            collapsed: false,
+            items: [
+              { text: '快速入门', link: '/guide/python-intro' },
+              { text: '深入理解类', link: '/guide/python-class' },
+              { text: '工程进阶', link: '/guide/python-engineering' },
+            ]
+          },
+          {
+            text: 'FastAPI 开发',
+            collapsed: false,
+            items: [
+              { text: '基础', link: '/guide/fastapi-basics' },
+              { text: 'MySQL 项目实战', link: '/guide/fastapi-mysql-project' },
+              { text: '进阶', link: '/guide/fastapi-advanced' },
+            ]
+          },
         ]
       },
       {
         text: '🗄️ 数据库与建模',
-        collapsed: false,
+        collapsed: true,
         items: [
           { text: '表结构设计', link: '/guide/mysql-table-design' },
           { text: 'SQL 基础与查询', link: '/guide/sql-basics' },
@@ -227,85 +231,73 @@ export default withMermaid(defineConfig({
       },
       {
         text: '🔐 并发与事务',
-        collapsed: false,
+        collapsed: true,
         items: [
           { text: '并发、事务与一致性', link: '/guide/concurrency-transaction' },
           { text: '综合练习', link: '/guide/exercises' },
         ]
       },
       {
-        text: '🟢 Node.js',
-        collapsed: false,
+        text: '🟢 Node 后端',
+        collapsed: true,
         items: [
-          { text: '运行时与底层模型', link: '/guide/node-runtime' },
-          { text: '模块系统（CJS/ESM）', link: '/guide/node-module-system' },
-          { text: '异步编程与错误处理', link: '/guide/node-async' },
-          { text: 'EventEmitter · Buffer · Stream', link: '/guide/node-stream' },
-          { text: 'HTTP 与 BFF', link: '/guide/node-http' },
-          { text: '性能与稳定性', link: '/guide/node-perf' },
-          { text: '综合场景与实战练习', link: '/guide/node-practice' },
-        ]
-      },
-      {
-        text: '🏗️ NestJS 核心原理',
-        collapsed: false,
-        items: [
-          { text: '简介与架构概览', link: '/guide/nestjs-intro' },
-          { text: '装饰器体系', link: '/guide/nestjs-decorators' },
-          { text: '元数据与 Reflector', link: '/guide/nestjs-metadata-reflector' },
-          { text: '依赖注入', link: '/guide/nestjs-di' },
-          { text: '动态模块与配置管理', link: '/guide/nestjs-dynamic-module' },
-        ]
-      },
-      {
-        text: '🔀 NestJS 请求处理',
-        collapsed: false,
-        items: [
-          { text: '请求生命周期与 AOP', link: '/guide/nestjs-pipeline' },
-          { text: 'RxJS 与 Interceptor 实战', link: '/guide/nestjs-rxjs-interceptor' },
-          { text: '参数校验与异常处理', link: '/guide/nestjs-validation-filter' },
-        ]
-      },
-      {
-        text: '📦 NestJS 接口与数据',
-        collapsed: false,
-        items: [
-          { text: 'DTO、序列化与 Swagger', link: '/guide/nestjs-dto' },
-          { text: '数据库操作（TypeORM）', link: '/guide/nestjs-database' },
-          { text: 'Prisma：另一种 ORM 思路', link: '/guide/nestjs-prisma' },
-          { text: 'GraphQL：另一种接口契约', link: '/guide/nestjs-graphql' },
-        ]
-      },
-      {
-        text: '🔐 NestJS 认证授权',
-        collapsed: false,
-        items: [
-          { text: '认证与登录状态', link: '/guide/nestjs-auth' },
-          { text: '授权模型与三方登录', link: '/guide/nestjs-authorization' },
-        ]
-      },
-      {
-        text: '🛠️ NestJS 工程实践',
-        collapsed: false,
-        items: [
-          { text: '文件上传与大文件处理', link: '/guide/nestjs-file-upload' },
-          { text: '日志与可观测性', link: '/guide/nestjs-logging' },
-          { text: '定时任务与事件驱动', link: '/guide/nestjs-schedule-events' },
-          { text: '生产环境清单', link: '/guide/nestjs-advanced' },
-        ]
-      },
-      {
-        text: '🌐 NestJS 通信与架构',
-        collapsed: false,
-        items: [
-          { text: '实时通信：WebSocket 与 SSE', link: '/guide/nestjs-realtime' },
-          { text: '微服务与跨语言通信', link: '/guide/nestjs-microservice' },
-          { text: '项目架构蓝图', link: '/guide/nestjs-project-blueprint' },
+          {
+            text: 'Node.js 基础',
+            collapsed: false,
+            items: [
+              { text: '运行时与底层模型', link: '/guide/node-runtime' },
+              { text: '模块系统（CJS/ESM）', link: '/guide/node-module-system' },
+              { text: '异步编程与错误处理', link: '/guide/node-async' },
+              { text: 'EventEmitter · Buffer · Stream', link: '/guide/node-stream' },
+              { text: 'HTTP 与 BFF', link: '/guide/node-http' },
+              { text: '性能与稳定性', link: '/guide/node-perf' },
+              { text: '综合场景与实战练习', link: '/guide/node-practice' },
+            ]
+          },
+          {
+            text: 'NestJS 核心与请求',
+            collapsed: true,
+            items: [
+              { text: '简介与架构概览', link: '/guide/nestjs-intro' },
+              { text: '装饰器体系', link: '/guide/nestjs-decorators' },
+              { text: '元数据与 Reflector', link: '/guide/nestjs-metadata-reflector' },
+              { text: '依赖注入', link: '/guide/nestjs-di' },
+              { text: '动态模块与配置管理', link: '/guide/nestjs-dynamic-module' },
+              { text: '请求生命周期与 AOP', link: '/guide/nestjs-pipeline' },
+              { text: 'RxJS 与 Interceptor', link: '/guide/nestjs-rxjs-interceptor' },
+              { text: '参数校验与异常处理', link: '/guide/nestjs-validation-filter' },
+            ]
+          },
+          {
+            text: 'NestJS 数据与认证',
+            collapsed: true,
+            items: [
+              { text: 'DTO、序列化与 Swagger', link: '/guide/nestjs-dto' },
+              { text: '数据库操作（TypeORM）', link: '/guide/nestjs-database' },
+              { text: 'Prisma ORM', link: '/guide/nestjs-prisma' },
+              { text: 'GraphQL 接口契约', link: '/guide/nestjs-graphql' },
+              { text: '认证与登录状态', link: '/guide/nestjs-auth' },
+              { text: '授权模型与三方登录', link: '/guide/nestjs-authorization' },
+            ]
+          },
+          {
+            text: 'NestJS 工程与架构',
+            collapsed: true,
+            items: [
+              { text: '文件上传与大文件处理', link: '/guide/nestjs-file-upload' },
+              { text: '日志与可观测性', link: '/guide/nestjs-logging' },
+              { text: '定时任务与事件驱动', link: '/guide/nestjs-schedule-events' },
+              { text: '生产环境清单', link: '/guide/nestjs-advanced' },
+              { text: '实时通信：WebSocket 与 SSE', link: '/guide/nestjs-realtime' },
+              { text: '微服务与跨语言通信', link: '/guide/nestjs-microservice' },
+              { text: '项目架构蓝图', link: '/guide/nestjs-project-blueprint' },
+            ]
+          },
         ]
       },
       {
         text: '🐳 Docker 与部署',
-        collapsed: false,
+        collapsed: true,
         items: [
           { text: 'Docker 与部署', link: '/guide/docker-deployment' },
           { text: 'Dockerfile 进阶', link: '/guide/dockerfile-practice' },
@@ -315,7 +307,7 @@ export default withMermaid(defineConfig({
       },
       {
         text: '📦 基础设施',
-        collapsed: false,
+        collapsed: true,
         items: [
           { text: 'Worker 与异步任务', link: '/guide/background-worker' },
           { text: 'Redis 深入', link: '/guide/redis-deep' },
@@ -325,7 +317,7 @@ export default withMermaid(defineConfig({
       },
       {
         text: '🔵 Go 语言',
-        collapsed: false,
+        collapsed: true,
         items: [
           { text: 'Go 快速入门', link: '/guide/go-intro' },
           { text: '类型系统与泛型', link: '/guide/go-advanced-types' },
@@ -335,7 +327,7 @@ export default withMermaid(defineConfig({
       },
       {
         text: '☕ Java 快速入门',
-        collapsed: false,
+        collapsed: true,
         items: [
           { text: '学习路线', link: '/guide/java-learning-path' },
           { text: '1. Java 去陌生化', link: '/guide/java-intro' },
