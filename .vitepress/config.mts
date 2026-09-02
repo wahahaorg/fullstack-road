@@ -14,12 +14,45 @@ export default withMermaid(defineConfig({
   cleanUrls: true,
   lastUpdated: true,
   ignoreDeadLinks: true,
+  // prep/ 是本地私有的面试答辩材料，不参与站点构建，也已加入 .gitignore
+  srcExclude: ['prep/**'],
   themeConfig: {
     logo: '/logo.svg',
     siteTitle: '全栈知识站',
     nav: [
       { text: '首页', link: '/' },
       { text: '知识地图', link: '/guide/knowledge-map' },
+      {
+        text: '🤖 Agent',
+        items: [
+          { text: 'Agent 工程总览', link: '/guide/agent-intro' },
+          { text: '范式与框架选型', link: '/guide/agent-patterns' },
+          { text: 'LangGraph 状态机', link: '/guide/agent-langgraph' },
+          { text: 'Tool Calling 与 MCP', link: '/guide/agent-tool-calling' },
+          { text: 'Multi-Agent 与人工兜底', link: '/guide/agent-multi-agent' },
+          { text: 'SSE 流式', link: '/guide/agent-streaming' },
+          { text: 'Text2SQL', link: '/guide/agent-text2sql' },
+          { text: 'Agent 评测', link: '/guide/agent-eval' },
+        ]
+      },
+      {
+        text: '🛡️ 生产化',
+        items: [
+          { text: 'Prompt 注入攻防', link: '/guide/agent-security' },
+          { text: '可观测性、成本与性能', link: '/guide/agent-observability' },
+          { text: '生产可靠性', link: '/guide/agent-reliability' },
+          { text: '上下文工程', link: '/guide/agent-context' },
+        ]
+      },
+      {
+        text: '🔍 RAG',
+        items: [
+          { text: 'RAG 入库链路', link: '/guide/rag-pipeline' },
+          { text: '混合检索与 Rerank', link: '/guide/rag-retrieval' },
+          { text: '引用溯源与拒答', link: '/guide/rag-citation' },
+          { text: '多模态文档', link: '/guide/rag-multimodal' },
+        ]
+      },
       {
         text: 'Python',
         items: [
@@ -94,6 +127,40 @@ export default withMermaid(defineConfig({
           { text: '全栈知识地图', link: '/guide/knowledge-map' },
           { text: '这套教程怎么学', link: '/guide/learning-path' },
           { text: '后端思维补齐', link: '/guide/backend-thinking' },
+        ]
+      },
+      {
+        text: '🤖 Agent 工程',
+        collapsed: false,
+        items: [
+          { text: 'Agent 工程总览', link: '/guide/agent-intro' },
+          { text: 'Agent 范式与框架选型', link: '/guide/agent-patterns' },
+          { text: 'LangGraph 状态机与 Checkpoint', link: '/guide/agent-langgraph' },
+          { text: 'Tool Calling、工具安全与 MCP', link: '/guide/agent-tool-calling' },
+          { text: 'Multi-Agent 编排、路由与人工兜底', link: '/guide/agent-multi-agent' },
+          { text: 'SSE 流式与阶段事件协议', link: '/guide/agent-streaming' },
+          { text: 'Text2SQL 与 Schema Linking', link: '/guide/agent-text2sql' },
+          { text: 'Agent 与 RAG 评测方法', link: '/guide/agent-eval' },
+        ]
+      },
+      {
+        text: '🛡️ Agent 生产化',
+        collapsed: false,
+        items: [
+          { text: 'Prompt 注入攻防与守护栏', link: '/guide/agent-security' },
+          { text: '可观测性、成本与性能', link: '/guide/agent-observability' },
+          { text: '生产可靠性：预算与熔断', link: '/guide/agent-reliability' },
+          { text: '上下文工程与长任务', link: '/guide/agent-context' },
+        ]
+      },
+      {
+        text: '🔍 RAG 检索',
+        collapsed: false,
+        items: [
+          { text: 'RAG 入库链路', link: '/guide/rag-pipeline' },
+          { text: '混合检索：BM25 + 向量 + RRF', link: '/guide/rag-retrieval' },
+          { text: '引用溯源、拒答与降级', link: '/guide/rag-citation' },
+          { text: '多模态文档与区域级引用', link: '/guide/rag-multimodal' },
         ]
       },
       {

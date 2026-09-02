@@ -1,6 +1,6 @@
 ---
 title: 全栈知识地图
-description: 按目标、技术栈与能力层级浏览全栈知识站的 47 篇笔记
+description: 按目标、技术栈与能力层级浏览全栈知识站的全部笔记
 ---
 
 # 全栈知识地图
@@ -15,6 +15,9 @@ description: 按目标、技术栈与能力层级浏览全栈知识站的 47 篇
 
 | 你的目标 | 建议入口 | 接下来读 | 最终产出 |
 | --- | --- | --- | --- |
+| 做 Agent 应用开发 | [Agent 工程总览](./agent-intro) | [LangGraph 状态机](./agent-langgraph) → [Tool Calling 与 MCP](./agent-tool-calling) → [Multi-Agent 与人工兜底](./agent-multi-agent) | 一条可恢复、可审计、敢接敏感操作的 Agent 链路 |
+| 做能溯源的知识库问答 | [RAG 入库链路](./rag-pipeline) | [混合检索与 Rerank](./rag-retrieval) → [引用溯源与拒答](./rag-citation) → [评测方法](./agent-eval) | 一套带引用、能拒答、有评测数据支撑的 RAG 服务 |
+| 做自然语言取数（Text2SQL） | [Text2SQL 与 Schema Linking](./agent-text2sql) | [SQL 基础与查询](./sql-basics) → [评测方法](./agent-eval) | 一条生成受约束、执行有兜底的取数链路 |
 | 前端转 Python 后端 | [Python 快速入门](./python-intro) | [FastAPI 基础](./fastapi-basics) → [项目结构](./fastapi-mysql-project) | 一个分层清晰、可连接 MySQL 的 API |
 | 强化 Node.js 面试 | [Node.js 运行时](./node-runtime) | [异步编程](./node-async) → [性能与稳定性](./node-perf) → [实战练习](./node-practice) | 能从运行时原理解释线上问题 |
 | 系统掌握 NestJS | [NestJS 架构概览](./nestjs-intro) | [依赖注入](./nestjs-di) → [请求管道](./nestjs-pipeline) → [认证授权](./nestjs-auth) | 一套可维护的企业级接口骨架 |
@@ -24,6 +27,16 @@ description: 按目标、技术栈与能力层级浏览全栈知识站的 47 篇
 | 掌握部署与异步架构 | [Docker 与部署](./docker-deployment) | [Worker](./background-worker) → [Redis](./redis-deep) → [消息队列](./message-queue) | 能拆分 Web、任务与基础设施 |
 
 ## 能力分层
+
+### 0. Agent 与 RAG（AI 应用层）
+
+- **Agent 编排**：[工程总览](./agent-intro) · [范式与框架选型](./agent-patterns) · [LangGraph 状态机](./agent-langgraph) · [Tool Calling 与 MCP](./agent-tool-calling) · [Multi-Agent 与人工兜底](./agent-multi-agent)
+- **检索增强**：[入库链路](./rag-pipeline) · [混合检索与 Rerank](./rag-retrieval) · [引用溯源与拒答](./rag-citation) · [多模态文档](./rag-multimodal)
+- **数据问答**：[Text2SQL 与 Schema Linking](./agent-text2sql)
+- **交互与度量**：[SSE 流式与阶段事件](./agent-streaming) · [评测方法](./agent-eval)
+- **上生产**：[Prompt 注入攻防](./agent-security) · [可观测性与成本](./agent-observability) · [预算与熔断](./agent-reliability) · [上下文工程](./agent-context)
+
+这一层依赖下面所有层：Agent 的异步入库要用[Worker](./background-worker)，会话记忆要用[Redis](./redis-deep)，元数据要靠[表结构设计](./mysql-table-design)，流式接口要靠[FastAPI 进阶](./fastapi-advanced)。**Agent 做不稳，问题通常不在 Prompt，而在这些底座上。**
 
 ### 1. 语言与运行时
 
