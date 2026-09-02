@@ -38,6 +38,15 @@ export default withMermaid(defineConfig({
             ]
           },
           {
+            text: 'RAG 检索',
+            items: [
+              { text: '入库链路', link: '/guide/rag-pipeline' },
+              { text: '混合检索与 Rerank', link: '/guide/rag-retrieval' },
+              { text: '引用溯源与拒答', link: '/guide/rag-citation' },
+              { text: '多模态文档', link: '/guide/rag-multimodal' },
+            ]
+          },
+          {
             text: '生产化',
             items: [
               { text: 'Prompt 注入攻防', link: '/guide/agent-security' },
@@ -47,15 +56,6 @@ export default withMermaid(defineConfig({
               { text: 'Agent 与 RAG 评测', link: '/guide/agent-eval' },
             ]
           },
-        ]
-      },
-      {
-        text: 'RAG',
-        items: [
-          { text: 'RAG 入库链路', link: '/guide/rag-pipeline' },
-          { text: '混合检索与 Rerank', link: '/guide/rag-retrieval' },
-          { text: '引用溯源与拒答', link: '/guide/rag-citation' },
-          { text: '多模态文档', link: '/guide/rag-multimodal' },
         ]
       },
       {
@@ -173,6 +173,16 @@ export default withMermaid(defineConfig({
             ]
           },
           {
+            text: 'RAG 检索',
+            collapsed: true,
+            items: [
+              { text: '入库链路', link: '/guide/rag-pipeline' },
+              { text: '混合检索：BM25 + 向量 + RRF', link: '/guide/rag-retrieval' },
+              { text: '引用溯源、拒答与降级', link: '/guide/rag-citation' },
+              { text: '多模态文档与区域级引用', link: '/guide/rag-multimodal' },
+            ]
+          },
+          {
             text: '生产化与评测',
             collapsed: true,
             items: [
@@ -183,16 +193,6 @@ export default withMermaid(defineConfig({
               { text: 'Agent 与 RAG 评测方法', link: '/guide/agent-eval' },
             ]
           },
-        ]
-      },
-      {
-        text: '🔍 RAG 检索',
-        collapsed: true,
-        items: [
-          { text: 'RAG 入库链路', link: '/guide/rag-pipeline' },
-          { text: '混合检索：BM25 + 向量 + RRF', link: '/guide/rag-retrieval' },
-          { text: '引用溯源、拒答与降级', link: '/guide/rag-citation' },
-          { text: '多模态文档与区域级引用', link: '/guide/rag-multimodal' },
         ]
       },
       {
