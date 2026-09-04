@@ -37,6 +37,77 @@
   font-size: 0.92em;
 }
 
+.vp-doc .mermaid .mermaid-zoom-trigger {
+  cursor: zoom-in;
+}
+
+.vp-doc .mermaid .mermaid-zoom-trigger:focus-visible {
+  outline: 2px solid var(--vp-c-brand-1);
+  outline-offset: 4px;
+}
+
+.mermaid-zoom-overlay {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 48px;
+  background: rgb(0 0 0 / 72%);
+  cursor: zoom-out;
+}
+
+.mermaid-zoom-content {
+  display: grid;
+  width: min(1400px, 95vw);
+  height: min(900px, 90vh);
+  place-items: center;
+  overflow: auto;
+  border-radius: 12px;
+  background: var(--vp-c-bg);
+  box-shadow: 0 24px 80px rgb(0 0 0 / 35%);
+  cursor: default;
+}
+
+.mermaid-zoom-content svg {
+  width: min(1200px, calc(95vw - 48px)) !important;
+  max-width: none !important;
+  height: auto !important;
+  max-height: none !important;
+  margin: 24px;
+}
+
+.mermaid-zoom-close {
+  position: fixed;
+  z-index: 1;
+  top: 16px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgb(255 255 255 / 35%);
+  border-radius: 999px;
+  background: rgb(0 0 0 / 45%);
+  color: #fff;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+@media (max-width: 640px) {
+  .mermaid-zoom-overlay {
+    padding: 56px 12px 12px;
+  }
+
+  .mermaid-zoom-content {
+    width: 100%;
+    height: 100%;
+  }
+
+  .mermaid-zoom-content svg {
+    width: calc(100vw - 48px) !important;
+  }
+}
+
 /* Keep the desktop navigation usable before VitePress switches to its mobile menu. */
 @media (min-width: 960px) and (max-width: 1440px) {
   .VPNavBarSearch {
