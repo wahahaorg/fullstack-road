@@ -56,3 +56,102 @@ openssl s_client -connect api.example.com:443 -servername api.example.com -alpn 
 - [curl write-out](https://curl.se/docs/manpage.html#-w)
 - [MDN HTTP 状态码](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Reference/Status)
 - [OpenSSL s_client](https://docs.openssl.org/3.0/man1/openssl-s_client/)
+
+## DNS：先确认解析结果，再谈应用
+
+```bash
+getent ahosts api.example.com
+# 容器内执行，比较宿主机结果
+cat /etc/resolv.conf
+```
+
+同一域名可能返回多个地址（轮询、IPv4/IPv6、地域 DNS）。`getent` 证明的是当前解析器给出的结果，不证明每个地址都可达。关注 TTL、搜索域、容器 DNS 和是否存在 AAAA 记录导致客户端优先尝试 IPv6。不要直接把 `/etc/hosts` 当生产修复；它会绕过 DNS 变更并制造漂移。
+
+## TCP：连接成功不等于请求成功
+
+三次握手建立连接，四次挥手关闭连接；RST 表示连接被异常重置。排查监听和连接状态：
+
+```bash
+ss -lntp                 # 谁在监听 TCP 端口
+ss -ant state syn-recv  # 是否堆积半连接
+ss -ant state time-wait | wc -l
+```
+
+`SYN-RECV` 多且持续增长，优先查服务 accept、网络策略和 backlog；`TIME-WAIT` 是主动关闭方的正常状态，不能仅凭数量下结论。容器中 `127.0.0.1` 只代表容器自身，服务间访问应使用监听的 `0.0.0.0` 与服务名。
+
+## TLS 与 HTTP 版本
+
+HTTP/1.1 常用一个连接顺序处理请求，队头阻塞会放大慢请求；HTTP/2 在一条 TCP 连接上多路复用，但 TCP 丢包仍会影响整条连接；HTTP/3 基于 QUIC/UDP，是否可用由客户端、网关和负载均衡共同决定。不要把“启用 HTTP/2”当作单纯改应用代码。
+
+```bash
+curl -v --http1.1 https://api.example.com/health
+curl -v --http2   https://api.example.com/health
+```
+
+看输出中的 `ALPN: server accepted`、协议版本和响应头，确认协商结果。代理可能在客户端到网关使用 HTTP/2、网关到上游仍使用 HTTP/1.1，因此要分别测两段。
+
+## 超时必须形成预算
+
+一次请求通常包含连接超时、TLS 超时、响应头超时、响应体读取超时和总截止时间。下游调用的总预算必须小于上游剩余预算，否则上游已经超时，后台调用还会继续占用连接和线程。
+
+```txt
+入口总截止时间 2s
+  ├─ DNS/TCP/TLS 300ms
+  ├─ 下游 A 800ms（含最多一次重试）
+  └─ 数据库 600ms
+```
+
+超时后要取消下游请求并释放连接；只在调用方返回 504、却让下游继续跑，会造成“幽灵请求”。日志至少记录 timeout 类型、耗时、attempt、上游地址和 request id。
+
+## 502、503、504 怎么拆
+
+| 状态 | 典型边界 | 首先查什么 |
+|---|---|---|
+| 502 | 网关拿到无效响应、连接被上游重置 | 网关 error log、上游进程日志、协议/端口 |
+| 503 | 当前服务不可用或没有健康实例 | readiness、连接池、限流和负载均衡成员 |
+| 504 | 网关等待上游超时 | 上游耗时分位数、下游依赖、网关 timeout 配置 |
+
+状态码只是观测点。应用也可能自己返回 502；必须结合 `Server`、网关 request id 和应用日志确认产生者。
+
+## 连接池与资源耗尽
+
+HTTP keep-alive、数据库连接池和文件描述符都属于有限资源。连接池过小会排队，过大则把压力推给下游；必须同时观察 active、idle、pending、获取连接耗时。`ulimit -n` 只是上限，不能替代应用指标。
+
+```bash
+lsof -p <pid> | wc -l
+# 仅查看自己启动的本地进程；生产需遵守权限与变更流程
+```
+
+出现“偶发超时”时，比较连接池等待时间与网络连接时间：前者高说明应用资源排队，后者高才更像网络或下游问题。
+
+## 抓包与证据
+
+应用日志回答“代码走到哪里”，`curl -v` 回答“客户端看到了什么”，抓包回答“线上传了什么”。在有权限且经过审批的环境使用 `tcpdump`，只抓目标地址和短时间窗口，避免采集敏感 payload：
+
+```bash
+tcpdump -nn -i any 'host 10.0.0.8 and port 443' -c 100
+```
+
+TLS 加密后抓包通常只能看到握手、IP、端口和时序；不要声称抓包能直接读取 HTTPS 业务内容。优先使用脱敏后的 trace、指标和网关日志。
+
+## 一张故障决策表
+
+```txt
+DNS 无结果？       → resolver / TTL / 容器 DNS
+有 IP 但 connect 失败？ → 路由 / 安全组 / 监听 / backlog
+TCP 成功 TLS 失败？    → 时间、SAN、SNI、链、ALPN
+HTTP 4xx？             → 请求语义、鉴权、路由
+HTTP 5xx？             → 产生者、上游、资源池、依赖
+只有高并发才失败？     → 连接池、FD、队列、限流、backlog、GC
+只有重试后数据异常？   → 幂等键、请求是否已执行、超时预算
+```
+
+每一步都留下可复现探针和时间窗口。修复后的成功响应不够，还要检查延迟分位数、错误率、连接池水位和业务副作用。
+
+## 面试追问
+
+- **为什么 ping 通但 HTTP 不通？** ping 是 ICMP，不能证明 TCP 端口、TLS 或 HTTP 路由可用。
+- **客户端超时，服务端到底执行没有？** 不能从超时判断；用 request id、数据库记录和幂等键确认。
+- **HTTP/2 一定更快吗？** 多路复用减少连接和队头阻塞，但服务端、代理、TLS、丢包和请求形态都影响结果。
+- **重试放在哪里？** 只在明确的幂等边界放，设置总预算与退避，避免客户端、网关、SDK 多层叠加重试。
+- **怎么证明是连接池问题？** 对比池等待、建立连接和服务处理三个时间；只看总耗时不能定位。
