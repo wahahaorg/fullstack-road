@@ -20,7 +20,7 @@ REQUIRED_CATEGORIES = {
     "direct",
     "version_compare",
 }
-VALID_ROUTES = {"direct", "fixed_rag", "agentic_rag", "refuse"}
+VALID_ROUTES = {"direct", "fixed_rag", "agentic_rag", "version_tool", "refuse"}
 
 
 def load_json(path: Path) -> dict[str, Any]:

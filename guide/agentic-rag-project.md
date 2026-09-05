@@ -155,12 +155,13 @@ flowchart TB
 两条链路使用同一套文档状态：
 
 ```text
-draft → reviewing → processing → published → archived
-                   ↘ failed
+draft → processing → review_pending → published → archived
+          ↘ failed
 ```
 
-- `draft` 和 `reviewing` 不能被检索。
-- `processing` 表示审核已通过，但当前版本还没有完成索引。
+- `draft` 表示文件和元数据已经创建，但尚未提交处理。
+- `processing` 表示正在解析、切分、Embedding 或建立候选索引。
+- `review_pending` 表示候选索引已经完整，等待审核发布。
 - `published` 才能进入普通检索。
 - `archived` 保留历史记录，只允许通过有权限的版本工具读取。
 - `failed` 必须记录失败阶段和原因，不能只留一行错误日志。
@@ -225,6 +226,20 @@ Agentic RAG 不是给普通 RAG 多套一层 LangGraph。两者的差别在于�
 - [Agent 生产可靠性](./agent-reliability)：失败状态和恢复路径在设计阶段进入状态机，不等上线后再补。
 
 这些文章负责解释单项能力，本系列负责把它们组合进同一个系统，并观察能力之间的冲突。例如权限过滤会影响召回率，历史版本管理会影响引用，新增长对话记忆又会扩大 Prompt Injection 的攻击面。
+
+## 17 章学习路线
+
+教程始终在同一个项目上继续，不会每章换一套示例：
+
+| 阶段 | 章节 |
+|---|---|
+| 建立产品与最小闭环 | 第 1 章：项目目标与架构 · [第 2 章：最小 RAG](./agentic-rag-project-minimal) |
+| 建立知识库后台 | [第 3 章：权限](./agentic-rag-project-permissions) · [第 4 章：生命周期](./agentic-rag-project-lifecycle) · [第 5 章：结构化解析](./agentic-rag-project-parsing) · [第 6 章：异步入库](./agentic-rag-project-async-ingestion) |
+| 做正确固定 RAG | [第 7 章：混合检索](./agentic-rag-project-retrieval) · [第 8 章：引用与拒答](./agentic-rag-project-citations) |
+| 升级 Agentic RAG | [第 9 章：问题路由](./agentic-rag-project-routing) · [第 10 章：LangGraph](./agentic-rag-project-langgraph) · [第 11 章：工具与人工介入](./agentic-rag-project-tools-memory) · [第 12 章：SSE](./agentic-rag-project-streaming) |
+| 达到可交付标准 | [第 13 章：安全](./agentic-rag-project-security) · [第 14 章：可靠性](./agentic-rag-project-reliability) · [第 15 章：评测](./agentic-rag-project-evaluation) · [第 16 章：观测与部署](./agentic-rag-project-operations) · [第 17 章：求职复盘](./agentic-rag-project-career) |
+
+前两章先给出可运行结果，后续章节逐层替换简化实现。阅读时遇到某项底层知识不熟，可以沿正文链接回到对应专题文章，再回到项目继续。
 
 ## 本章小结
 

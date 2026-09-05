@@ -1,0 +1,37 @@
+services:
+  api:
+    build: .
+    environment:
+      APP_PROVIDER: demo
+      APP_SEED_FIXTURES: "true"
+      DATABASE_URL: sqlite+aiosqlite:///./.data/agentic-rag.db
+    ports:
+      - "8000:8000"
+    volumes:
+      - agentic-rag-data:/app/.data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready')"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  worker:
+    build: .
+    environment:
+      APP_PROVIDER: demo
+      DATABASE_URL: sqlite+aiosqlite:///./.data/agentic-rag.db
+    volumes:
+      - agentic-rag-data:/app/.data
+    entrypoint: ["uv", "run", "python", "-m", "app.worker"]
+
+  outbox-relay:
+    build: .
+    environment:
+      APP_PROVIDER: demo
+      DATABASE_URL: sqlite+aiosqlite:///./.data/agentic-rag.db
+    volumes:
+      - agentic-rag-data:/app/.data
+    entrypoint: ["uv", "run", "python", "-m", "app.outbox_relay"]
+
+volumes:
+  agentic-rag-data:

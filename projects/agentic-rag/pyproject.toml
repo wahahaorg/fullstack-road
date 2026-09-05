@@ -4,9 +4,20 @@ version = "0.1.0"
 description = "Companion project for the Fullstack Road Agentic RAG tutorial"
 requires-python = ">=3.12"
 dependencies = [
+    "aiosqlite>=0.20,<1",
+    "asyncpg>=0.29,<1",
     "fastapi>=0.141.1",
+    "greenlet>=3.1,<4",
     "httpx>=0.28.1",
+    "langgraph>=1,<2",
+    "minio>=7.2,<8",
+    "openpyxl>=3.1,<4",
+    "pyjwt>=2.10,<3",
+    "pypdf>=5,<6",
+    "python-docx>=1.1,<2",
     "python-multipart>=0.0.32",
+    "python-pptx>=1,<2",
+    "sqlalchemy>=2.0,<3",
     "uvicorn[standard]>=0.52.4",
 ]
 

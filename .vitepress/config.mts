@@ -51,6 +51,10 @@ export default withMermaid(defineConfig({
             items: [
               { text: '企业知识库 Agentic RAG', link: '/guide/agentic-rag-project' },
               { text: '最小 RAG 闭环', link: '/guide/agentic-rag-project-minimal' },
+              { text: '权限与文档生命周期', link: '/guide/agentic-rag-project-permissions' },
+              { text: '检索与 Agentic RAG', link: '/guide/agentic-rag-project-retrieval' },
+              { text: '安全、评测与部署', link: '/guide/agentic-rag-project-security' },
+              { text: '项目复盘与求职表达', link: '/guide/agentic-rag-project-career' },
             ]
           },
           {
@@ -207,6 +211,21 @@ export default withMermaid(defineConfig({
             items: [
               { text: '1. 项目目标与架构', link: '/guide/agentic-rag-project' },
               { text: '2. 跑通最小 RAG 闭环', link: '/guide/agentic-rag-project-minimal' },
+              { text: '3. 用户、团队与检索权限', link: '/guide/agentic-rag-project-permissions' },
+              { text: '4. 文件存储与文档生命周期', link: '/guide/agentic-rag-project-lifecycle' },
+              { text: '5. 多格式解析与结构化切分', link: '/guide/agentic-rag-project-parsing' },
+              { text: '6. 异步入库与任务状态', link: '/guide/agentic-rag-project-async-ingestion' },
+              { text: '7. 混合召回与 Rerank', link: '/guide/agentic-rag-project-retrieval' },
+              { text: '8. 上下文、引用与拒答', link: '/guide/agentic-rag-project-citations' },
+              { text: '9. 问题分类与执行路线', link: '/guide/agentic-rag-project-routing' },
+              { text: '10. LangGraph 多轮检索', link: '/guide/agentic-rag-project-langgraph' },
+              { text: '11. 工具、记忆与人工介入', link: '/guide/agentic-rag-project-tools-memory' },
+              { text: '12. SSE 流式事件协议', link: '/guide/agentic-rag-project-streaming' },
+              { text: '13. 权限安全与越权测试', link: '/guide/agentic-rag-project-security' },
+              { text: '14. 入库可靠性与索引一致性', link: '/guide/agentic-rag-project-reliability' },
+              { text: '15. RAG 与 Agent 离线评测', link: '/guide/agentic-rag-project-evaluation' },
+              { text: '16. 可观测性、测试与部署', link: '/guide/agentic-rag-project-operations' },
+              { text: '17. 项目复盘与求职表达', link: '/guide/agentic-rag-project-career' },
             ]
           },
         ]
