@@ -90,6 +90,7 @@ export default withMermaid(defineConfig({
               { text: '异步与错误处理', link: '/guide/node-async' },
               { text: 'Stream 与 Buffer', link: '/guide/node-stream' },
               { text: 'HTTP 与 BFF', link: '/guide/node-http' },
+              { text: 'HTTP、TCP、TLS 与网络排障', link: '/guide/network-troubleshooting' },
             ]
           },
           {

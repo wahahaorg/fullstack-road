@@ -83,6 +83,7 @@ UPDATE ... WHERE ...
 
 - [并发、事务与一致性](./concurrency-transaction)
 - [锁机制与并发控制](./locking)
+- [HTTP、TCP、TLS 与网络排障](./network-troubleshooting)
 - [综合练习](./exercises)
 
 后端面试和实战经常卡在这里：
