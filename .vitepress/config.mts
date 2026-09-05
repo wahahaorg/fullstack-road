@@ -47,6 +47,12 @@ export default withMermaid(defineConfig({
             ]
           },
           {
+            text: '综合实战',
+            items: [
+              { text: '企业知识库 Agentic RAG', link: '/guide/agentic-rag-project' },
+            ]
+          },
+          {
             text: '生产化',
             items: [
               { text: 'Prompt 注入攻防', link: '/guide/agent-security' },
@@ -192,6 +198,13 @@ export default withMermaid(defineConfig({
               { text: '生产可靠性：预算与熔断', link: '/guide/agent-reliability' },
               { text: '上下文工程与长任务', link: '/guide/agent-context' },
               { text: 'Agent 与 RAG 评测方法', link: '/guide/agent-eval' },
+            ]
+          },
+          {
+            text: '综合实战',
+            collapsed: false,
+            items: [
+              { text: '1. 项目目标与架构', link: '/guide/agentic-rag-project' },
             ]
           },
         ]

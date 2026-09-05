@@ -92,6 +92,15 @@ status: approved
 
 私人的面试答辩材料不是教程实现依据。教程不能继承其中的公司名称、任职时间、职责边界和占位数字。所有教程指标必须由配套项目实际运行得到。
 
+### 配套代码与当前进度
+
+配套代码统一放在 `projects/agentic-rag/`，正式文章放在 `guide/`。每章只能在同一个配套项目上继续演进。
+
+| 章节 | 状态 | 已验证产物 |
+|---|---|---|
+| 第 1 章：项目目标与架构 | 已完成 | 业务场景、5 份样例文档、11 条验收问题、一致性校验脚本和 4 个边界测试 |
+| 第 2 章：最小 RAG 闭环 | 未开始 | — |
+
 ## 五、写作与实现的不可变规则
 
 ### 1. 始终按一个项目向前建设
@@ -185,18 +194,18 @@ status: approved
 
 | 实战内容 | 必须融合的已有知识 |
 |---|---|
-| 最小 RAG 与入库 | [RAG 入库链路](../guide/rag-pipeline.md) |
-| 切分与复杂文档 | [多模态 RAG](../guide/rag-multimodal.md)、[上下文工程](../guide/agent-context.md) |
-| 混合检索与排序 | [混合检索与 Rerank](../guide/rag-retrieval.md) |
-| 引用与拒答 | [引用溯源与拒答](../guide/rag-citation.md) |
-| 选择固定链路或 Agent | [Agent 工程总览](../guide/agent-intro.md)、[Agent 范式与框架选型](../guide/agent-patterns.md) |
-| 多轮检索状态机 | [LangGraph 状态机](../guide/agent-langgraph.md) |
-| 工具和人工介入 | [Tool Calling 与 MCP](../guide/agent-tool-calling.md)、[Multi-Agent 与人工兜底](../guide/agent-multi-agent.md) |
-| SSE | [Agent 流式输出](../guide/agent-streaming.md) |
-| 权限与攻击面 | [Agent 安全](../guide/agent-security.md) |
-| 失败恢复 | [Agent 生产可靠性](../guide/agent-reliability.md) |
-| 效果证明 | [Agent 与 RAG 评测](../guide/agent-eval.md) |
-| Trace、成本和容量 | [Agent 可观测性](../guide/agent-observability.md) |
+| 最小 RAG 与入库 | [RAG 入库链路](./guide/rag-pipeline.md) |
+| 切分与复杂文档 | [多模态 RAG](./guide/rag-multimodal.md)、[上下文工程](./guide/agent-context.md) |
+| 混合检索与排序 | [混合检索与 Rerank](./guide/rag-retrieval.md) |
+| 引用与拒答 | [引用溯源与拒答](./guide/rag-citation.md) |
+| 选择固定链路或 Agent | [Agent 工程总览](./guide/agent-intro.md)、[Agent 范式与框架选型](./guide/agent-patterns.md) |
+| 多轮检索状态机 | [LangGraph 状态机](./guide/agent-langgraph.md) |
+| 工具和人工介入 | [Tool Calling 与 MCP](./guide/agent-tool-calling.md)、[Multi-Agent 与人工兜底](./guide/agent-multi-agent.md) |
+| SSE | [Agent 流式输出](./guide/agent-streaming.md) |
+| 权限与攻击面 | [Agent 安全](./guide/agent-security.md) |
+| 失败恢复 | [Agent 生产可靠性](./guide/agent-reliability.md) |
+| 效果证明 | [Agent 与 RAG 评测](./guide/agent-eval.md) |
+| Trace、成本和容量 | [Agent 可观测性](./guide/agent-observability.md) |
 
 “融合”不等于在每章末尾放一个链接。正文必须明确指出：当前项目使用了哪条原则、对应哪段代码、通过什么样例验证。
 

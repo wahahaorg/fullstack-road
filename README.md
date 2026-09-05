@@ -66,9 +66,9 @@ Python 快速入门
 
 ## 建设中的综合实战
 
-仓库计划增加一套 **Python + FastAPI + LangGraph 企业知识库 Agentic RAG 项目**。它会从空目录开始，逐步完成文档上传与审核、异步入库、混合检索、引用回答、权限隔离、多轮检索、工具调用、Checkpoint、SSE、可靠性、评测和部署。
+仓库正在建设一套 **Python + FastAPI + LangGraph 企业知识库 Agentic RAG 项目**。它会从空目录开始，逐步完成文档上传与审核、异步入库、混合检索、引用回答、权限隔离、多轮检索、工具调用、Checkpoint、SSE、可靠性、评测和部署。
 
-这套教程不会把普通 CRUD 写成逐行操作记录，也不会把 NestJS 项目简单翻译成 Python。每章必须产生可运行的项目增量，解释关键设计取舍，并验证正常路径和失败路径。完整范围、17 章路线与发布标准见 [Agentic RAG 实战教程写作契约](./AGENTIC_RAG_PROJECT_SPEC.md)。
+这套教程不会把普通 CRUD 写成逐行操作记录，也不会把 NestJS 项目简单翻译成 Python。每章必须产生可运行的项目增量，解释关键设计取舍，并验证正常路径和失败路径。从[第 1 章：项目目标与架构](./guide/agentic-rag-project.md)开始；完整范围、17 章路线与发布标准见 [Agentic RAG 实战教程写作契约](./AGENTIC_RAG_PROJECT_SPEC.md)。
 
 ## 内容原则
 
@@ -106,6 +106,7 @@ npm run docs:build
 fullstack-road/
 ├── index.md                         # 站点首页
 ├── guide/                           # 公开教程文章
+├── projects/agentic-rag/            # Agentic RAG 实战配套代码与验收数据
 ├── .vitepress/                      # 导航、侧边栏、主题与构建配置
 ├── public/                          # 图片等静态资源
 ├── AGENTIC_RAG_PROJECT_SPEC.md      # Agentic RAG 综合实战写作基准

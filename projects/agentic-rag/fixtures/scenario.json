@@ -1,0 +1,99 @@
+{
+  "users": [
+    {
+      "id": "user-finance-alice",
+      "name": "Alice",
+      "teams": ["team-finance"],
+      "roles": ["employee"]
+    },
+    {
+      "id": "user-engineering-bob",
+      "name": "Bob",
+      "teams": ["team-engineering"],
+      "roles": ["employee"]
+    },
+    {
+      "id": "user-admin-carol",
+      "name": "Carol",
+      "teams": ["team-finance", "team-engineering", "team-sales"],
+      "roles": ["knowledge_admin"]
+    }
+  ],
+  "teams": [
+    {"id": "team-finance", "name": "财务部"},
+    {"id": "team-engineering", "name": "研发部"},
+    {"id": "team-sales", "name": "销售部"}
+  ],
+  "knowledge_bases": [
+    {
+      "id": "kb-company",
+      "name": "公司公共制度库",
+      "visibility": "company"
+    },
+    {
+      "id": "kb-engineering",
+      "name": "研发内部知识库",
+      "visibility": "team",
+      "team_id": "team-engineering"
+    },
+    {
+      "id": "kb-sales",
+      "name": "销售内部知识库",
+      "visibility": "team",
+      "team_id": "team-sales"
+    }
+  ],
+  "documents": [
+    {
+      "id": "doc-travel-v1",
+      "title": "员工差旅管理制度 V1",
+      "filename": "travel-policy-v1.md",
+      "knowledge_base_id": "kb-company",
+      "status": "archived",
+      "version": 1,
+      "effective_from": "2025-01-01",
+      "effective_to": "2026-06-30"
+    },
+    {
+      "id": "doc-travel-v2",
+      "title": "员工差旅管理制度 V2",
+      "filename": "travel-policy-v2.md",
+      "knowledge_base_id": "kb-company",
+      "status": "published",
+      "version": 2,
+      "effective_from": "2026-07-01",
+      "effective_to": null
+    },
+    {
+      "id": "doc-expense-v1",
+      "title": "费用报销操作规范",
+      "filename": "expense-reimbursement.md",
+      "knowledge_base_id": "kb-company",
+      "status": "published",
+      "version": 1,
+      "effective_from": "2026-01-01",
+      "effective_to": null
+    },
+    {
+      "id": "doc-oncall-v1",
+      "title": "研发生产值班与故障响应手册",
+      "filename": "engineering-oncall.md",
+      "knowledge_base_id": "kb-engineering",
+      "status": "published",
+      "version": 1,
+      "effective_from": "2026-03-01",
+      "effective_to": null
+    },
+    {
+      "id": "doc-sales-price-v2-draft",
+      "title": "渠道折扣政策 V2（草案）",
+      "filename": "sales-pricing-draft.md",
+      "knowledge_base_id": "kb-sales",
+      "status": "draft",
+      "version": 2,
+      "effective_from": null,
+      "effective_to": null
+    }
+  ]
+}
+

@@ -17,6 +17,7 @@ description: 按目标、技术栈与能力层级浏览全栈知识站的全部�
 | --- | --- | --- | --- |
 | 做 Agent 应用开发 | [Agent 工程总览](./agent-intro) | [LangGraph 状态机](./agent-langgraph) → [Tool Calling 与 MCP](./agent-tool-calling) → [Multi-Agent 与人工兜底](./agent-multi-agent) | 一条可恢复、可审计、敢接敏感操作的 Agent 链路 |
 | 做能溯源的知识库问答 | [RAG 入库链路](./rag-pipeline) | [混合检索与 Rerank](./rag-retrieval) → [引用溯源与拒答](./rag-citation) → [评测方法](./agent-eval) | 一套带引用、能拒答、有评测数据支撑的 RAG 服务 |
+| 完成一个 Agent 求职项目 | [企业知识库 Agentic RAG 实战](./agentic-rag-project) | 固定 RAG → 权限与异步入库 → LangGraph 多轮检索 → 评测与部署 | 一套可运行、可验证、能解释设计取舍的 Python AI 项目 |
 | 做自然语言取数（Text2SQL） | [Text2SQL 与 Schema Linking](./agent-text2sql) | [SQL 基础与查询](./sql-basics) · [MySQL 日志、备份恢复与复制](./mysql-recovery) · [PostgreSQL 基础与实战](./postgresql) → [评测方法](./agent-eval) | 一条生成受约束、执行有兜底的取数链路 |
 | 前端转 Python 后端 | [Python 快速入门](./python-intro) | [FastAPI 基础](./fastapi-basics) → [项目结构](./fastapi-mysql-project) | 一个分层清晰、可连接 MySQL 的 API |
 | 强化 Node.js 面试 | [Node.js 运行时](./node-runtime) | [异步编程](./node-async) → [性能与稳定性](./node-perf) → [实战练习](./node-practice) | 能从运行时原理解释线上问题 |
@@ -35,6 +36,7 @@ description: 按目标、技术栈与能力层级浏览全栈知识站的全部�
 - **数据问答**：[Text2SQL 与 Schema Linking](./agent-text2sql)
 - **交互与度量**：[SSE 流式与阶段事件](./agent-streaming) · [评测方法](./agent-eval)
 - **上生产**：[Prompt 注入攻防](./agent-security) · [可观测性与成本](./agent-observability) · [预算与熔断](./agent-reliability) · [上下文工程](./agent-context)
+- **综合实战**：[企业知识库 Agentic RAG：项目目标与架构](./agentic-rag-project)
 
 这一层依赖下面所有层：Agent 的异步入库要用[Worker](./background-worker)，会话记忆要用[Redis](./redis-deep)，元数据要靠[表结构设计](./mysql-table-design)，流式接口要靠[FastAPI 进阶](./fastapi-advanced)。**Agent 做不稳，问题通常不在 Prompt，而在这些底座上。**
 
@@ -62,7 +64,7 @@ description: 按目标、技术栈与能力层级浏览全栈知识站的全部�
 ### 4. 工程、部署与实战
 
 - **部署**：[Docker 与部署](./docker-deployment) · [Dockerfile 进阶](./dockerfile-practice) · [Compose 与进程守护](./docker-compose-network) · [Nginx 流量治理](./nginx-core)
-- **完整项目**：[FastAPI + MySQL 项目](./fastapi-mysql-project) · [Java 学习时间记录系统](./java-project-practice)
+- **完整项目**：[企业知识库 Agentic RAG](./agentic-rag-project) · [FastAPI + MySQL 项目](./fastapi-mysql-project) · [Java 学习时间记录系统](./java-project-practice)
 - **代码阅读**：[阅读陌生 Java 项目](./java-reading-project)
 - **练习与面试**：[综合练习](./exercises) · [Node.js 实战练习](./node-practice) · [Java 招聘要求判断](./java-job-requirements)
 

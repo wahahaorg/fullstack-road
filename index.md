@@ -71,6 +71,7 @@ features:
 |---|---|---|
 | 搞懂 Agent 怎么编排和落地 | [Agent 工程总览](/guide/agent-intro) | [LangGraph 状态机](/guide/agent-langgraph) → [Tool Calling 与 MCP](/guide/agent-tool-calling) |
 | 做一个能溯源的知识库问答 | [RAG 入库链路](/guide/rag-pipeline) | [混合检索与 Rerank](/guide/rag-retrieval) → [引用溯源与拒答](/guide/rag-citation) |
+| 完成一个 Python Agent 求职项目 | [企业知识库 Agentic RAG 实战](/guide/agentic-rag-project) | 从固定 RAG 做到多轮检索、权限、可靠性、评测与部署 |
 | 让自然语言查询变成可控的 SQL | [Text2SQL 与 Schema Linking](/guide/agent-text2sql) | [Agent 与 RAG 评测方法](/guide/agent-eval) |
 | 从前端转向 Python 后端 | [Python 快速入门](/guide/python-intro) | [FastAPI + MySQL 项目](/guide/fastapi-mysql-project) |
 | 准备 Node.js / NestJS 面试 | [Node.js 运行时](/guide/node-runtime) | [NestJS 架构概览](/guide/nestjs-intro) |
@@ -98,6 +99,8 @@ RAG 入库链路（解析 / 切分 / 元数据 / 增量重建）
 
 上生产：Prompt 注入攻防 → 可观测性与成本 → 预算熔断与断点续跑
   → 上下文工程与长任务 → 评测方法与回归门禁
+
+综合实战：企业知识库 Agentic RAG → 从最小闭环逐章建设到可交付系统
 ```
 
 底座能力可横向补：[Worker 与异步任务](/guide/background-worker)、[Redis 深入](/guide/redis-deep)、[FastAPI 进阶](/guide/fastapi-advanced)、[并发与事务](/guide/concurrency-transaction)。
