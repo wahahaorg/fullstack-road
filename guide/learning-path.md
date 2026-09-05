@@ -85,6 +85,7 @@ UPDATE ... WHERE ...
 - [锁机制与并发控制](./locking)
 - [分布式一致性与可靠消息](./distributed-consistency)
 - [HTTP、TCP、TLS 与网络排障](./network-troubleshooting)
+- [MySQL 日志、备份恢复与复制](./mysql-recovery)
 - [综合练习](./exercises)
 
 后端面试和实战经常卡在这里：

@@ -17,7 +17,7 @@ description: 按目标、技术栈与能力层级浏览全栈知识站的全部�
 | --- | --- | --- | --- |
 | 做 Agent 应用开发 | [Agent 工程总览](./agent-intro) | [LangGraph 状态机](./agent-langgraph) → [Tool Calling 与 MCP](./agent-tool-calling) → [Multi-Agent 与人工兜底](./agent-multi-agent) | 一条可恢复、可审计、敢接敏感操作的 Agent 链路 |
 | 做能溯源的知识库问答 | [RAG 入库链路](./rag-pipeline) | [混合检索与 Rerank](./rag-retrieval) → [引用溯源与拒答](./rag-citation) → [评测方法](./agent-eval) | 一套带引用、能拒答、有评测数据支撑的 RAG 服务 |
-| 做自然语言取数（Text2SQL） | [Text2SQL 与 Schema Linking](./agent-text2sql) | [SQL 基础与查询](./sql-basics) → [评测方法](./agent-eval) | 一条生成受约束、执行有兜底的取数链路 |
+| 做自然语言取数（Text2SQL） | [Text2SQL 与 Schema Linking](./agent-text2sql) | [SQL 基础与查询](./sql-basics) · [MySQL 日志、备份恢复与复制](./mysql-recovery) → [评测方法](./agent-eval) | 一条生成受约束、执行有兜底的取数链路 |
 | 前端转 Python 后端 | [Python 快速入门](./python-intro) | [FastAPI 基础](./fastapi-basics) → [项目结构](./fastapi-mysql-project) | 一个分层清晰、可连接 MySQL 的 API |
 | 强化 Node.js 面试 | [Node.js 运行时](./node-runtime) | [异步编程](./node-async) → [性能与稳定性](./node-perf) → [实战练习](./node-practice) | 能从运行时原理解释线上问题 |
 | 系统掌握 NestJS | [NestJS 架构概览](./nestjs-intro) | [依赖注入](./nestjs-di) → [请求生命周期](./nestjs-pipeline) → [认证与登录状态](./nestjs-auth) → [项目架构蓝图](./nestjs-project-blueprint) | 一套可维护的企业级接口骨架 |
@@ -54,7 +54,7 @@ description: 按目标、技术栈与能力层级浏览全栈知识站的全部�
 
 ### 3. 数据、状态与可靠性
 
-- **建模与查询**：[MySQL 表结构设计](./mysql-table-design) · [SQL 基础与查询](./sql-basics)
+- **建模与查询**：[MySQL 表结构设计](./mysql-table-design) · [SQL 基础与查询](./sql-basics) · [MySQL 日志、备份恢复与复制](./mysql-recovery)
 - **一致性**：[并发、事务与一致性](./concurrency-transaction) · [锁机制与并发控制](./locking) · [分布式一致性与可靠消息](./distributed-consistency) · [Redis 深入](./redis-deep)
 - **异步系统**：[Worker 与异步任务](./background-worker) · [消息队列](./message-queue)
 - **认证授权**：[NestJS 认证与登录状态](./nestjs-auth) · [授权模型与三方登录](./nestjs-authorization) · [Java 登录与鉴权](./java-auth)
@@ -99,7 +99,7 @@ flowchart LR
 
 网络排障、锁机制、分布式一致性与可靠消息已加入主线。下一阶段按以下顺序补齐：
 
-1. **MySQL 日志、备份恢复与复制**：区分 redo / undo / binlog，围绕误删恢复、复制延迟与恢复演练展开。
+1. [**MySQL 日志、备份恢复与复制**](./mysql-recovery)：区分 redo / undo / binlog，围绕误删恢复、复制延迟与恢复演练展开。
 2. **Linux 与服务故障排查**：从 CPU、内存、磁盘、端口与连接异常定位原因，衔接已有 Nginx 与 Docker 内容。
 3. **后端并发与故障测试实战**：用真实数据库、并发连接和可控故障验证超卖、重复消费与恢复路径。
 4. **Java 求职分支**：JVM、Java 并发与性能诊断，按具体求职目标深入。
