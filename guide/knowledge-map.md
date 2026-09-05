@@ -55,7 +55,7 @@ description: 按目标、技术栈与能力层级浏览全栈知识站的全部�
 ### 3. 数据、状态与可靠性
 
 - **建模与查询**：[MySQL 表结构设计](./mysql-table-design) · [SQL 基础与查询](./sql-basics)
-- **一致性**：[并发、事务与一致性](./concurrency-transaction) · [锁机制与并发控制](./locking) · [Redis 深入](./redis-deep)
+- **一致性**：[并发、事务与一致性](./concurrency-transaction) · [锁机制与并发控制](./locking) · [分布式一致性与可靠消息](./distributed-consistency) · [Redis 深入](./redis-deep)
 - **异步系统**：[Worker 与异步任务](./background-worker) · [消息队列](./message-queue)
 - **认证授权**：[NestJS 认证与登录状态](./nestjs-auth) · [授权模型与三方登录](./nestjs-authorization) · [Java 登录与鉴权](./java-auth)
 
@@ -97,15 +97,13 @@ flowchart LR
 
 ## 继续补全的方向
 
-参考成熟的全栈知识库分类后，本站下一阶段更值得补齐的是：
+网络排障、锁机制、分布式一致性与可靠消息已加入主线。下一阶段按以下顺序补齐：
 
-1. Linux 与服务故障排查。
-2. 跨服务一致性与可靠消息。
-3. MySQL 日志、备份恢复与复制。
-4. HTTP、HTTPS、TCP 与网络排障。
-5. JVM、Java 并发与性能诊断。
-6. 分布式系统基础：CAP、幂等、限流、熔断与可观测性。
+1. **MySQL 日志、备份恢复与复制**：区分 redo / undo / binlog，围绕误删恢复、复制延迟与恢复演练展开。
+2. **Linux 与服务故障排查**：从 CPU、内存、磁盘、端口与连接异常定位原因，衔接已有 Nginx 与 Docker 内容。
+3. **后端并发与故障测试实战**：用真实数据库、并发连接和可控故障验证超卖、重复消费与恢复路径。
+4. **Java 求职分支**：JVM、Java 并发与性能诊断，按具体求职目标深入。
 
-这些主题会优先围绕“当前文章需要哪些前置知识”逐步加入，而不是简单扩充文章数量。
+已有的 [SQL 进阶与查询优化](./mysql-advanced)、[Redis 实战](./redis-practice)、[Nginx 流量治理](./nginx-core) 继续作为深入入口。新增章节以“解释机制、复现问题、验证恢复”为标准；通用测试章还未完成，各章练习不等于已有可运行测试工程。
 
 > 信息架构参考：[heibaiying/Full-Stack-Notes](https://github.com/heibaiying/Full-Stack-Notes)。本站仅借鉴其按领域组织并为文章补充摘要的方式，未复制其文章与图片。
