@@ -82,6 +82,7 @@ UPDATE ... WHERE ...
 最后读：
 
 - [并发、事务与一致性](./concurrency-transaction)
+- [锁机制与并发控制](./locking)
 - [综合练习](./exercises)
 
 后端面试和实战经常卡在这里：

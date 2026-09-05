@@ -234,6 +234,7 @@ export default withMermaid(defineConfig({
         collapsed: true,
         items: [
           { text: '并发、事务与一致性', link: '/guide/concurrency-transaction' },
+          { text: '锁机制与并发控制', link: '/guide/locking' },
           { text: '综合练习', link: '/guide/exercises' },
         ]
       },

@@ -55,7 +55,7 @@ description: 按目标、技术栈与能力层级浏览全栈知识站的全部�
 ### 3. 数据、状态与可靠性
 
 - **建模与查询**：[MySQL 表结构设计](./mysql-table-design) · [SQL 基础与查询](./sql-basics)
-- **一致性**：[并发、事务与一致性](./concurrency-transaction) · [Redis 深入](./redis-deep)
+- **一致性**：[并发、事务与一致性](./concurrency-transaction) · [锁机制与并发控制](./locking) · [Redis 深入](./redis-deep)
 - **异步系统**：[Worker 与异步任务](./background-worker) · [消息队列](./message-queue)
 - **认证授权**：[NestJS 认证与登录状态](./nestjs-auth) · [授权模型与三方登录](./nestjs-authorization) · [Java 登录与鉴权](./java-auth)
 
