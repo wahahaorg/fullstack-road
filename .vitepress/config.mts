@@ -50,6 +50,7 @@ export default withMermaid(defineConfig({
             text: '综合实战',
             items: [
               { text: '企业知识库 Agentic RAG', link: '/guide/agentic-rag-project' },
+              { text: '最小 RAG 闭环', link: '/guide/agentic-rag-project-minimal' },
             ]
           },
           {
@@ -205,6 +206,7 @@ export default withMermaid(defineConfig({
             collapsed: false,
             items: [
               { text: '1. 项目目标与架构', link: '/guide/agentic-rag-project' },
+              { text: '2. 跑通最小 RAG 闭环', link: '/guide/agentic-rag-project-minimal' },
             ]
           },
         ]

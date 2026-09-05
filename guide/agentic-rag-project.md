@@ -230,4 +230,4 @@ Agentic RAG 不是给普通 RAG 多套一层 LangGraph。两者的差别在于�
 
 我们要实现的是一套企业知识库后端：文档有生命周期，检索受数据权限限制，简单问题走固定 RAG，复杂问题才进入 Agentic RAG，最终答案必须有证据并能够被评测。
 
-架构先使用 PostgreSQL + pgvector、Redis 和 MinIO，保持状态关系清晰。下一章开始编写 FastAPI 应用，用一份 Markdown 制度跑通“上传 → 切分 → Embedding → 检索 → 带来源回答”的最小链路。
+架构先使用 PostgreSQL + pgvector、Redis 和 MinIO，保持状态关系清晰。继续阅读[第 2 章：跑通最小 RAG 闭环](./agentic-rag-project-minimal)，用一份 Markdown 制度完成“上传 → 切分 → Embedding → 检索 → 带来源回答”。

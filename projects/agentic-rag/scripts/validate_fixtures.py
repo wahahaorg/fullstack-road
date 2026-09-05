@@ -4,7 +4,6 @@ import json
 from pathlib import Path
 from typing import Any
 
-
 ROOT = Path(__file__).resolve().parents[1]
 SCENARIO_PATH = ROOT / "fixtures" / "scenario.json"
 DATASET_PATH = ROOT / "evals" / "dataset.jsonl"
@@ -39,7 +38,8 @@ def load_jsonl(path: Path) -> list[dict[str, Any]]:
         try:
             cases.append(json.loads(line))
         except json.JSONDecodeError as exc:
-            raise AssertionError(f"评测集第 {line_number} 行不是有效 JSON: {exc}") from exc
+            message = f"评测集第 {line_number} 行不是有效 JSON: {exc}"
+            raise AssertionError(message) from exc
     return cases
 
 
@@ -63,16 +63,14 @@ def validate() -> None:
 
     users = {item["id"]: item for item in scenario["users"]}
     teams = {item["id"]: item for item in scenario["teams"]}
-    knowledge_bases = {
-        item["id"]: item for item in scenario["knowledge_bases"]
-    }
+    knowledge_bases = {item["id"]: item for item in scenario["knowledge_bases"]}
     documents = {item["id"]: item for item in scenario["documents"]}
 
     assert len(users) == len(scenario["users"]), "用户 ID 不能重复"
     assert len(teams) == len(scenario["teams"]), "团队 ID 不能重复"
-    assert len(knowledge_bases) == len(
-        scenario["knowledge_bases"]
-    ), "知识库 ID 不能重复"
+    assert len(knowledge_bases) == len(scenario["knowledge_bases"]), (
+        "知识库 ID 不能重复"
+    )
     assert len(documents) == len(scenario["documents"]), "文档 ID 不能重复"
 
     for user in users.values():
@@ -126,8 +124,7 @@ def validate() -> None:
             document = documents[document_id]
             knowledge_base = knowledge_bases[document["knowledge_base_id"]]
             assert can_search_normally(user, document, knowledge_base), (
-                f"样例 {case['id']} 将无权或未发布文档设为普通检索来源: "
-                f"{document_id}"
+                f"样例 {case['id']} 将无权或未发布文档设为普通检索来源: {document_id}"
             )
 
     unreferenced_documents = documents.keys() - referenced_documents
@@ -144,4 +141,3 @@ def validate() -> None:
 
 if __name__ == "__main__":
     validate()
-
