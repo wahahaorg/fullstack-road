@@ -228,6 +228,7 @@ export default withMermaid(defineConfig({
           { text: 'SQL 基础与查询', link: '/guide/sql-basics' },
           { text: 'SQL 进阶与查询优化', link: '/guide/mysql-advanced' },
           { text: 'MySQL 日志、备份恢复与复制', link: '/guide/mysql-recovery' },
+          { text: '数据库外键：理论、实践与取舍', link: '/guide/foreign-keys' },
           { text: 'PostgreSQL 基础与实战', link: '/guide/postgresql' },
           { text: 'MongoDB 与 Mongoose', link: '/guide/mongodb-mongoose' },
         ]

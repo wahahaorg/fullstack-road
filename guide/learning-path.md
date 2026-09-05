@@ -86,6 +86,7 @@ UPDATE ... WHERE ...
 - [分布式一致性与可靠消息](./distributed-consistency)
 - [HTTP、TCP、TLS 与网络排障](./network-troubleshooting)
 - [MySQL 日志、备份恢复与复制](./mysql-recovery)
+- [数据库外键：理论、实践与取舍](./foreign-keys)
 - [PostgreSQL 基础与实战](./postgresql)
 - [综合练习](./exercises)
 

@@ -105,6 +105,8 @@ JOIN users b ON a.phone = b.phone AND a.id < b.id;
 
 ## 外键与级联
 
+> 本节是快速选型入口；完整的关系建模、删除顺序、级联风险、软删除和“不建外键”时的替代方案见[数据库外键：理论、实践与取舍](./foreign-keys)。
+
 ```sql
 CREATE TABLE orders (
   id      BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
@@ -935,7 +937,6 @@ D：用到 `user_id` 和 `status`；`status` 是范围条件，之后的 `create
 一条 SQL 从"能跑"到"能上生产"，要过四道关：**语义对不对**（`ON` 和 `WHERE` 放错位置结果就变了）、**NULL 处理对不对**（`NOT IN`、`COUNT`、聚合函数遇到 NULL 的行为都不一样）、**能不能走索引**（最左前缀、别用函数包列）、**数据量涨十倍还行不行**（深翻分页、相关子查询、`SELECT *` 都是随规模劣化的写法）。
 
 `EXPLAIN` 是唯一可靠的裁判。任何"这样写更快"的经验，包括这篇里的，都应该在你自己的数据量上验证一遍。
-
 
 
 
