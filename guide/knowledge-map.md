@@ -17,7 +17,7 @@ description: 按目标、技术栈与能力层级浏览全栈知识站的全部�
 | --- | --- | --- | --- |
 | 做 Agent 应用开发 | [Agent 工程总览](./agent-intro) | [LangGraph 状态机](./agent-langgraph) → [Tool Calling 与 MCP](./agent-tool-calling) → [Multi-Agent 与人工兜底](./agent-multi-agent) | 一条可恢复、可审计、敢接敏感操作的 Agent 链路 |
 | 做能溯源的知识库问答 | [RAG 入库链路](./rag-pipeline) | [混合检索与 Rerank](./rag-retrieval) → [引用溯源与拒答](./rag-citation) → [评测方法](./agent-eval) | 一套带引用、能拒答、有评测数据支撑的 RAG 服务 |
-| 做自然语言取数（Text2SQL） | [Text2SQL 与 Schema Linking](./agent-text2sql) | [SQL 基础与查询](./sql-basics) · [MySQL 日志、备份恢复与复制](./mysql-recovery) → [评测方法](./agent-eval) | 一条生成受约束、执行有兜底的取数链路 |
+| 做自然语言取数（Text2SQL） | [Text2SQL 与 Schema Linking](./agent-text2sql) | [SQL 基础与查询](./sql-basics) · [MySQL 日志、备份恢复与复制](./mysql-recovery) · [PostgreSQL 基础与实战](./postgresql) → [评测方法](./agent-eval) | 一条生成受约束、执行有兜底的取数链路 |
 | 前端转 Python 后端 | [Python 快速入门](./python-intro) | [FastAPI 基础](./fastapi-basics) → [项目结构](./fastapi-mysql-project) | 一个分层清晰、可连接 MySQL 的 API |
 | 强化 Node.js 面试 | [Node.js 运行时](./node-runtime) | [异步编程](./node-async) → [性能与稳定性](./node-perf) → [实战练习](./node-practice) | 能从运行时原理解释线上问题 |
 | 系统掌握 NestJS | [NestJS 架构概览](./nestjs-intro) | [依赖注入](./nestjs-di) → [请求生命周期](./nestjs-pipeline) → [认证与登录状态](./nestjs-auth) → [项目架构蓝图](./nestjs-project-blueprint) | 一套可维护的企业级接口骨架 |
@@ -54,7 +54,7 @@ description: 按目标、技术栈与能力层级浏览全栈知识站的全部�
 
 ### 3. 数据、状态与可靠性
 
-- **建模与查询**：[MySQL 表结构设计](./mysql-table-design) · [SQL 基础与查询](./sql-basics) · [MySQL 日志、备份恢复与复制](./mysql-recovery)
+- **建模与查询**：[MySQL 表结构设计](./mysql-table-design) · [SQL 基础与查询](./sql-basics) · [MySQL 日志、备份恢复与复制](./mysql-recovery) · [PostgreSQL 基础与实战](./postgresql)
 - **一致性**：[并发、事务与一致性](./concurrency-transaction) · [锁机制与并发控制](./locking) · [分布式一致性与可靠消息](./distributed-consistency) · [Redis 深入](./redis-deep)
 - **异步系统**：[Worker 与异步任务](./background-worker) · [消息队列](./message-queue)
 - **认证授权**：[NestJS 认证与登录状态](./nestjs-auth) · [授权模型与三方登录](./nestjs-authorization) · [Java 登录与鉴权](./java-auth)
