@@ -209,6 +209,38 @@ async def read_me(current_user: CurrentUser):
 
 ---
 
+## 应用生命周期：lifespan 与 app.state
+
+连接池、编译好的 Agent 图、后台容器这类资源需要“启动时建一次、关闭时释放”。旧写法是 `@app.on_event("startup")` / `"shutdown"` 两个分散的钩子，FastAPI 已将其废弃，统一为 lifespan：
+
+```python
+from contextlib import asynccontextmanager
+from fastapi import FastAPI, Request
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # yield 之前：启动逻辑（建连接池、初始化表、预热缓存）
+    await container.documents.initialize()
+    yield
+    # yield 之后：关闭逻辑（释放连接、停后台任务）
+
+app = FastAPI(lifespan=lifespan)
+app.state.rag = container   # 进程级资源挂到 app.state
+
+def get_rag(request: Request) -> RagContainer:
+    return request.app.state.rag
+```
+
+三条边界要分清：
+
+- **lifespan 管进程级，Depends 管请求级**。Depends 在同一请求内缓存结果、请求结束即销毁；lifespan 里构建的对象活整个进程。数据库引擎、模型客户端、编译好的编排图属于前者，当前用户、请求内 Session 属于后者。
+- **进程级资源放 `app.state`，用 Request 或 Depends 取**。`get_rag` 这种一行的取值函数包成 `Depends`，路由签名里它和其他依赖长一个样，测试时也好替换。
+- **启动即失败**。连接池在 lifespan 里初始化，配置错误会在应用启动时抛出，被部署流程的健康检查拦住，而不是等第一个请求才炸。
+
+踩坑连接：把“每请求构建一次”的重对象（比如 `builder.compile()` 出来的图、它内部的连接池）挪进 lifespan 构建一次、挂到 `app.state`，是高 QPS 下最常见的一处修复——见 [LangGraph 状态机](./agent-langgraph)的编译踩坑。
+
+---
+
 ## async / await 与阻塞陷阱
 
 ### 什么时候用 async def
