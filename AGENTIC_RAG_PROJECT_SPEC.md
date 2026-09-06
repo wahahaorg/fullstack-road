@@ -71,18 +71,24 @@ status: approved
 
 ### 技术栈基线
 
-- Python 3.12
-- FastAPI
-- Pydantic
-- SQLAlchemy 2 与 Alembic
-- PostgreSQL 与 pgvector
-- Redis
-- MinIO
-- Python Worker
-- LangChain
+2026-09 修订：为了让读者零外部依赖跑通、把学习重心放在链路与决策上，配套项目把“教学基线”与“生产迁移目标”分开声明。本次先更新契约，各章再同步边界声明。
+
+教学基线（当前实际交付）：
+
+- Python 3.12（uv 管理）
+- FastAPI、Pydantic
+- SQLAlchemy 2（async，默认 aiosqlite，asyncpg 驱动已声明）
+- 进程内向量索引（查询前重建，教学取舍）
+- SQLite 任务表（入库队列）
+- 本地文件系统对象存储（MinIO 客户端可切换）
+- OpenAI-compatible 模型接口（httpx 直连，未引入 LangChain）
 - LangGraph
-- SSE
-- Docker Compose
+- Python Worker、SSE、Docker Compose
+
+生产迁移目标（出现在各章边界声明中的“后续方向”，不是当前交付）：
+
+- PostgreSQL + pgvector、Redis 队列、MinIO、Alembic 迁移
+- 持久化 Checkpoint、租约与共享队列、OpenTelemetry
 
 技术栈不是展示清单。新增 Elasticsearch、消息队列、图数据库或其他基础设施之前，必须先有当前方案无法满足的可复现问题，并在正文比较新增后的收益和运维代价。
 
@@ -173,9 +179,9 @@ status: approved
 
 | 章 | 标题 | 项目增量 | 完成标志 |
 |---|---|---|---|
-| 5 | 多格式解析与结构化切分 | PDF、Word、PPT、Excel、页码、标题、表格和父子 Chunk | 可以查看并比较同一文档的不同切分结果 |
+| 5 | 多格式解析与结构化切分 | PDF、Word、PPT、Excel、页码/幻灯片/工作表定位标题；父子 Chunk 与坐标定位列为生产扩展 | 可以查看并比较同一文档不同格式的解析输出 |
 | 6 | 异步入库与任务状态 | Worker、解析、切分、Embedding、索引、进度和失败信息 | 大文件不阻塞接口，失败任务可以定位并重新执行 |
-| 7 | 向量、关键词、混合召回与 Rerank | pgvector、关键词召回、RRF、Rerank、相邻块合并 | 在固定问题集上比较各阶段的召回与排序 |
+| 7 | 向量、关键词、混合召回与 Rerank | 教学内存向量与关键词召回、RRF、确定性 Rerank；pgvector 与相邻块合并列为生产扩展 | 在固定问题集上比较各阶段的召回与排序 |
 | 8 | 引用、拒答与上下文构造 | Token 预算、结构化答案、引用校验和证据不足拒答 | 每条有效答案可定位原文，无证据问题不会编造来源 |
 
 ### 第四阶段：升级为 Agentic RAG

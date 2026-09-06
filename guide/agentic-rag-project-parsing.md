@@ -1,11 +1,20 @@
 ---
 title: 企业知识库 Agentic RAG 实战（五）：多格式解析与结构化切分
-description: 将 PDF、Word、PPT 和 Excel 解析为统一结构块，保留页码、标题、表格与区域坐标，并用父子 Chunk 改善检索和引用。
+description: 先讲清多格式解析要保留哪些结构信息；配套项目当前交付统一解析入口和按格式定位标题的简化版，ContentBlock、父子 Chunk 与坐标定位是生产扩展方向。
 ---
 
 # 企业知识库 Agentic RAG 实战（五）：多格式解析与结构化切分
 
 > 前四章已经知道哪些文档可用，但检索质量仍取决于如何把文件变成 Chunk。本章不追求“支持很多后缀”，而是让每个片段既适合召回，又能回到用户看得懂的原文位置。
+
+## 本章交付与边界
+
+配套项目当前交付的是一个刻意简化的解析层，先说清它做了什么：
+
+- `app/parsing.py` 的 `parse_document()` 是统一解析入口：Markdown 与纯文本直接交给切分器；PDF 用 pypdf 逐页提取文本，以“第 N 页”作为 Chunk 标题；Word 按 Heading 样式分节，普通段落归入最近的标题；PPT 以“第 N 张幻灯片”为标题汇总同页文本框；Excel 以“工作表：名称”为标题拼接数据行；不支持的后缀直接报错。
+- `app/chunking.py` 按标题与段落切分，600 字上限、约 80 字重叠，尽量对齐句号或换行边界，超长段落用重叠窗口断开。
+
+本章正文讲解的 `ContentBlock`、坐标定位、OCR 阈值、Parser Registry、父子 Chunk 与三种切分策略对比是完整设计参考：一部分在后续章节以简化形式落地，其余属于生产扩展方向。不要把正文中的类和脚本当成仓库里已有的代码，遇到差异以本节为准。
 
 ## 先看结构化切分带来的差异
 
@@ -40,7 +49,7 @@ Chunk B: 上限 一线城市 北京 上海 广州 深圳 650 元……
 - 空间位置：页码、幻灯片编号、工作表、单元格区域。
 - 来源身份：解析后的片段对应哪个原始对象、哪个文档版本。
 
-本项目先把不同格式归一化为 `ContentBlock`：
+完整实现会先把不同格式归一化为 `ContentBlock`。配套项目当前的 `ChunkDraft`（`heading` + `content`）是它的最小版本，还没有类型、页码和坐标字段，但归一化的思路从这里开始理解：
 
 ```python
 class ContentBlock(BaseModel):
@@ -118,7 +127,7 @@ parsed = await parser.parse(source)
 
 ## 父子 Chunk 同时满足召回和上下文
 
-只用大 Chunk，向量容易混入多个主题；只用小 Chunk，答案又缺少限定条件。本项目采用两层结构：
+只用大 Chunk，向量容易混入多个主题；只用小 Chunk，答案又缺少限定条件。生产实现通常采用两层结构，这也是本章的设计目标：
 
 - 子 Chunk：100～300 个有效字符，面向检索和 Rerank。
 - 父 Chunk：一个完整小节、一张表格或一页幻灯片，面向 LLM 上下文和引用展示。
@@ -137,7 +146,7 @@ class SearchChunk:
 
 `embedding_text` 可以补入标题和列名，`text` 保留用户应看到的原文。不要为了提高召回修改原文内容，否则引用展示会把机器补写的文字冒充文档原句。
 
-检索命中多个相邻子 Chunk 后，按 `parent_id` 去重并取父内容：
+检索命中多个相邻子 Chunk 后，按 `parent_id` 去重并取父内容。配套项目尚未实现这一层，当前由第 8 章的 Evidence 预算组装（上下文预算、每文档限量、来源编号）承担同样职责，父子 Chunk 列为检索优化的扩展项：
 
 ```python
 child_hits = await retriever.search(query, top_k=20)
@@ -147,7 +156,7 @@ context = await parent_store.fetch(ranked_parents[:5])
 
 ## 表格不能被普通空行切分
 
-上一章的 Markdown 切分器遇到表格时恰好保留了整段，但超长表格仍可能从任意字符断开。本章把表格视为结构对象：
+上一章的 Markdown 切分器遇到表格时恰好保留了整段，但超长表格仍可能从任意字符断开。完整实现把表格视为结构对象：
 
 1. 保存完整表格作为父 Chunk。
 2. 将表头与每一行拼成子 Chunk。
@@ -158,7 +167,7 @@ context = await parent_store.fetch(ranked_parents[:5])
 
 ## 用同一组问题比较切分策略
 
-不要凭视觉感觉决定 Chunk 大小。配套项目保留三种策略并输出中间结果：
+不要凭视觉感觉决定 Chunk 大小。生产实现通常保留多种策略并输出中间结果：
 
 ```text
 fixed-500       固定字符窗口
@@ -166,15 +175,21 @@ heading-aware   标题与段落切分
 parent-child    结构块 + 父子 Chunk
 ```
 
-运行切分预览：
+配套项目当前只落地了 heading-aware 一种，且没有现成的预览脚本。你可以在项目目录用几行代码直接观察切分结果：
 
 ```bash
-uv run python scripts/inspect_chunks.py \
-  fixtures/documents/travel-policy-v2.pdf \
-  --strategy parent-child
+cd projects/agentic-rag && uv run python -c "
+from pathlib import Path
+from app.parsing import parse_document
+
+raw = Path('fixtures/documents/travel-policy-v2.md').read_bytes()
+for draft in parse_document('travel-policy-v2.md', raw):
+    print(f'[{draft.heading}] {len(draft.content)} 字')
+    print(draft.content[:120], '...')
+"
 ```
 
-预览结果需要包含 Chunk 文本、标题路径、页码、父子关系和估算 Token 数。随后用固定问题集比较：
+把文件名换成其他格式的 fixture，即可对比各格式的解析输出；补齐多策略对比脚本是一个值得自己完成的练习。随后用固定问题集比较：
 
 - “上海住宿每晚最多报销多少？”是否命中正确表格行。
 - “北京和成都相差多少？”是否同时取到两行和共同表头。
@@ -184,7 +199,7 @@ uv run python scripts/inspect_chunks.py \
 
 ## 解析失败不能留下半套索引
 
-解析任务写入独立的 `index_version`。只有全部结构块、父子 Chunk 和向量准备完成后，才更新文档的 `candidate_index_version`：
+生产实现会为解析产物引入独立的候选/生效索引版本（`index_version`），只有全部结构块和向量准备完成后才切换检索入口。下面的机制是第 14 章可靠性要展开的设计参考：
 
 ```python
 try:
@@ -195,10 +210,10 @@ except UnsupportedEncryptedFile as exc:
     await documents.mark_failed(document.id, code="encrypted_file", detail=str(exc))
 ```
 
-如果第 37 页解析失败，旧的已发布索引继续服务，失败候选版本不参与检索。用户看到的是旧版本或明确的处理失败，而不是缺了后半部分的新制度。
+当前配套项目用更简单的保证实现同一目标：解析失败时任务被标记 `parse_error` 并停止推进，文档不会进入 `review_pending`，已发布的旧版本继续参与检索（第 4 章的版本归档保证旧版本不被新上传覆盖）。用户看到的是旧版本或明确的失败原因，而不是缺了后半部分的新制度；候选/生效双索引切换列入生产扩展。
 
 ## 本章小结
 
-现在，不同格式都会先转成统一结构块，Chunk 保留标题路径、页码、工作表和区域定位。子 Chunk 用于准确召回，父 Chunk 用于完整上下文和证据展示，解析失败也不会污染当前生效索引。
+现在，六种常见格式都有统一解析入口，Chunk 保留页码、幻灯片或工作表级别的定位标题；解析失败会让任务停在 `parse_error`，不会把半套索引推进检索。`ContentBlock`、父子 Chunk 和坐标级定位是这一层走向生产时的扩展方向，先理解它们解决什么问题，再决定何时引入。
 
 继续阅读[第 6 章：异步入库与任务状态](./agentic-rag-project-async-ingestion)，把耗时的解析、切分、Embedding 和索引过程移出 HTTP 请求，加入后台 Worker、任务状态、进度和可重试错误。

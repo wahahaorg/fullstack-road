@@ -78,7 +78,7 @@ description: 认识一套 Python + FastAPI + LangGraph 企业知识库的最终�
 - 入库任务可以重试，并避免重复消费生成重复 Chunk。
 - 重建索引失败时保留仍可使用的旧版本。
 
-管理能力以 API 和 Swagger 为主；问答链路会提供一个轻量演示页面，用于观察 SSE、引用和 Agent 节点。这个系列的核心是 Python AI 后端，不展开成另一套 React 基础课。
+管理能力以 API 和 Swagger 为主；SSE、引用和 Agent 节点用 API 客户端或 curl 观察，轻量演示页面列为后续增强。这个系列的核心是 Python AI 后端，不展开成另一套 React 基础课。
 
 ## 用一组真实业务角色约束设计
 
@@ -109,7 +109,7 @@ description: 认识一套 Python + FastAPI + LangGraph 企业知识库的最终�
 - Python API、后台 Worker 和 Agent 编排代码。
 - 文档元数据、权限、任务、Chunk、会话和评测数据模型。
 - 文档解析、Embedding、固定 RAG 和 Agentic RAG。
-- SSE 事件协议和轻量演示页面。
+- SSE 事件协议。
 - 自动化测试、离线评测、Docker Compose 和运行说明。
 
 ### 第一版暂不加入
@@ -182,6 +182,8 @@ draft → processing → review_pending → published → archived
 | Redis | 后台任务、临时进度和短期状态 | 文档解析与 Embedding 不能占住 HTTP 请求 |
 | MinIO | 原始文件 | 重新解析和切分时不要求用户再次上传 |
 
+上表是第一版的目标形态。为了让读者零外部依赖跑通，配套项目的教学基线是：SQLite（aiosqlite）同时承载元数据与入库任务表，进程内向量索引承载检索（查询前重建，保证 API 与 Worker 分进程一致），本地文件系统承载原始文件；`asyncpg` 与 `minio` 客户端、Docker Compose 已为迁移留好接口。后续章节会逐章声明“当前交付与生产迁移方向”的边界，图中组件名以目标形态书写，阅读时以各章边界声明为准。
+
 选择 pgvector 不代表 Elasticsearch 没有价值。第 7 章会比较向量、关键词和混合检索；只有当前方案的检索结果证明需要额外能力时，才考虑增加新的检索系统。
 
 这个取舍对应[RAG 入库链路](./rag-pipeline)中的一条原则：原始文件、解析结果和索引状态要能够独立保存和重建。这里进一步限制了状态系统数量，让第一版的失败恢复可以解释清楚。
@@ -247,4 +249,4 @@ Agentic RAG 不是给普通 RAG 多套一层 LangGraph。两者的差别在于�
 
 我们要实现的是一套企业知识库后端：文档有生命周期，检索受数据权限限制，简单问题走固定 RAG，复杂问题才进入 Agentic RAG，最终答案必须有证据并能够被评测。
 
-架构先使用 PostgreSQL + pgvector、Redis 和 MinIO，保持状态关系清晰。继续阅读[第 2 章：跑通最小 RAG 闭环](./agentic-rag-project-minimal)，用一份 Markdown 制度完成“上传 → 切分 → Embedding → 检索 → 带来源回答”。
+架构先以零依赖的教学基线（SQLite、进程内向量、文件系统存储）跑通全链路，并保留向 PostgreSQL + pgvector、Redis 和 MinIO 迁移的接口。继续阅读[第 2 章：跑通最小 RAG 闭环](./agentic-rag-project-minimal)，用一份 Markdown 制度完成“上传 → 切分 → Embedding → 检索 → 带来源回答”。
