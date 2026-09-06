@@ -662,16 +662,6 @@ location /api/chat {
 
 ---
 
-## 面试怎么说
-
-- **为什么选 SSE 不选 WebSocket**：需求是服务端单向推。SSE 就是一个 HTTP 响应，鉴权、限流、网关、日志、链路追踪全部复用，浏览器自带重连和 `Last-Event-ID` 续传。WebSocket 要自己管心跳、重连、房间、多实例广播，只有双向高频交互才值这个成本。
-- **WebSocket 握手**：客户端带 `Upgrade: websocket` 和随机的 `Sec-WebSocket-Key`，服务端拼上协议规定的 GUID 做 SHA1 + base64 放进 `Sec-WebSocket-Accept`，返回 101。这不是加密，是证明对端真的实现了协议。之后走二进制帧，头部最少 2 字节。
-- **为什么客户端到服务端必须掩码**：防代理缓存投毒。不掩码的话攻击者能构造出让老式代理误认为是 HTTP 请求的 payload。
-- **多实例为什么会丢消息**：`server.to(room).emit()` 只遍历本进程内存里的连接表。解法是换 `@socket.io/redis-adapter`，用 Redis Pub/Sub 把 emit 广播到所有实例。另外 socket.io 默认要粘性会话，除非直接 `transports: ['websocket']`。
-- **消息怎么保证不丢**：WebSocket 本身不保证送达。消息先落库拿到自增 id，再推送；客户端重连时带最后收到的 id 拉增量；用客户端生成的 msgId 加唯一索引做幂等去重。
-
----
-
 ## 面试问答
 
 **1. WebSocket 握手成功返回什么状态码？`Sec-WebSocket-Accept` 算出来的意义是什么？**

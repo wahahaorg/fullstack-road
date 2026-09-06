@@ -699,12 +699,6 @@ error_log  /var/log/nginx/error.log warn;
 
 > ⚠️ 502 和 504 的区别决定排查方向完全不同：502 是"敲门没人应"，去看进程和网络；504 是"人在里面但不出来"，去看代码和依赖。把两者混为一谈会浪费大量时间。
 
----
-
-## 面试怎么说
-
-> nginx 我主要用它做三件事：静态资源托管、反向代理和流量治理。反代必须配 `Host`、`X-Real-IP`、`X-Forwarded-For`、`X-Forwarded-Proto` 四个头，并在 Node 侧开 `trust proxy`，否则拿不到真实客户端 IP 和协议；做 AI 流式输出时要关 `proxy_buffering` 并放大 `proxy_read_timeout`，不然 SSE 会被缓冲住。灰度我用 `map` 加 cookie 做，登录时按用户 ID 哈希染色，保证同一用户稳定落在同一版本；灰度期间数据库变更必须向前兼容，只做加列不做删列。排查性能问题时我会在 `log_format` 里加 `$request_time` 和 `$upstream_response_time`，两者的差值能直接区分是后端慢还是客户端网络慢。
-
 配套阅读：[Docker 与部署](/guide/docker-deployment)、[Dockerfile 实践](/guide/dockerfile-practice)、[Docker Compose 与网络](/guide/docker-compose-network)。
 
 ---
@@ -745,6 +739,24 @@ error_log  /var/log/nginx/error.log warn;
 - `gzip_types` 不要加图片和视频——它们已经是压缩格式，再压是纯浪费 CPU
 - `gzip_vary on` 让 CDN 按 Accept-Encoding 分别缓存
 - 加分：能说出更省 CPU 的路子——构建时预生成 `.js.gz` / `.js.br`，运行时 `gzip_static on` / `brotli_static on` 直接发预压缩文件，把压缩开销从每次请求挪到构建一次
+
+**6. 反向代理后面跑 SSE 流式接口要注意什么？**
+
+- 关 `proxy_buffering`：nginx 默认把上游响应缓冲满一块再发，SSE 会被攒成"最后一口气全吐出来"，前端失去流式效果
+- 放大 `proxy_read_timeout`：读超时要大于最长回答时间，否则长回答在代理层被掐断
+- 加分：应用侧响应头带 `X-Accel-Buffering: no`，对不归自己管的中间层也生效；心跳间隔要小于链路上最短的超时
+
+**7. 灰度发布怎么保证同一用户稳定落在同一版本？**
+
+- 用 `map` 加 cookie 做染色：登录时按用户 ID 哈希决定版本并写入 cookie，后续请求按 cookie 分池，同一用户始终命中同一版本
+- 灰度期间数据库变更必须向前兼容：只加列不删列、旧代码能读写新结构，这样回滚只回滚应用不回滚数据
+- 加分：回滚最快的一档是改配置中心的灰度比例，其次是改 nginx 的 map 指回稳定版，都比重发镜像快
+
+**8. `$request_time` 和 `$upstream_response_time` 的差值能说明什么？**
+
+- `$request_time` 是 nginx 视角的总耗时，`$upstream_response_time` 是后端耗时；差值主要是传输和 nginx 自身处理
+- 两者都大：后端真的慢，查慢 SQL 和外部调用；request 大、upstream 小：后端不背锅，通常是客户端网络慢或响应体过大
+- 加分：`upstream_response_time` 出现多段值说明发生了重试，是 `-` 说明请求根本没到后端就被 nginx 拦了（限流、413、upstream 找不到）
 
 
 

@@ -556,16 +556,6 @@ readiness 反过来必须查依赖，因为它的动作是**摘流量**：这个
 
 ---
 
-## 面试怎么说
-
-- **为什么不用 `console.log`**：没有级别、没有结构、不能控制目的地和轮转；而且 `process.stdout` 指向文件或 TTY 时是同步写，日志一多会直接占用事件循环的时间。
-- **自定义 Logger 怎么注入依赖**：`NestFactory.create` 时开 `bufferLogs: true`，启动日志先进缓冲区，等容器就绪后 `app.useLogger(app.get(AppLogger))`，缓冲区随即 flush。
-- **请求日志放 Middleware 还是 Interceptor**：Middleware 能覆盖 404 和被 Guard 拒掉的请求、耗时从最外层算起，但拿不到响应体和异常；Interceptor 能拿到 handler 名、响应和异常，但只覆盖路由命中的请求。生产上两个配合用。
-- **traceId 怎么传**：`AsyncLocalStorage` 绑在异步调用链上，日志格式里自动读取，不污染业务方法签名；入口接受上游 `X-Request-Id`，没有就自己生成，同时写回响应头和错误响应体。
-- **liveness 和 readiness 的区别**：前者失败会重启容器，只能检查进程自身；后者失败只是摘流量，应该检查依赖。把数据库探针放进 liveness，会把一次数据库抖动放大成全副本重启。
-
----
-
 ## 面试问答
 
 **1. Winston 打出来的 Error 日志是一个空 `{}`，为什么？**
@@ -599,3 +589,17 @@ readiness 反过来必须查依赖，因为它的动作是**摘流量**：这个
 - liveness 失败的动作是 kubelet 杀掉容器重启。数据库抖 30 秒，所有副本的 liveness 同时失败、全部被杀重启，重启后连接池冷启动、本地缓存全空、请求一齐涌向刚恢复的数据库——一次可以自愈的抖动被放大成全站故障。
 - liveness 唯一要回答的是「重启我有用吗」，数据库挂了重启没用；readiness 才查依赖，它的动作是摘流量，把连不上数据库的副本摘掉让流量走健康副本，是完全正确的处理。
 - readiness 还承担优雅退出的第一步：收到 SIGTERM 后立刻返回 503，等负载均衡摘掉流量再关连接。启动慢的应用用 startupProbe，别把 liveness 的 `failureThreshold` 调大——那会让它整个运行期都变得迟钝。
+
+**6. 为什么 `console.log` 不能上生产？内置 Logger 不够用吗？**
+
+- `console.log` 没有级别、没有结构化、不能控制目的地和轮转；而且 `process.stdout` 指向文件或 TTY 时是同步写，一次 log 就是一次阻塞的系统调用，日志一多直接吃掉事件循环的时间。
+- 内置 Logger 够到测试环境：级别、context、时间戳都有，`ConsoleLogger` 还能直接输出 JSON；但它的目的地只有 stdout / stderr——error 单独落文件、按天轮转、把日志发给告警服务，它一件都做不了，这就是换 Winston / Pino 的理由。
+- 自定义 Logger 要注入依赖（带上配置里的服务名、把错误上报给监控 Service），靠 `bufferLogs` 解决时序：`NestFactory.create` 时开 `bufferLogs: true`，启动日志先进缓冲区，容器就绪后 `app.useLogger(app.get(AppLogger))`，缓冲区随即 flush。
+- 别踩的坑：开了 `bufferLogs` 忘了 `useLogger`，启动日志一直躺在缓冲区里，表现为「服务明明起来了但控制台什么都没有」。
+
+**7. 请求日志放 Middleware 还是 Interceptor？traceId 怎么做到全链路无感传递？**
+
+- 两个都要、分工不同：Middleware 耗时从最外层算起、覆盖 404 和被 Guard 拒掉的请求（在 `res.on('finish')` 里记），但拿不到响应体和异常；Interceptor 能拿 handler 名、响应和异常，但只覆盖路由命中的请求。只能选一个选 Middleware——404、限流拒绝、鉴权失败恰恰是排查时最需要的。
+- traceId 用 `AsyncLocalStorage` 绑在异步调用链上（前端类比 React Context），业务方法签名不用为它加参数；最外层 Middleware 里 `requestContext.run({ traceId }, next)`——next 必须写在 run 的回调里，写成 `run(...); next()` 后续代码全部取不到。
+- 入口接受上游的 `X-Request-Id`（校验合法形态再接受，避免日志字段注入），没有就自己生成，同时写回响应头和错误响应体——用户报障截个图就能定位到那一次请求。
+- 加分：定时任务和消息消费者跑在请求之外，`getStore()` 是空的，入口要自己 run 一个上下文；跨进程要把 traceId 作为消息体字段显式传，消费时再 run 进去。

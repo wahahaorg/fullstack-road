@@ -265,10 +265,6 @@ KEY idx_kb_status_created (knowledge_base_id, parse_status, created_at)
 
 这比直接写 SQL 更重要。
 
-## 面试怎么说
-
-> 我写 SQL 时会先从接口查询场景出发，确认主表、过滤条件、关联关系、排序和分页方式。对于更新类 SQL，我会特别注意 WHERE 条件和影响行数；涉及多表修改时使用事务；涉及并发时优先使用唯一约束、条件更新或行锁保证最终正确性。
-
 ---
 
 ## 面试问答
@@ -278,6 +274,7 @@ KEY idx_kb_status_created (knowledge_base_id, parse_status, created_at)
 - 并发注册时不要只靠"先查是否存在"，给手机号加唯一索引 `UNIQUE KEY uk_phone (phone)` 才是最终兜底。
 - 库存扣减不要"先查再改"，条件更新 `SET stock = stock - 1 WHERE id = 1 AND stock > 0` 把判断和修改放进一条 SQL，更稳。
 - 执行后检查影响行数：为 0 说明库存不足或商品不存在，不要继续往下走。
+- 涉及并发时，优先把正确性交给数据库——唯一约束、条件更新或行锁，保证最终正确性，而不是只靠应用层判断。
 - 加分：后台开发里 `UPDATE` 最重要的是 WHERE 条件，更新类 SQL 出事故多半出在条件上。
 
 **2. 物理删除和软删除怎么选？**

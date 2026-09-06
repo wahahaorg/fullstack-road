@@ -668,16 +668,6 @@ export class AppModule {}
 
 ---
 
-## 面试怎么说
-
-- **解决什么 / 代价**：解决 over-fetching 和 under-fetching；代价是单端点 POST 让 HTTP 缓存失效、查询复杂度由调用方决定、N+1 是执行模型的固有结果、监控和限流粒度从接口级退化到端点级。
-- **选型**：内部管理后台和 BFF 层最受益；对外开放 API、简单 CRUD、靠缓存扛量的读接口用 REST 更省。
-- **N+1 与 DataLoader**：字段级 resolver 在列表里执行 N 次；DataLoader 利用同一 tick 内攒 key 做批量查询。两个必答的坑——loader 必须是请求级实例（它带无过期缓存，单例会串用户数据），batch 函数返回值必须和入参 keys 等长同序。
-- **安全三件套**：深度限制、复杂度预算、生产环境关掉 introspection 和落地页；再往前一步是持久化查询白名单。
-- **错误处理**：永远 200 + `errors` 数组，前端不能靠状态码判断，业务码放 `extensions.code`；GraphQL 的 Filter 是 return 错误而不是写 response。
-
----
-
 ## 面试问答
 
 **1. code-first 和 schema-first 怎么选？**
@@ -713,3 +703,10 @@ export class AppModule {}
 - 生产关掉 `introspection` 和落地页：introspection 会把完整 schema 吐出来，等于把所有实体、字段名和关联关系交给攻击者做侦察；关掉后前端 codegen 读 CI 里生成的 `schema.gql` 文件，不去线上 introspect。
 - 每个列表字段的 `first` 都要 `@Max()` 强制上限，别信 `defaultValue`；终极手段是持久化查询白名单——客户端只传 query 的 hash，复杂度攻击直接从威胁模型里消失。
 - 别踩的坑：深度限制挡不住 `{ posts(first: 10000) { title } }`——只有两层照样能打死库，所以深度和复杂度缺一不可。
+
+**6. GraphQL 解决了 REST 的什么问题？代价和选型怎么判断？**
+
+- 解决 over-fetching（商品接口返回 42 个字段页面用 6 个）和 under-fetching（一个页面五个请求还形成瀑布）；服务端声明能提供什么、客户端声明这次要什么，一个请求拿完，页面加字段前端改 query 后端不动。
+- 代价：所有请求落到 `POST /graphql` 一个端点，URL 不再代表资源，CDN、浏览器缓存、ETag 一起失效，要缓存只能在应用层自己做；查询复杂度由调用方决定，等于把慢查询的开关交出去；N+1 是字段级 resolver 执行模型的固有结果；监控和限流粒度从接口级退化到端点级，要按 operationName 甚至字段重建一套。
+- 选型一句话：调用方是自己人、查询形状多变、缓存不是主要手段 → GraphQL（内部管理后台、BFF 聚合层最受益）；调用方不可控、查询形状固定、靠缓存扛量 → REST（对外开放 API、简单 CRUD、文件上传 / Webhook 这些本身面向 HTTP 语义的场景）。
+- 加分：schema 演进没有 `/v2` 可用——字段一旦发布就无法确知谁在用，删除前先靠字段级埋点观察调用量，再走 `@deprecated` 长周期下线。

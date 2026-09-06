@@ -594,16 +594,6 @@ Prisma 4 时代的 `prisma.$use(async (params, next) => ...)` 中间件已经被
 
 ---
 
-## 面试怎么说
-
-- **Prisma 和 TypeORM 的本质区别**：一个是 schema 定义代码（DSL → 代码生成 → Client），一个是代码定义 schema（装饰器 + 运行时元数据）。类型精确、没有 lazy loading、没有 QueryBuilder，全是这一条的推论。
-- **`migrate dev` 和 `migrate deploy`**：前者是开发命令，会 diff、会生成迁移文件，检测到 drift 会提示重置数据库并重跑 seed；后者只按顺序执行已有迁移。生产只能用 deploy。
-- **Prisma 会不会 N+1**：`include` 是固定条数的多条查询（不是 JOIN，也不是 N+1），真正的 N+1 来自在循环里查询。需要 JOIN 可以开 `relationJoins` 预览特性，用 `relationLoadStrategy` 按查询指定。
-- **在 Nest 里怎么接**：`PrismaService extends PrismaClient`，`onModuleInit` 里 `$connect`、`onModuleDestroy` 里 `$disconnect`，`main.ts` 里 `app.enableShutdownHooks()`，包成 `@Global()` 的 `PrismaModule`。
-- **软删除怎么做**：`$extends` 的 `query` 扩展（不是已废弃的 `$use`），并且要说清它逐方法生效、嵌套查询覆盖不到这两个局限。
-
----
-
 ## 面试问答
 
 **1. Prisma 和 TypeORM 最本质的区别是什么？**

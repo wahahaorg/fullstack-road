@@ -271,12 +271,6 @@ class RedisLock:
 
 ---
 
-## 面试怎么说
-
-> Redis 我不只当缓存用。String 做分布式锁和限流，Hash 存用户对象方便单独读写字段，List 做轻量 MQ，Sorted Set 做排行榜和延时队列。缓存我用 Cache Aside 模式，写数据库后删缓存，配合过期时间加随机偏移防雪崩。分布式锁用 SETNX + Lua 脚本保证原子性，一定要设过期时间和唯一 Token。
-
----
-
 ## 面试问答
 
 **1. 缓存穿透、击穿、雪崩怎么区分，分别怎么处理？**
@@ -310,3 +304,10 @@ class RedisLock:
 - value 必须是唯一 token，否则业务超时锁过期易主后，A 释放时会删掉 B 刚拿到的锁
 - 释放锁要「比对 token 再删」且两步原子，用 Lua 脚本实现
 - 别踩的坑：释放时直接 DEL 不比对 token，锁过期被别人拿走后，删掉的就是别人的锁
+
+**6. 除了缓存，String / List / Sorted Set 还有哪些典型用法？**
+
+- String：分布式锁（SETNX + Lua + 唯一 Token）和计数限流
+- List：LPUSH + BRPOP 做轻量 MQ，适合允许少量丢失的低价值场景
+- Sorted Set：排行榜和延时队列（score 存执行时间戳，轮询取到期任务）
+- 加分：选结构先看访问模式——Hash 要按字段单独读写，ZSET 要按分数范围取，选错了后面全是补丁

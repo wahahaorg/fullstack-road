@@ -586,14 +586,6 @@ docker inspect --format '{{json .State}}' <容器> | jq    # 看 OOMKilled、Err
 
 ---
 
-## 面试怎么说
-
-> 镜像是一叠只读层，每条 `RUN` / `COPY` 产生一层只记差异，容器是在最上面加的可写层——所以后面的层删文件不会让镜像变小，产生和清理必须写在同一条 `RUN` 里。写 Dockerfile 我按两个方向优化：**时间上**把指令按变化频率从低到高排，依赖清单先 `COPY` 再 `npm ci`，最后才 `COPY . .`，因为缓存失效是从 miss 的那层往后全失效；**体积上**用多阶段构建，builder 装全量依赖编译，runner 只 `COPY --from` 产物加 `npm ci --omit=dev`，配合 slim 或 alpine 基础镜像，1.5 GB 能降到 200 MB 以内。细节上 `CMD` 一定用 exec form，shell form 会让 `sh` 当 PID 1 吞掉 `SIGTERM`；`USER node` 跑非 root，配合 `COPY --chown` 避免事后 `chown -R` 把镜像撑大；密钥用 BuildKit 的 `--mount=type=secret` 而不是 `ARG`，因为 `docker history` 能读到 `ARG`。
->
-> 原理上容器就是 namespace 隔离视图 + cgroups 限制资源 + UnionFS 分层存储，它共享宿主机内核，不是虚拟机——这既解释了启动快体积小，也解释了隔离强度不如 VM，以及 Docker Desktop 在 macOS 上其实跑了个 Linux 虚拟机。Node 在容器里要同时设 cgroup 内存上限和 `--max-old-space-size`，否则 V8 按宿主机内存估算堆上限，最后是被 OOM Killer 静默杀掉、退出码 137。
-
----
-
 ## 继续读
 
 - [Compose、网络与进程守护](/guide/docker-compose-network)：多容器编排、服务间怎么互相访问、信号与优雅退出、PM2 到底还要不要
@@ -636,3 +628,19 @@ docker inspect --format '{{json .State}}' <容器> | jq    # 看 OOMKilled、Err
 - `--start-period` 是启动宽限期，期间探测失败不计入 `--retries`，Nest 这种启动时要连数据库的应用必须给
 - alpine 和 distroless 里没有 curl，用 Node 20 自带的全局 fetch 写探针最省事，还顺便验证了 Node 运行时是活的
 
+
+**6. 镜像层的缓存怎么利用才不会失效？**
+
+- 指令按变化频率从低到高排：先 COPY 依赖清单再 `npm ci`，最后才 `COPY . .`——缓存失效从 miss 的那层开始往后全部失效
+- 后面的层删文件不会让镜像变小：每层只记差异，文件的产生和清理必须写在同一条 `RUN` 里
+
+**7. CMD 为什么要用 exec form？密钥为什么不能走 ARG？**
+
+- shell form 会让 `sh` 当 PID 1 吞掉 `SIGTERM`，容器停止变成超时强杀；exec form 直接 exec 应用，信号能送达
+- 密钥用 BuildKit 的 `--mount=type=secret`；`ARG` 会留在镜像元数据里，`docker history` 能读出来
+- `USER node` 跑非 root，`COPY --chown` 一次到位，避免事后 `chown -R` 把镜像撑大
+
+**8. Node 在容器里为什么会被静默杀掉（退出码 137）？**
+
+- 容器是 namespace 隔离视图 + cgroups 限制资源 + UnionFS 分层存储，共享宿主机内核，不是虚拟机——Docker Desktop 在 macOS 上其实跑了个 Linux 虚拟机
+- 只设 cgroup 内存上限时，V8 按宿主机内存估算堆上限，超限被 OOM Killer 静默杀掉；要同时设 `--max-old-space-size`，让两个上限对齐

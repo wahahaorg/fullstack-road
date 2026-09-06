@@ -491,14 +491,6 @@ if (!roles?.length) return true   // 没标注 = 不限制
 
 ---
 
-## 面试怎么说
-
-- **顺序**：Middleware → Guard → Interceptor（前置）→ Pipe → Handler → Interceptor（后置）→ Exception Filter。每层内部按「全局 → 控制器 → 方法」生效，Interceptor 的后置部分逆序。
-- **Middleware 和 Interceptor 的区别**：Middleware 在 HTTP 平台层，拿不到 `ExecutionContext`，读不到路由元数据也改不了响应体；Interceptor 在 Nest 内部，能读元数据、能用 RxJS 加工响应、能短路。
-- **为什么全局切面推荐用 `APP_GUARD` 这类 token 注册**：`useGlobalXxx(new X())` 传的是手动 new 的实例，不在 IoC 容器里，注入不了 Provider。
-
----
-
 ## 面试问答
 
 **1. 说一下一个请求的完整执行顺序。**
@@ -526,3 +518,8 @@ if (!roles?.length) return true   // 没标注 = 不限制
 
 - 靠 `ExecutionContext` / `ArgumentsHost` 抽象：`getType()` 判断上下文，`switchToHttp()` / `switchToWs()` 各取所需；把「从上下文取凭证、挂用户信息」收进私有方法，主体逻辑保持与上下文无关。
 - 别踩的坑：Guard 里直接写死 `switchToHttp().getRequest()`，挪到 WebSocket 上会拿到 `undefined`，而且是运行时才炸；另外 WebSocket 只在建立连接时握手一次，token 过期不会自动生效，长连接场景要自己做定期校验。
+
+**6. 全局切面为什么推荐用 `APP_GUARD` 这类 token 注册？**
+
+- `useGlobalXxx(new X())` 传的是手动 new 的实例，不在 IoC 容器里，注入不了 Provider——切面里要用配置、要依赖别的 Service 就做不到。
+- 用 `APP_GUARD` / `APP_PIPE` 这类 token 注册，切面交给容器管理，和普通 Provider 一样能注入依赖、按模块装配。

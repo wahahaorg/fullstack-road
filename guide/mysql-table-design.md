@@ -320,14 +320,6 @@ failed → pending
 
 否则后续会出现各种非法状态流转。
 
-## 面试怎么说
-
-你可以这样回答建表思路：
-
-> 我不会直接按页面字段建表，而是先拆业务实体和生命周期，再判断实体之间是一对一、一对多还是多对多。然后为核心业务规则设计唯一约束、非空约束和必要索引。对于会被并发修改的表，我会额外考虑版本号、状态流转、事务和幂等字段。这样表结构不只是能存数据，还能帮助系统守住业务正确性。
-
----
-
 ## 面试问答
 
 **1. 拿到一个业务名词，怎么判断它要不要单独成表？**
@@ -356,7 +348,7 @@ failed → pending
 **5. 一张业务表除了业务字段，你还会加哪些通用字段？**
 
 - `created_at` / `updated_at`：`DATETIME(3)`，`DEFAULT CURRENT_TIMESTAMP(3)`，`updated_at` 再加 `ON UPDATE CURRENT_TIMESTAMP(3)`。
-- 按需加：软删除 `deleted_at`、审计 `created_by` / `updated_by`、乐观锁 `version INT UNSIGNED NOT NULL DEFAULT 0`。
+- 按需加：软删除 `deleted_at`、审计 `created_by` / `updated_by`、乐观锁 `version INT UNSIGNED NOT NULL DEFAULT 0`；会重试的写入（导入、回调）加幂等键列，配合唯一索引防重复。
 - 状态字段还要配套状态机（pending → running → success / failed，failed → pending），否则会出现各种非法状态流转。
 - 别踩的坑：所有字段一律 `VARCHAR(255)`——长度应该来自业务规则，不是复制粘贴。
 

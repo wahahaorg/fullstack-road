@@ -768,18 +768,6 @@ export class ImageService {
 
 ---
 
-## 面试怎么说
-
-- **三条路线**：小文件后端中转，大文件后端签名前端直传，超大文件分片。判断依据是「字节流要不要经过应用服务器」——中转吃带宽、内存和连接数，还让上传和部署互相牵制。
-- **multer 与 Nest 的关系**：Nest 的四个上传 Interceptor 是 multer `single`/`array`/`fields`/`any` 的封装，`@UploadedFile(s)` 只是把 multer 已经解析好的结果从 request 上取下来注入。
-- **为什么必须重命名文件**：原始文件名可控，带来路径穿越、编码乱码、重名覆盖和可执行文件落地四类风险。只从原名取一个白名单扩展名，主名用 UUID。
-- **为什么不能信 `mimetype`**：它来自客户端填的 multipart 段头，随便改。真实类型要读文件头的 magic number；大小限制要在 Nginx、multer、业务校验三层各设一次，且外层不小于内层。
-- **分片上传的协议**：切片 → 算内容 hash（抽样 + Web Worker）→ `/check` 问哪些已存（秒传与断点续传都出自这一步）→ 限并发补传缺失片 → `/merge` 按序号流式 append。三个坑：按数值而非字典序排序、合并必须流式、hash 参与路径拼接必须校验格式。
-- **直传的三个安全点**：objectKey 与 content-type 由服务端决定且带用户前缀、凭证有效期分钟级、CORS 配在存储侧（配在 Nest 上没用，请求根本不到 Nest）。预签名 POST 还能强制 `content-length-range`，预签名 PUT 不能。
-- **大文件下载**：不能 `readFileSync` 后 `send`，要 `createReadStream` + `StreamableFile`；能给 `Content-Length` 就给，否则走 chunked；中文名要 `filename*=UTF-8''` + ASCII 兜底名；续传靠 `Accept-Ranges` + `Range` + 206 + `Content-Range`，注意 `end` 是闭区间。
-
----
-
 ## 面试问答
 
 **1. 三条上传路线怎么选？数据库里该存什么？**
@@ -800,6 +788,7 @@ export class ImageService {
 - 对 2GB 文件做全量 MD5 要读完整个文件，主线程上跑就是几十秒白屏；放 Worker 用 `spark-md5` 的增量接口逐片喂，抽样（首尾整片 + 中间每片取 2 字节）把 1GB 从几十秒降到几十毫秒。
 - 抽样是拿碰撞概率换时间。如果这份 hash 会用于「秒传即视为拥有」的权限判断，必须全量——否则等于构造一个 hash 就能拿到别人的文件。
 - hash 必须由内容决定，不能用文件名 + 大小（改个名就命中别人的文件）；它还会拼进服务端路径，必须用正则锁死成 32 位 hex，否则前端传 `../../etc` 就是任意路径写入。
+- 合并还有两个必答的坑：按序号**数值**升序循环，不能遍历 `readdir` 的字典序——`"10"` 排在 `"2"` 前面，超过 10 片就拼出一个损坏的文件；合并必须流式 `pipeline` 逐片 append，把每片读进内存再 concat，10GB 文件就是 10GB 内存。
 - 加分：能说出 `/check` 接口返回已存在的分片序号，秒传和断点续传都出自这一步。
 
 **4. 直传方案里预签名 URL 和 STS 凭证怎么选？三个安全点是什么？**

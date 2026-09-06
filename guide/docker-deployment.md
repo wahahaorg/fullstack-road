@@ -366,12 +366,6 @@ async def health():
 
 ---
 
-## 面试怎么说
-
-> 我做的项目都用 Docker 容器化，写多阶段构建的 Dockerfile 减小镜像体积，用 docker-compose 编排后端服务、数据库和缓存。部署时用 nginx 做反向代理和 SSL 终结，Node 应用通过 PM2 做进程管理和集群模式。CI/CD 用 GitHub Actions，测试通过后自动构建镜像并部署到服务器。环境变量通过 `.env` + CI Secrets 分层管理，不提交到代码仓库。
-
----
-
 ## 面试问答
 
 **1. 多阶段构建到底优化了什么？**
