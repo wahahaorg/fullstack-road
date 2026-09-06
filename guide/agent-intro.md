@@ -537,7 +537,7 @@ flowchart TB
 | 模型层 | 多供应商、重试、成本 | 到处 `new OpenAI()`，换模型要改十个文件 |
 | 数据层 | 隔离、幂等、TTL | Checkpoint 无限增长，没有清理策略 |
 
-**生产推荐：** 编排层必须能脱离 HTTP 单独跑（一个函数进、一个结构出）。这样你才能写离线评测集批量回归，见 [Agent 效果评测](./agent-eval)。接入层的流式与超时细节见 [FastAPI 进阶](./fastapi-advanced) 和 [Agent 流式输出](./agent-streaming)。
+**生产推荐：** 编排层必须能脱离 HTTP 单独跑（一个函数进、一个结构出）。这样你才能写离线评测集批量回归，见 [Agent 效果评测](./agent-eval)。接入层的流式与超时细节见 [FastAPI 进阶](./fastapi-advanced#流式响应-sse) 和 [Agent 流式输出](./agent-streaming)。
 
 ---
 

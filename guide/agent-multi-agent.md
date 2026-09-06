@@ -599,7 +599,7 @@ async def decide(approval_id: str, body: DecisionIn, reviewer=Depends(current_re
 
 这个骨架里有四处是生产必需、原型阶段最容易省掉的：按 `thread_id` 的分布式锁、审批状态前置校验（幂等）、审批权限二次校验、审计日志与业务表分离。四处都省掉的系统，上线后一定会出现重复退款。
 
-接口本身的组织方式（依赖注入、鉴权、异常处理）见 [FastAPI 进阶](./fastapi-advanced)，定时扫描与重试见 [Worker 与异步任务](./background-worker)。
+接口本身的组织方式（依赖注入、鉴权、异常处理）见 [FastAPI 进阶](./fastapi-advanced#依赖注入-depends)，定时扫描与重试见 [Worker 与异步任务](./background-worker)。
 
 ---
 

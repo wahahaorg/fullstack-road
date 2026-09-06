@@ -348,7 +348,7 @@ async def lifespan(app: FastAPI):
         yield                               # 应用运行期间持有同一个连接池
 ```
 
-**踩坑：** 每个请求都 `builder.compile()` 一次不会报错，但会反复建连接池，QPS 一上来就耗尽数据库连接。lifespan 与依赖注入见 [FastAPI 进阶](./fastapi-advanced)。
+**踩坑：** 每个请求都 `builder.compile()` 一次不会报错，但会反复建连接池，QPS 一上来就耗尽数据库连接。lifespan 与依赖注入见 [FastAPI 进阶](./fastapi-advanced#应用生命周期-lifespan-与-app-state)。
 
 ### thread_id：一条会话的身份
 
