@@ -66,7 +66,7 @@ Python 快速入门
 
 ## Agentic RAG 综合实战
 
-仓库提供一套 17 章的 **Python + FastAPI + LangGraph 企业知识库 Agentic RAG 教程**。正文从产品边界和最小 RAG 开始，依次覆盖文档上传与审核、异步入库、混合检索、引用回答、权限隔离、多轮检索、工具调用、Checkpoint、SSE、可靠性、评测、部署和求职复盘。
+仓库提供一套 17 章的 **Python + FastAPI + LangGraph 企业知识库 Agentic RAG 教程**。正文从产品边界和最小 RAG 开始，依次覆盖文档上传与审核、异步入库、混合检索、引用回答、权限隔离、多轮检索、工具调用、Checkpoint、SSE、可靠性、评测、部署和求职复盘。先打开[项目代码入口与运行](./guide/agentic-rag-project-code)，可以直接进入完整源码目录和本地启动说明。
 
 教程围绕 Alice、Bob、Carol 使用同一套企业文档的业务场景展开，不把普通 CRUD 写成逐行操作记录，也不把 NestJS 项目简单翻译成 Python。第 1 至第 16 章的核心本地链路已经在同一项目中实现并有自动化验证，第 17 章整理真实能力与边界；Redis Relay、持久化 Checkpoint、租约索引切换和 OpenTelemetry 等生产扩展在正文中明确标为规划项。从[第 1 章：项目目标与架构](./guide/agentic-rag-project.md)开始；最终可在[第 17 章：项目复盘与求职表达](./guide/agentic-rag-project-career.md)查看整体交付画像。完整范围与发布标准见 [Agentic RAG 实战教程写作契约](./AGENTIC_RAG_PROJECT_SPEC.md)。
 

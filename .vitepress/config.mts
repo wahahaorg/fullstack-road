@@ -49,6 +49,7 @@ export default withMermaid(defineConfig({
           {
             text: '综合实战',
             items: [
+              { text: '项目代码入口与运行', link: '/guide/agentic-rag-project-code' },
               { text: '企业知识库 Agentic RAG', link: '/guide/agentic-rag-project' },
               { text: '最小 RAG 闭环', link: '/guide/agentic-rag-project-minimal' },
               { text: '权限与文档生命周期', link: '/guide/agentic-rag-project-permissions' },
@@ -209,6 +210,7 @@ export default withMermaid(defineConfig({
             text: '综合实战',
             collapsed: false,
             items: [
+              { text: '项目代码入口与运行', link: '/guide/agentic-rag-project-code' },
               { text: '1. 项目目标与架构', link: '/guide/agentic-rag-project' },
               { text: '2. 跑通最小 RAG 闭环', link: '/guide/agentic-rag-project-minimal' },
               { text: '3. 用户、团队与检索权限', link: '/guide/agentic-rag-project-permissions' },

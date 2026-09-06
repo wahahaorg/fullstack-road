@@ -7,6 +7,8 @@ description: 认识一套 Python + FastAPI + LangGraph 企业知识库的最终�
 
 > 这是综合实战的第 1 章。先认识最终要做成的产品，理解文档怎样进入知识库、问题怎样找到证据，以及什么情况下才需要 Agent。第 2 章开始编写 Python 代码，跑通第一条带来源的 RAG 闭环。
 
+**先看代码**：[项目代码入口与运行](./agentic-rag-project-code) · [GitHub 源码目录](https://github.com/wahahaorg/fullstack-road/tree/main/projects/agentic-rag) · 本地路径：`projects/agentic-rag/`
+
 ## 先看最终使用场景
 
 假设 Alice 要去上海出差。她不想分别打开差旅制度和报销规范，于是直接提问：
