@@ -1,0 +1,77 @@
+name: agentic-rag
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "projects/agentic-rag/**"
+      - ".github/workflows/agentic-rag.yml"
+  pull_request:
+    paths:
+      - "projects/agentic-rag/**"
+      - ".github/workflows/agentic-rag.yml"
+
+concurrency:
+  group: agentic-rag-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: projects/agentic-rag
+
+jobs:
+  lint-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: projects/agentic-rag/uv.lock
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Lint
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+
+      - name: Test
+        run: uv run pytest -q
+
+  eval:
+    needs: lint-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: projects/agentic-rag/uv.lock
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Run offline eval suite
+        run: uv run python evals/run.py
+
+      - name: Upload eval report
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-report-${{ github.sha }}
+          path: projects/agentic-rag/reports/latest.json
+
+  docker:
+    needs: lint-test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Build image
+        run: docker build -t agentic-rag:${{ github.sha }} .

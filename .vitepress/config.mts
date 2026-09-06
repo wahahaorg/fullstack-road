@@ -66,6 +66,7 @@ export default withMermaid(defineConfig({
               { text: '生产可靠性', link: '/guide/agent-reliability' },
               { text: '上下文工程', link: '/guide/agent-context' },
               { text: 'Agent 与 RAG 评测', link: '/guide/agent-eval' },
+              { text: '部署与交付', link: '/guide/agent-deploy' },
             ]
           },
         ]
@@ -134,6 +135,7 @@ export default withMermaid(defineConfig({
       {
         text: 'Go',
         items: [
+          { text: '学习路线与能力地图', link: '/guide/go-learning-path' },
           { text: 'Go 快速入门', link: '/guide/go-intro' },
           { text: '类型系统与泛型', link: '/guide/go-advanced-types' },
           { text: '并发模式与工程实践', link: '/guide/go-advanced-concurrency' },
@@ -204,6 +206,7 @@ export default withMermaid(defineConfig({
               { text: '生产可靠性：预算与熔断', link: '/guide/agent-reliability' },
               { text: '上下文工程与长任务', link: '/guide/agent-context' },
               { text: 'Agent 与 RAG 评测方法', link: '/guide/agent-eval' },
+              { text: '部署与交付：从本地 Demo 到可上线', link: '/guide/agent-deploy' },
             ]
           },
           {
@@ -361,6 +364,7 @@ export default withMermaid(defineConfig({
         text: '🔵 Go 语言',
         collapsed: true,
         items: [
+          { text: '学习路线与能力地图', link: '/guide/go-learning-path' },
           { text: 'Go 快速入门', link: '/guide/go-intro' },
           { text: '类型系统与泛型', link: '/guide/go-advanced-types' },
           { text: '并发模式与工程实践', link: '/guide/go-advanced-concurrency' },
