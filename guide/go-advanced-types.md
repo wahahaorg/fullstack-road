@@ -74,26 +74,40 @@ fmt.Println(v, ok)  // world true
 
 ```go
 // 泛型二叉搜索树
-type Tree[T comparable] struct {
+type Ordered interface {
+    ~int | ~int64 | ~float64 | ~string
+}
+
+type Tree[T Ordered] struct {
     Left, Right *Tree[T]
     Value       T
+    Set         bool
 }
 
 func (t *Tree[T]) Insert(v T) {
+    if !t.Set {
+        t.Value = v
+        t.Set = true
+        return
+    }
     if t.Value == v {
         return
     }
-    if t.Value == *new(T) { // 零值判断
-        t.Value = v
+    if v < t.Value {
+        if t.Left == nil {
+            t.Left = &Tree[T]{}
+        }
+        t.Left.Insert(v)
         return
     }
-    if any(v) < any(t.Value) { // 需要约束支持比较
-        // ...
+    if t.Right == nil {
+        t.Right = &Tree[T]{}
     }
+    t.Right.Insert(v)
 }
 ```
 
-> 注意：`comparable` 是内置约束，表示可比较（`==`、`!=`）。但不能直接用 `<`、`>` 比较，那些需要 `constraints.Ordered`。
+> 注意：`comparable` 是内置约束，表示可比较（`==`、`!=`）。`<`、`>` 需要自己的有序约束（如上面的 `Ordered`）；不能把值转换成 `any` 后再比较。泛型代码也要显式处理零值，不能用 `*new(T)` 作为“节点是否初始化”的通用标记，因为合法数据本身可能就是零值。
 
 ### 类型约束（Constraints）
 
@@ -154,16 +168,16 @@ func Find[T comparable](items []T, target T) int {
     return -1
 }
 
-// golang.org/x/exp/constraints 提供额外约束
-import "golang.org/x/exp/constraints"
+// Go 1.21+ 可使用标准库 cmp.Ordered
+import "cmp"
 
-func Max[T constraints.Ordered](a, b T) T {
+func Max[T cmp.Ordered](a, b T) T {
     if a > b { return a }
     return b
 }
 ```
 
-`constraints.Ordered` 包含所有可以 `<` `>` `<=` `>=` 的类型：`int` 系、`float` 系、`string`。
+`cmp.Ordered` 包含所有可以 `<`、`>`、`<=`、`>=` 的类型：整数、浮点数和字符串。若项目仍支持 Go 1.20 及更早版本，再考虑使用 `golang.org/x/exp/constraints`。
 
 ### 泛型的常见误区
 
@@ -371,6 +385,28 @@ func NewReadOnly(r Reader) *ReadOnly {
     return &ReadOnly{Reader: r}
 }
 ```
+
+### 接口的两个陷阱：隐式实现与 `nil`
+
+接口值可以看成“动态类型 + 动态值”两部分。只有两部分都为空时，接口才等于 `nil`：
+
+```go
+type ServiceError struct{}
+
+func (*ServiceError) Error() string { return "service failed" }
+
+func load() error {
+    var err *ServiceError = nil
+    return err // 接口里已经记录了 *ServiceError，结果不等于 nil
+}
+
+if err := load(); err != nil {
+    // 会进入这里。需要返回 nil 时，直接 return nil，
+    // 或先判断指针再赋给 error 接口。
+}
+```
+
+这和 TypeScript 的结构类型或 Python 的鸭子类型有相似之处：调用方只依赖方法集合，不依赖具体类名。但 Go 的接口满足关系由编译器检查，且“小接口优先”（例如 `io.Reader`）比把所有方法塞进一个大接口更容易测试和替换。
 
 ---
 

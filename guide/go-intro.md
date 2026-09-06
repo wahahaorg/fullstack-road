@@ -141,6 +141,41 @@ var s string = "你好"
 var active bool = true
 ```
 
+### 字节、rune 与 UTF-8
+
+Go 的 `string` 保存的是 UTF-8 字节序列，不是“字符数组”。`len` 返回字节数，遍历字符串时用 `range` 才会按 Unicode 码点读取：
+
+```go
+s := "你好 Go"
+fmt.Println(len(s)) // 9：中文每个字符占 3 个 UTF-8 字节
+
+for i, r := range s {
+    fmt.Printf("字节位置=%d 字符=%c\n", i, r)
+}
+
+bytes := []byte(s) // 适合网络协议、文件和编码处理
+runes := []rune(s) // 适合按“字符”截取或统计
+fmt.Println(len(bytes), len(runes)) // 9 5
+```
+
+`byte` 是 `uint8` 的别名，`rune` 是 `int32` 的别名。不要用 `s[:2]` 截取中文；这可能切断一个 UTF-8 字符。需要按字符截取时先转成 `[]rune`，需要按字节处理时才使用 `[]byte`。
+
+### 常量与 `iota`
+
+常量在编译期确定，适合状态码、权限位和不会在运行时变化的配置。`iota` 会在同一个 `const` 块中从 0 递增：
+
+```go
+type Status int
+
+const (
+    Draft Status = iota // 0
+    Published            // 1，沿用上一行的类型和表达式
+    Archived             // 2
+)
+```
+
+它不是运行时计数器，也不会跨 `const` 块保留值。
+
 ---
 
 ## 控制流
@@ -298,6 +333,47 @@ func operate(a, b int, op func(int, int) int) int {
 
 ---
 
+## 指针与值语义
+
+Go 默认按值传递：函数收到的是实参的一份副本。指针让函数拿到“某个值的地址”，从而可以读取或修改原值。
+
+```go
+func resetByValue(n int) {
+    n = 0 // 只修改副本
+}
+
+func resetByPointer(n *int) {
+    if n == nil {
+        return
+    }
+    *n = 0 // 修改调用方的变量
+}
+
+count := 3
+resetByValue(count)
+fmt.Println(count) // 3
+resetByPointer(&count)
+fmt.Println(count) // 0
+```
+
+`&count` 取地址，`*p` 解引用，`nil` 表示没有指向有效值的指针。这个模型和 JavaScript 对象引用有相似之处，但不要直接等同：Go 的 `struct` 传参默认会复制字段，只有显式传指针或包含引用型字段时才共享底层数据。
+
+结构体方法也要选择接收者：值接收者适合不修改对象的小值类型，指针接收者适合修改对象或避免复制大结构体。编译器会在可寻址的变量上自动补 `&`，但接口值、函数返回值等场景不能依赖这种自动转换。
+
+```go
+type Counter struct{ Value int }
+
+func (c Counter) Snapshot() int { return c.Value }
+func (c *Counter) Add(n int)    { c.Value += n }
+
+c := Counter{}
+c.Add(1) // 等价于 (&c).Add(1)
+```
+
+`new(T)` 只分配一个零值 `T` 并返回 `*T`。业务代码通常用结构体字面量或构造函数表达意图，只有确实需要“指向零值的指针”时才使用 `new`。
+
+---
+
 ## 数组与切片
 
 ```go
@@ -331,6 +407,25 @@ cap(slice2)  // 底层数组从起始位置到末尾的容量
 | 切片 | `arr.slice(1,3)` | `arr[1:3]` |
 | 删除 | `arr.splice(i,1)` | 需要手动拼接 `append(arr[:i], arr[i+1:]...)` |
 
+### Slice 的底层结构与别名
+
+Slice 可以理解为一个小描述符：指向底层数组的指针、当前 `len` 和可继续扩容的 `cap`。复制 slice 只复制描述符，不会复制底层数组：
+
+```go
+source := []int{1, 2, 3}
+view := source[:2]
+view[0] = 99
+fmt.Println(source) // [99 2 3]，两者共享底层数组
+
+copyOfSource := append([]int(nil), source...)
+copyOfSource[0] = 7
+fmt.Println(source[0]) // 99，复制后互不影响
+```
+
+`append` 可能在容量不足时分配新的底层数组，所以调用方必须接住返回值：`items = append(items, item)`。如果一个 slice 的子切片长期存活，它也会让整个底层数组保持存活；处理大文件或大请求体时，可以用 `copy` 取出需要的部分再释放原始引用。
+
+空 slice 和 `nil` slice 都可以 `len`、`range` 和 `append`，但它们在 JSON 编码或作为 API 字段时可能表现不同：`nil` slice 通常编码为 `null`，空 slice 编码为 `[]`。对外响应要根据契约主动选择。
+
 ---
 
 ## Map（字典）
@@ -359,6 +454,8 @@ for key, value := range m2 {
     fmt.Println(key, value)
 }
 ```
+
+Map 的遍历顺序没有稳定保证，不能把它当作排序后的结果。读取不存在的 key 会得到该类型的零值，因此需要用 `value, ok := m[key]` 区分“没有 key”和“key 的值恰好是零值”。Map 不是并发安全容器；并发读写必须在边界处使用锁或 `sync.Map`，细节见[并发模式与工程实践](./go-advanced-concurrency)。
 
 ---
 
@@ -696,6 +793,27 @@ curl http://localhost:8080/users        # [{"id":1,"name":"Alice"},...]
 ---
 
 ## 包管理（go mod）
+
+### package、导入与可见性
+
+目录通常对应一个 package，同一个目录下的 `.go` 文件必须属于同一个 package（测试文件可以使用 `包名` 或 `包名_test`）。标识符首字母大写表示对其他 package 可见，小写表示只在当前 package 可见：
+
+```go
+// internal/user/user.go
+package user
+
+import "strings"
+
+type Profile struct { // 外部可用
+    Name string
+}
+
+func normalizeName(name string) string { // 仅当前 package 可用
+    return strings.TrimSpace(name)
+}
+```
+
+这不是装饰性命名规则，而是 Go 最基础的封装边界。`internal/` 目录还会限制导入方只能来自它的父目录树，适合放业务实现，避免被其他模块直接依赖。
 
 ```bash
 # 初始化模块（第一步）

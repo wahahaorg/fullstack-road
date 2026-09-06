@@ -22,7 +22,7 @@
 | Python 后端 | Python 语言、工程化、FastAPI、Pydantic、SQLAlchemy 和项目结构 | [Python 快速入门](./guide/python-intro.md) |
 | Node.js 与 NestJS | 运行时、异步模型、Stream、依赖注入、AOP、鉴权、数据层、微服务与生产清单 | [Node.js 运行时](./guide/node-runtime.md) · [NestJS 架构](./guide/nestjs-intro.md) |
 | Java | 面向 TS、Node.js 和 Python 开发者的 Java、Spring Boot、数据库、鉴权与项目实战 | [Java 学习路线](./guide/java-learning-path.md) |
-| Go | 语言迁移、类型与泛型、goroutine、channel、并发模式和工程化 | [Go 快速入门](./guide/go-intro.md) |
+| Go | 语言迁移、类型与泛型、goroutine、channel、并发模式和工程化 | [Go 学习路线与能力地图](./guide/go-learning-path.md) |
 | 数据与一致性 | SQL、MySQL、PostgreSQL、外键、事务、锁、分布式一致性和可靠消息 | [数据库与一致性路线](./guide/knowledge-map.md) |
 | 工程与部署 | Worker、Redis、消息队列、Docker、Compose、Nginx 和 CI/CD | [Docker 与部署](./guide/docker-deployment.md) |
 

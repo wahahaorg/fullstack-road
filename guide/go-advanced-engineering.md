@@ -2,6 +2,30 @@
 
 > 测试、错误包装、优雅关闭、中间件模式、性能分析、模块管理——把 Go 用到生产级别。
 
+## 先建立 Go 工具链习惯
+
+Go 项目通常把格式化、编译、测试和静态检查放进同一条命令链。它们分别回答不同问题：
+
+| 命令 | 解决的问题 |
+|---|---|
+| `go fmt ./...` | 代码格式是否统一 |
+| `go test ./...` | 行为是否符合测试 |
+| `go test -race ./...` | 运行路径是否存在数据竞争 |
+| `go vet ./...` | 是否有常见的可疑构造 |
+| `go list -m all` | 当前模块实际解析了哪些依赖 |
+| `go env GOMOD GOPATH` | 当前使用哪份模块和缓存 |
+
+前端里的 ESLint、TypeScript 编译和 Jest 在 Go 中没有完全一一对应的工具，但可以用这条最小 CI 检查替代：
+
+```bash
+go fmt ./...
+go vet ./...
+go test -race ./...
+go build ./...
+```
+
+`go build ./...` 只保证代码能编译，不代表接口行为正确；`go test -race` 也只覆盖测试实际跑到的路径，所以两者都不能省略。
+
 ## 测试（testing 包）
 
 Go 有内置的测试工具链，不需要第三方框架。测试文件的命名规则：`xxx_test.go`，测试函数签名：`func TestXxx(t *testing.T)`。
@@ -555,6 +579,32 @@ func handleProfile(w http.ResponseWriter, r *http.Request) {
     // 使用 userID...
 }
 ```
+
+---
+
+## 内存、逃逸与垃圾回收
+
+Go 的内存管理是自动的，但“自动回收”不等于不用关心分配。编译器会做逃逸分析：如果一个值的生命周期可能超过当前函数，就会从栈移动到堆，堆分配增加后会带来更多 GC 工作。
+
+```go
+func stackValue() int {
+    value := 42
+    return value // 返回值被复制，通常不需要让局部变量逃逸
+}
+
+func heapValue() *int {
+    value := 42
+    return &value // 地址逃出函数，value 必须存活到调用方使用完
+}
+```
+
+不要凭直觉断言“返回指针一定慢”或“放进 interface 一定上堆”，用编译器报告验证：
+
+```bash
+go test -gcflags='-m=2' ./...
+```
+
+优化顺序通常是先减少不必要的对象和拷贝，再用 Benchmark、`-benchmem` 和 pprof 证明收益。不要为了阻止一次逃逸而牺牲 API 可读性；Go 的 GC 会自动回收不可达堆对象，业务代码不需要手动 `free`。
 
 ---
 

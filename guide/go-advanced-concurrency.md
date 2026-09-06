@@ -302,11 +302,74 @@ sm.Range(func(key, value any) bool {
 - 读多写少 + key 集稳定：`sync.Map`
 - 有明确的热点 key：`sync.Map`
 
+### `sync.Cond`：等待条件而不是等待时间
+
+`sync.Cond` 适合“队列为空就等待，入队后唤醒消费者”这类条件同步。它不是超时器，也不能替代 channel：
+
+```go
+type Queue struct {
+    mu    sync.Mutex
+    cond  *sync.Cond
+    items []int
+}
+
+func NewQueue() *Queue {
+    q := &Queue{}
+    q.cond = sync.NewCond(&q.mu)
+    return q
+}
+
+func (q *Queue) Push(item int) {
+    q.mu.Lock()
+    q.items = append(q.items, item)
+    q.mu.Unlock()
+    q.cond.Signal() // 通知一个等待者
+}
+
+func (q *Queue) Pop() int {
+    q.mu.Lock()
+    defer q.mu.Unlock()
+    for len(q.items) == 0 { // 必须用 for，唤醒后要重新检查条件
+        q.cond.Wait()
+    }
+    item := q.items[0]
+    q.items = q.items[1:]
+    return item
+}
+```
+
+如果任务天然是“发送值、接收值、关闭并遍历”，优先使用 channel；只有共享状态和条件等待本身是核心模型时才使用 `sync.Cond`。
+
 ---
 
 ## Select：多 channel 调度
 
 `select` 是 Go 并发编程的调度核心，同时等待多个 channel：
+
+### Channel 方向与关闭协议
+
+发送方负责关闭 channel，接收方通过第二个返回值判断 channel 是否已经关闭。把方向写进函数签名，可以让编译器帮助检查所有权：
+
+```go
+func produce(out chan<- int) {
+    defer close(out)
+    for i := 0; i < 3; i++ {
+        out <- i
+    }
+}
+
+func consume(in <-chan int) {
+    for value := range in { // channel 关闭且读完后自然退出
+        fmt.Println(value)
+    }
+}
+
+ch := make(chan int)
+go produce(ch)
+consume(ch)
+```
+
+关闭 channel 是“不会再有新值”的广播信号，不是“释放资源”的操作。不要让多个发送方随意 `close`，也不要向已关闭的 channel 发送数据；需要停止一组生产者时，用一个拥有关闭权的协调者或 `context.Cancel`。
 
 ### 基础模式
 
@@ -528,9 +591,14 @@ func workerPool(ctx context.Context, numWorkers int, jobs []Job) []Result {
         }(i)
     }
 
-    // 发送任务
+    // 发送任务时也要监听取消，否则所有 worker 退出后，生产者可能永久阻塞
+sendLoop:
     for _, job := range jobs {
-        jobCh <- job
+        select {
+        case jobCh <- job:
+        case <-ctx.Done():
+            break sendLoop
+        }
     }
     close(jobCh)
 
