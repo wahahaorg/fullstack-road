@@ -34,6 +34,7 @@ export default withMermaid(defineConfig({
               { text: 'Tool Calling 与 MCP', link: '/guide/agent-tool-calling' },
               { text: 'Multi-Agent 与人工兜底', link: '/guide/agent-multi-agent' },
               { text: 'SSE 流式', link: '/guide/agent-streaming' },
+              { text: 'AI 应用前端', link: '/guide/agent-frontend' },
               { text: 'Text2SQL', link: '/guide/agent-text2sql' },
             ]
           },
@@ -184,6 +185,7 @@ export default withMermaid(defineConfig({
               { text: 'Tool Calling、工具安全与 MCP', link: '/guide/agent-tool-calling' },
               { text: 'Multi-Agent 编排与人工兜底', link: '/guide/agent-multi-agent' },
               { text: 'SSE 流式与事件协议', link: '/guide/agent-streaming' },
+              { text: 'AI 应用前端：消费事件流', link: '/guide/agent-frontend' },
               { text: 'Text2SQL 与 Schema Linking', link: '/guide/agent-text2sql' },
             ]
           },
