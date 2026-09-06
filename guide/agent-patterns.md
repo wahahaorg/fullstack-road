@@ -140,7 +140,7 @@ g.set_entry_point("agent")
 react_app = g.compile()
 ```
 
-这段的循环骨架和手写版本是同一个东西，手写实现见 [ReAct 范式](./agent-intro#react-范式-thought-action-observation)。用图来写多出来的收益是终止条件、状态快照和流式事件都由框架接住了。
+这段的循环骨架和手写版本是同一个东西，手写实现见 [ReAct 范式](./agent-intro#react-范式-thought-→-action-→-observation)。用图来写多出来的收益是终止条件、状态快照和流式事件都由框架接住了。
 
 **踩坑：** `tools_condition` 只判断"模型这次有没有要调工具"，它不管轮次。必须自己加轮次上限——在 `agent` 节点里读一个 `step` 计数，超限时强制返回一条"信息不足，请转人工"的消息走向 `END`，否则模型完全有能力在两个工具之间来回调二十次。
 
@@ -458,7 +458,7 @@ async def generate_with_reflection(task: str, max_rounds: int = 2) -> str:
 
 **第二条：需要条件回环。** "校验没通过就回去重新检索，最多两次"这种回环，条件必须写在我的代码里（读 State 字段 + 返回下一个节点名），而不是交给角色之间的自然语言协商。CrewAI 和 AutoGen 也能循环，但循环的**触发条件**不完全在你手上，这是核心差别。
 
-**第三条：需要中断恢复。** 退款、开票这类动作必须挂起等人工审批，而审批可能几小时后才来，中间进程会重启、请求会打到另一个实例。`interrupt` + `PostgresSaver` 让"挂起"变成数据库里的一行状态，恢复时从断点继续而不是从头重跑。这一条是很多框架的真实短板。见 [interrupt 与 Checkpointer](./agent-multi-agent#interrupt-checkpointer-暂停-恢复与拒绝)。
+**第三条：需要中断恢复。** 退款、开票这类动作必须挂起等人工审批，而审批可能几小时后才来，中间进程会重启、请求会打到另一个实例。`interrupt` + `PostgresSaver` 让"挂起"变成数据库里的一行状态，恢复时从断点继续而不是从头重跑。这一条是很多框架的真实短板。见 [interrupt 与 Checkpointer](./agent-multi-agent#interrupt-checkpointer-暂停、恢复与拒绝)。
 
 **第四条：需要审计每一步。** 政务、金融类场景要能回答"这个结论是哪一步、依据哪条证据得出的"。状态图的每一步都有输入输出快照，可回放、可存证。对话驱动的框架只能给你一长串聊天记录。
 
