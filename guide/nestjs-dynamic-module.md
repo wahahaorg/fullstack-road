@@ -1,3 +1,7 @@
+---
+title: 动态模块与配置管理
+---
+
 # 动态模块与配置管理
 
 > `TypeOrmModule.forRoot({ ... })` 能带参数，自己写的 `UsersModule` 却不能——差别不在框架给了谁特权，而在前者是动态模块。这篇讲清动态模块怎么写，以及每个真实项目都躲不开的配置管理。
@@ -372,3 +376,39 @@ JwtModule.registerAsync({
 | `ClientsModule` | `register(Async)` | 一次声明一组微服务客户端 |
 
 规律：**昂贵的共享资源用 `forRoot`，局部声明用 `forFeature`，天然多份的配置用 `register`。** 自己写模块时照这个规律挑方法名。
+
+---
+
+## 面试问答
+
+**1. 动态模块和静态模块的本质区别是什么？`forRoot` 是怎么把配置传进去的？**
+
+- 静态模块的参数写死在 `@Module()` 装饰器里，装饰器在类定义时就执行完，`imports: [UsersModule]` 无论出现在哪里拿到的内容都一样。
+- 动态模块没有任何魔法：就是一个返回 `DynamicModule` 对象的静态方法，字段和 `@Module()` 参数是同一套，只多一个指回自己的 `module` 和可选的 `global`。
+- 配置改变行为的唯一机制是把 options 包成 Provider（`useValue`）注册进容器，模块内部用 `@Inject` 注入它；`TypeOrmModule.forRoot` 建连接也是这条路。
+- 加分：能说出 `imports` 数组里模块类和动态模块对象可以混用，以及 `global: true` 等价于 `@Global()`。
+
+**2. register / forRoot / forFeature 三个方法名怎么选？**
+
+- `register`：用一次配一次、多次调用互不相干——`JwtModule` 不同使用方的 secret 和有效期本就不同，不存在全局唯一的 JWT 配置。
+- `forRoot`：连接池这类昂贵的共享资源全应用只配一次；`forFeature` 在它之上补局部信息，比如「我这个模块要用哪些实体的 Repository」。
+- 别踩的坑：把本该 `forRoot` 的数据库连接写成各业务模块自己 `register`，昂贵的连接被建了好几份。
+
+**3. registerAsync 的三种形态（useFactory / useClass / useExisting）分别什么时候用？**
+
+- `useFactory` 最常用，`inject` 数组声明它自己的依赖，典型是从 `ConfigService` 读配置。
+- 配置逻辑想收进一个类用 `useClass`（容器负责实例化）；要复用已注册的实例用 `useExisting`。三种形态的核心是归一成「产出 options 的那个 Provider」。
+- 加分：知道 `ConfigurableModuleBuilder` 能把每个模块 40 行左右的样板消成一次 `build()` + `extends`，三种异步形态、options Provider 和 `isGlobal` 全部自带。
+
+**4. 生产环境里 `.env` 文件和真实的进程环境变量谁优先？**
+
+- `envFilePath` 传数组时靠前的文件优先，同名 key 后面的不会覆盖前面的，环境专属配置盖过公共配置。
+- 更高一层：真实的进程环境变量永远赢——容器 `-e` 或 K8s 的 `env` 字段能直接盖掉镜像里的默认值。
+- 仓库里只提交 `.env.example`，真实的 `.env*` 进 `.gitignore`，生产密钥走部署平台的 secret 机制。
+
+**5. 配置校验为什么必须放在启动时（fail fast）？**
+
+- 配置少一个 key 服务照样起来，等冷门接口被调用才炸——这是最难查的线上问题之一；用 `validationSchema`（Joi）或 `validate` 函数把错误提前到启动时。
+- `validationOptions` 里配 `abortEarly: false`，一次报全所有缺失项。
+- 启动失败会让 K8s 停止滚动更新，坏配置根本进不了生产。
+- 别踩的坑：必需项用 `get()` 取到 `undefined` 还继续跑，必需项一律用 `getOrThrow()`。

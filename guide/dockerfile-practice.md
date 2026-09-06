@@ -1,3 +1,7 @@
+---
+title: Dockerfile 进阶：镜像怎么写才对
+---
+
 # Dockerfile 进阶：镜像怎么写才对
 
 > [Docker 与部署](/guide/docker-deployment) 给了一份能用的 Dockerfile。这篇回答它后面的问题：为什么这么写、每一行改动让镜像大了多少、构建慢在哪、容器凭什么能跑起来。
@@ -595,4 +599,40 @@ docker inspect --format '{{json .State}}' <容器> | jq    # 看 OOMKilled、Err
 - [Compose、网络与进程守护](/guide/docker-compose-network)：多容器编排、服务间怎么互相访问、信号与优雅退出、PM2 到底还要不要
 - [Nginx：反向代理与流量控制](/guide/nginx-core)：镜像跑起来之后，流量怎么进来、怎么灰度
 - [Docker 与部署](/guide/docker-deployment)：整体部署链路、环境变量分层、CI/CD 工作流
+
+---
+
+## 面试问答
+
+**1. COPY 和 ADD 有什么区别？为什么推荐 COPY？**
+
+- COPY 只做一件事：把构建上下文里的文件复制进镜像；ADD 额外能解压本地 tar 包、能拉 URL，行为太多
+- 默认用 COPY，确实需要自动解压这类行为时才考虑 ADD
+- 注意 COPY 的源路径是**构建上下文**里的路径，不是你机器上的任意路径，`COPY ../xxx` 一定报错——构建发生在 daemon / BuildKit 构建器里，不在你的终端里
+
+**2. EXPOSE 3000 写了，为什么外面还是访问不到？**
+
+- EXPOSE 不打开端口也不做任何映射，它只把「这个服务监听 3000」写进镜像元数据当文档，外加让 `docker run -P`（大写）知道该随机映射谁
+- 真正决定外部能否访问的是 `docker run -p 8080:3000` 或 Compose 的 ports
+- 反过来也成立：不写 EXPOSE，`-p` 照样能用
+
+**3. 容器一启动就退出，怎么排查？常见退出码什么含义？**
+
+- 容器的生命周期等于 PID 1 的生命周期，前台进程一结束容器立刻退出——这不是故障是设计，90% 的答案在 `docker logs` 里
+- 137 是收到 SIGKILL，配合 `.State.OOMKilled` 确认是不是内存超限被 OOM Killer 杀；127 是命令找不到（典型：alpine 里写了 bash）；139 是段错误，典型 alpine 原生模块和 musl 不匹配；143 是正常的 docker stop
+- 别踩的坑：不要在 CMD 里用 `&` 或 `nohup` 把进程丢后台——PID 1 立刻结束、容器立刻退出，一个容器只跑一个前台进程
+
+**4. alpine 镜像最小，为什么不能无脑换上去？**
+
+- alpine 用 musl 不是 glibc：npm 上的预编译二进制大多只提供 glibc 版本，sharp、bcrypt 要现场编译或直接失败，Prisma 要显式声明 `binaryTargets` 才能拿到正确的 query engine
+- 判断顺序：先用 `node:20-slim`（默认首选），体积真的成为瓶颈且项目没有原生依赖时才换 alpine
+- 无论用哪个，tag 都要钉死——`FROM node:20` 会随上游滚动，同一份 Dockerfile 上周和这周构建出的镜像不一样
+- 加分：能说出最严格的做法是钉 digest（`FROM node:20-alpine@sha256:...`）
+
+**5. HEALTHCHECK 探测失败会自动重启容器吗？**
+
+- 不会。它只把状态标成 healthy / unhealthy，本身不重启任何东西
+- 真正的价值在于被别人消费：Compose 的 `depends_on: condition: service_healthy` 和编排器的探针读的都是这个状态
+- `--start-period` 是启动宽限期，期间探测失败不计入 `--retries`，Nest 这种启动时要连数据库的应用必须给
+- alpine 和 distroless 里没有 curl，用 Node 20 自带的全局 fetch 写探针最省事，还顺便验证了 Node 运行时是活的
 

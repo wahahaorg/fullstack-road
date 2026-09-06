@@ -1,3 +1,7 @@
+---
+title: Nginx：反向代理与流量治理
+---
+
 # Nginx：反向代理与流量治理
 
 > 应用跑在 3000 端口不等于能上线。这篇讲清 nginx 的配置怎么组织、反代要配哪几行才不出错，以及怎么把它当成流量治理的控制面：灰度、限流、慢请求定位。
@@ -702,6 +706,45 @@ error_log  /var/log/nginx/error.log warn;
 > nginx 我主要用它做三件事：静态资源托管、反向代理和流量治理。反代必须配 `Host`、`X-Real-IP`、`X-Forwarded-For`、`X-Forwarded-Proto` 四个头，并在 Node 侧开 `trust proxy`，否则拿不到真实客户端 IP 和协议；做 AI 流式输出时要关 `proxy_buffering` 并放大 `proxy_read_timeout`，不然 SSE 会被缓冲住。灰度我用 `map` 加 cookie 做，登录时按用户 ID 哈希染色，保证同一用户稳定落在同一版本；灰度期间数据库变更必须向前兼容，只做加列不做删列。排查性能问题时我会在 `log_format` 里加 `$request_time` 和 `$upstream_response_time`，两者的差值能直接区分是后端慢还是客户端网络慢。
 
 配套阅读：[Docker 与部署](/guide/docker-deployment)、[Dockerfile 实践](/guide/dockerfile-practice)、[Docker Compose 与网络](/guide/docker-compose-network)。
+
+---
+
+## 面试问答
+
+**1. location 的匹配优先级是怎么走的？**
+
+- 先看 `=` 精确匹配，命中立即结束；然后找最长前缀匹配，它带 `^~` 就直接用它、不再试正则
+- 没带 `^~` 就按书写顺序逐个试正则，第一个命中的生效；正则全不中再回退到刚才记住的最长前缀
+- 关键差异：前缀之间比「谁更长」，正则之间比的才是「谁写在前面」
+- 加分：能给出优化习惯——静态资源目录写成 `^~` 省掉每个请求的正则回溯，`/health` 这类高频固定路径写成 `=`，正则 location 数量越少越好
+
+**2. proxy_pass 结尾的斜杠怎么影响转发的路径？**
+
+- proxy_pass 的地址带路径部分（哪怕只有一个 `/`），nginx 就把 location 前缀替换掉；不带路径部分则原样透传完整 URI
+- 例：请求 `/api/users/1`，写 `proxy_pass http://127.0.0.1:3000;` 后端收到 `/api/users/1`，写成 `http://127.0.0.1:3000/;` 后端收到 `/users/1`
+- 应用配了全局前缀（`app.setGlobalPrefix('api')`）就不加斜杠，让 `/api/` 一路带到后端；`/api` 只是给 nginx 分流用就加斜杠剥掉
+- 别踩的坑：正则 location 里 proxy_pass 不允许带路径，只能配合 rewrite 改写；需要复杂改写时也优先用 rewrite，比隐式斜杠规则更容易读懂
+
+**3. 反向代理不配 proxy_set_header 会出什么事故？**
+
+- 缺 `Host`：后端收到的 Host 是 upstream 地址，基于域名的多租户路由、重定向、生成的绝对 URL 全错
+- 缺 `X-Real-IP` / `X-Forwarded-For`：后端看到的客户端 IP 全是 nginx 内网 IP，风控、按 IP 限流、登录日志、地域统计集体失效
+- 缺 `X-Forwarded-Proto`：后端以为自己在跑 http，生成的绝对 URL 是 `http://`，OAuth 回调对不上、Cookie 的 secure 判断出错
+- Node 侧还要显式 `trust proxy`，而且只能写数字跳数（如 1）——写 true 等于无条件信整条链，而 XFF 是客户端可以随便伪造的头
+
+**4. 开源版 nginx 的负载均衡健康检查是什么机制？失败重试有什么风险？**
+
+- 只有被动检查：`max_fails=2 fail_timeout=10s` 表示 10 秒内连续失败 2 次就摘掉 10 秒——靠真实用户请求当探针，摘除之前一定有真实用户吃到错误
+- 主动健康检查（定时请求 `/health`）是商业版 `health_check` 指令或 Tengine / OpenResty 的能力；开源版靠调小 max_fails、fail_timeout 加 `proxy_next_upstream` 补偿
+- 别踩的坑：`proxy_next_upstream` 默认包含 error timeout，POST 已经发到后端、处理完但响应超时时，重试就是重复下单——写接口要显式 `proxy_next_upstream off` 或在应用层用幂等键兜底
+- `ip_hash` 做会话保持是将就的方案：NAT 后大量用户共享出口 IP 会压垮单实例，扩缩容哈希洗牌集体掉登录；正解是会话放 Redis 或用 JWT 让服务无状态
+
+**5. gzip 怎么配置才不出问题？**
+
+- `gzip_comp_level` 5 左右就够，6 以上收益递减、CPU 明显上升；`gzip_min_length 1k`，小文件压完可能更大
+- `gzip_types` 不要加图片和视频——它们已经是压缩格式，再压是纯浪费 CPU
+- `gzip_vary on` 让 CDN 按 Accept-Encoding 分别缓存
+- 加分：能说出更省 CPU 的路子——构建时预生成 `.js.gz` / `.js.br`，运行时 `gzip_static on` / `brotli_static on` 直接发预压缩文件，把压缩开销从每次请求挪到构建一次
 
 
 

@@ -1,3 +1,7 @@
+---
+title: 文件上传与大文件处理
+---
+
 # 文件上传与大文件处理
 
 > 上传看起来只是一个 `<input type="file">`，但从 100KB 的头像到 10GB 的视频，中间要换三套方案。这篇把前后端两侧串起来：multer 到底在做什么、分片上传的协议长什么样、以及为什么生产环境的文件字节流根本不该经过你的 Node 进程。
@@ -773,3 +777,41 @@ export class ImageService {
 - **分片上传的协议**：切片 → 算内容 hash（抽样 + Web Worker）→ `/check` 问哪些已存（秒传与断点续传都出自这一步）→ 限并发补传缺失片 → `/merge` 按序号流式 append。三个坑：按数值而非字典序排序、合并必须流式、hash 参与路径拼接必须校验格式。
 - **直传的三个安全点**：objectKey 与 content-type 由服务端决定且带用户前缀、凭证有效期分钟级、CORS 配在存储侧（配在 Nest 上没用，请求根本不到 Nest）。预签名 POST 还能强制 `content-length-range`，预签名 PUT 不能。
 - **大文件下载**：不能 `readFileSync` 后 `send`，要 `createReadStream` + `StreamableFile`；能给 `Content-Length` 就给，否则走 chunked；中文名要 `filename*=UTF-8''` + ASCII 兜底名；续传靠 `Accept-Ranges` + `Range` + 206 + `Content-Range`，注意 `end` 是闭区间。
+
+---
+
+## 面试问答
+
+**1. 三条上传路线怎么选？数据库里该存什么？**
+
+- 分歧点只有一个：文件字节流走不走你的应用服务器。小于 10MB 走后端中转（`FileInterceptor`），10MB 到几百 MB 后端签名、前端直传对象存储，更大或弱网用分片上传。
+- 中转吃应用带宽、内存和连接数，上传期间进程不能重启；真实项目通常三条并存——头像走中转（顺手裁剪压缩）、附件走直传、视频走分片直传。
+- 别踩的坑：数据库存完整 URL——域名换了、从 MinIO 迁云 OSS、从公有读改成签名访问，历史数据全废。只存 bucket 里的 object key，URL 在读取时拼。
+
+**2. `file.mimetype` 能信吗？大小限制要设几层？**
+
+- 不能。mimetype 直接来自客户端填的 multipart 段头，curl 或改一行前端代码就能把 `.exe` 声明成 `image/png`；真实类型要读文件头的 magic number。`diskStorage` 下 buffer 是空的，内置 `FileTypeValidator` 约等于君子协定。
+- 三层各设一次：Nginx `client_max_body_size`（超了直接 413，请求进不了 Node，是好事）、multer `limits.fileSize`（抛 `MulterError`，要在 Filter 里翻成 400）、业务层 `MaxFileSizeValidator`（400 加人话提示）。
+- 外层必须大于等于内层；Nginx 默认只有 1MB，很多人调完 multer 发现还是 413，原因就在这。
+- 别踩的坑：`memoryStorage` 不把 `fileSize` 压到几 MB，10 个并发 × 100MB 就是 1GB 常驻内存，OOM 就在这里。
+
+**3. 分片上传的 hash 为什么要放 Web Worker 算、还要抽样？抽样有什么风险？**
+
+- 对 2GB 文件做全量 MD5 要读完整个文件，主线程上跑就是几十秒白屏；放 Worker 用 `spark-md5` 的增量接口逐片喂，抽样（首尾整片 + 中间每片取 2 字节）把 1GB 从几十秒降到几十毫秒。
+- 抽样是拿碰撞概率换时间。如果这份 hash 会用于「秒传即视为拥有」的权限判断，必须全量——否则等于构造一个 hash 就能拿到别人的文件。
+- hash 必须由内容决定，不能用文件名 + 大小（改个名就命中别人的文件）；它还会拼进服务端路径，必须用正则锁死成 32 位 hex，否则前端传 `../../etc` 就是任意路径写入。
+- 加分：能说出 `/check` 接口返回已存在的分片序号，秒传和断点续传都出自这一步。
+
+**4. 直传方案里预签名 URL 和 STS 凭证怎么选？三个安全点是什么？**
+
+- 能用预签名就用预签名：它只对一个 object key 的一个操作有效，泄露的爆炸半径最小。只有客户端要调用多个存储 API（分片上传要 `UploadPart` 几十次）才上 STS，且必须按用户隔离前缀。
+- key 和 content-type 必须由服务端定且带用户 id 前缀，否则攻击者能签出 `u/999/avatar.png` 覆盖别人头像、或签出一个 `.html` 挂钓鱼页；凭证有效期分钟级——签出就无法撤回。
+- CORS 必须配在存储侧：浏览器直传是跨域请求，Nest 上的 `enableCors` 完全不起作用——请求根本没到 Nest。
+- 别踩的坑：上传成功不等于业务完成——前端传完就关页面，bucket 里留下没有任何数据库记录的孤儿对象，要靠存储事件通知或定期对账清理。
+
+**5. 大文件下载为什么要用流？Range 续传有哪些细节？**
+
+- `readFileSync` 把整个文件读进内存，10 个人同时下载 500MB 就是 5GB，而且超大文件会撞 Buffer 单对象尺寸上限；`createReadStream` + `StreamableFile` 内存恒定在一个缓冲区量级，客户端断开时 Nest 还会替你销毁读流。
+- 能给 `Content-Length` 就给，浏览器才能显示准确进度和剩余时间；不给就自动切到 chunked。
+- 中文文件名要同时给 ASCII 兜底名和 `filename*=UTF-8''` 的 RFC 5987 编码真名；`filename` 的值没清掉引号和控制字符就是一个头注入点。
+- Range 细节：先声明 `Accept-Ranges: bytes`，范围非法回 416 不是 400，`createReadStream` 的 `end` 是闭区间所以 `Content-Length = end - start + 1`。加分：文件在对象存储上时，正确做法是返回预签名 GET URL 让浏览器直连，Node 连流量都不过。

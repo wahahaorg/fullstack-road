@@ -1,3 +1,7 @@
+---
+title: Prisma：另一种 ORM 思路
+---
+
 # Prisma：另一种 ORM 思路
 
 > TypeORM 用装饰器在代码里定义表，Prisma 反过来——先写 schema 文件，再由它生成代码。这一个方向的翻转，决定了两者在类型安全、迁移体验和查询能力上的全部差异。
@@ -597,3 +601,37 @@ Prisma 4 时代的 `prisma.$use(async (params, next) => ...)` 中间件已经被
 - **Prisma 会不会 N+1**：`include` 是固定条数的多条查询（不是 JOIN，也不是 N+1），真正的 N+1 来自在循环里查询。需要 JOIN 可以开 `relationJoins` 预览特性，用 `relationLoadStrategy` 按查询指定。
 - **在 Nest 里怎么接**：`PrismaService extends PrismaClient`，`onModuleInit` 里 `$connect`、`onModuleDestroy` 里 `$disconnect`，`main.ts` 里 `app.enableShutdownHooks()`，包成 `@Global()` 的 `PrismaModule`。
 - **软删除怎么做**：`$extends` 的 `query` 扩展（不是已废弃的 `$use`），并且要说清它逐方法生效、嵌套查询覆盖不到这两个局限。
+
+---
+
+## 面试问答
+
+**1. Prisma 和 TypeORM 最本质的区别是什么？**
+
+- 方向相反：TypeORM 是代码定义 schema（写 Entity 装饰器，运行时读元数据拼 SQL）；Prisma 是 schema 定义代码（写 `.prisma`，`generate` 输出一整套带精确类型的 Client）。
+- 由此推出的现象：Prisma `select` 了哪几个字段，返回值类型就只有哪几个；没有 lazy loading，不会因属性访问意外触发 N+1；没有装饰器、不依赖 `reflect-metadata`。
+- 加分：前端类比——TypeORM 像手写类型声明，Prisma 像 `graphql-codegen`，契约在别处、类型是生成物；代价是改了 schema 忘了 `generate`，类型就是旧的。
+
+**2. 为什么生产只能用 `migrate deploy`？**
+
+- `migrate dev` 是开发态命令：比对 schema 和库的差异生成迁移，一旦检测到迁移历史不一致或库被手工改过（drift），会提示重置整个数据库并重跑 seed；CI 里没有交互终端，配上 `--force` 更是直接清库。
+- `deploy` 只做一件事：把还没执行过的迁移文件按顺序跑完。`db push` 不产生迁移文件，本质等于 TypeORM 的 `synchronize`，不进生产。
+- 加分：迁移文件是纯 SQL，要进 git、进 code review，破坏性变更自己在里面补好数据搬迁语句；判断标准——这个库的数据丢了你会不会心疼，会就用 migrate。
+
+**3. Prisma 有 N+1 问题吗？**
+
+- `include` 不是 JOIN 也不是 N+1：它默认拆成多条 SQL 在内存里拼装——先查主表，再用一条 `WHERE space_id IN (...)` 把关联捞回来，SQL 条数只和关联层数有关、不随记录条数增长；代价是多一次网络往返，换来没有 JOIN 的行膨胀。
+- 真正的 N+1 只有一个来源：你自己在循环里查（100 个 space 循环查 docs 就是 101 条 SQL）。解法是一次 `include`，或一次 `findMany` 之后在内存里按 spaceId 分组。
+- 想换 JOIN 策略，在 generator 里开 `relationJoins` 预览特性，之后按查询指定 `relationLoadStrategy: 'join' | 'query'`——哪个更快取决于数据形状，属于实测项，不是默认最佳实践。
+
+**4. 交互式事务最大的坑是什么？**
+
+- 回调里必须全程用 `tx`，写成 `prisma` 就跑在事务外面了——不报错，数据一致性悄悄坏掉。
+- 默认 5 秒超时；回调里只放数据库操作，发邮件、调模型、上传文件全部挪到事务提交之后——事务开着的时候，连接和行锁都被占着。
+- 加分：互不依赖的多个写操作用数组形态，一批发完就结束、占用短；后一步要用前一步的结果或中间有业务判断，才用交互式回调。
+
+**5. 在 Nest 里怎么集成 Prisma？软删除呢？**
+
+- `PrismaService extends PrismaClient`，`onModuleInit` 里 `$connect`（懒连接也能跑，但那样启动期发现不了配错的连接串）、`onModuleDestroy` 里 `$disconnect`，`main.ts` 里 `app.enableShutdownHooks()`，包成 `@Global()` 的 `PrismaModule`——横切基础设施正是少数适合全局的情况。
+- 软删除用 `$extends` 的 `query` 扩展，不是已废弃的 `$use`；它返回的是一个新 client 实例（直接在 `PrismaService` 里调一下没用，要在 `useFactory` 里包装完再交给容器），而且逐方法生效——只拦 `findMany`，`findFirst`、`count`、嵌套查询照样能看见已删除的行。
+- 别踩的坑：网上教程里 `$on('beforeExit', ...)` 那套，在 Prisma 5 之后的默认 library engine 上是死代码。

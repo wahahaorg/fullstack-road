@@ -1,3 +1,7 @@
+---
+title: NestJS 依赖注入
+---
+
 # NestJS 依赖注入
 
 > 后端对象的依赖链很深，手写 `new` 组装很快就会失控。这篇讲清 IoC 容器怎么接管对象的创建、注入、生命周期与销毁。
@@ -310,3 +314,36 @@ const service = moduleRef.get(OrderService)
 想复用整个真实模块、只替换其中一两个依赖，用 `.overrideProvider(MAIL_SENDER).useValue(mock)`。
 
 > ⚠️ 取 REQUEST / TRANSIENT 作用域的实例要用 `await moduleRef.resolve(X)`，`get(X)` 会抛错。
+
+---
+
+## 面试问答
+
+**1. IoC、DI、DIP 是什么关系？**
+
+- IoC 是设计原则（控制权交给框架，依赖创建、生命周期管理都算），DI 是落地它的实现手段（容器创建依赖送进来），DIP 是编码约束（高层模块依赖抽象）。
+- DI 只是换了「谁来 new」，DIP 才决定代码好不好换实现：`@Inject(ORDER_REPOSITORY)` 依赖接口，换存储只改 providers 里绑定实现的那一行。
+- 加分：TypeScript 的 interface 编译后不存在，不能当 token 用，要在 Nest 里做 DIP 得自己给一个运行时存在的 token（`Symbol` 或 class）。
+
+**2. 五种 Provider 写法怎么选？**
+
+- `useClass`：一个 token 对应多个候选实现（环境 / 租户 / Mock）；`useValue`：常量、配置、已有的第三方实例；`useFactory + inject`：实例化要依赖别人或需要 `await`；`useExisting`：别名，一个实例挂两个名字。
+- token 能用 class 就用 class；注入接口或非类值时用导出的 `Symbol` 常量。
+- 别踩的坑：token 用裸字符串——两个库都用 `'REDIS'` 会静默互相覆盖，拼错要等运行时才炸；async 工厂还会阻塞启动，工厂里要自己设超时，否则一个卡住的连接让容器永远起不来。
+
+**3. 构造函数注入和 `ModuleRef` 运行时取实例有什么区别？**
+
+- 构造函数注入是声明式的：启动期容器按依赖图解析并校验，缺依赖直接起不来。`ModuleRef.get(token)` 是运行时现取，依赖从声明变成埋在方法体里的 token，启动期的依赖校验对它失效——所以它是逃生舱，只在支付渠道路由、插件机制这种「运行时才知道取哪个」的场景用。
+- `ModuleRef` 也能打破循环依赖：不在构造函数注入对方，改成方法里现取。
+- 加分：循环依赖优先考虑抽第三个模块或用事件解耦；`forwardRef` 是最后的选择，而且两边都要加、只加一侧照样解析失败，加上也不等于修好——构造函数里可能拿到尚未初始化完的引用。
+
+**4. REQUEST 作用域有什么代价？有什么更便宜的替代？**
+
+- 沿依赖链向上传染：Controller 注入了请求级 Service，它自己和整条依赖链全变成请求级，每个请求重走依赖解析和实例化，高 QPS 接口开销明显；这些实例还只能 `moduleRef.resolve()` 取。
+- 需要请求上下文时先考虑 Guard / Interceptor 把数据挂到 `request` 上，或用 `AsyncLocalStorage` 在单例内部隔离；确实要按请求隔离整棵依赖树（典型是多租户切数据源）再上 REQUEST scope。
+
+**5. K8s 滚动更新时，Nest 服务怎么优雅退出？**
+
+- `app.enableShutdownHooks()` 必须显式开：默认不监听 `SIGTERM`，三个销毁钩子一个都不会跑，这是线上「连接没关干净」最常见的答案。
+- 顺序是 `onModuleDestroy` 先让 readiness 返回 503 摘流量；endpoints 摘除是异步广播的，`beforeApplicationShutdown` 里再等几秒让在途请求收尾；`terminationGracePeriodSeconds` 要设得比等待更长，否则没等完就被 `SIGKILL`。
+- 加分：能说出为什么默认不监听信号——挂信号监听器有开销，且一个进程里可能跑多个 Nest 实例（测试、monorepo），框架不替你决定谁响应信号。

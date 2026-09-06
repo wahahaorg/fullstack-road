@@ -1,3 +1,7 @@
+---
+title: Docker 与部署
+---
+
 # Docker 与部署
 
 > 前端转后端必须跨过的坎——不是代码写完就结束，而是能把它跑在服务器上。
@@ -365,3 +369,41 @@ async def health():
 ## 面试怎么说
 
 > 我做的项目都用 Docker 容器化，写多阶段构建的 Dockerfile 减小镜像体积，用 docker-compose 编排后端服务、数据库和缓存。部署时用 nginx 做反向代理和 SSL 终结，Node 应用通过 PM2 做进程管理和集群模式。CI/CD 用 GitHub Actions，测试通过后自动构建镜像并部署到服务器。环境变量通过 `.env` + CI Secrets 分层管理，不提交到代码仓库。
+
+---
+
+## 面试问答
+
+**1. 多阶段构建到底优化了什么？**
+
+- builder 阶段装全量依赖、跑构建，最终镜像只从 builder `COPY --from` 运行时需要的文件（dist、node_modules、package.json）
+- 最终镜像不含构建工具和源码，体积从 1GB+ 缩到 100-200MB，攻击面也小
+- 配合 `.dockerignore` 排除 node_modules、.git、.env 等，避免把不需要的文件打进镜像，上下文更小、构建更快
+
+**2. 从 push 到 main 到服务更新，CI/CD 链路经过哪几步？**
+
+- 第一个 job 跑测试：`npm ci`、lint、test
+- 第二个 job 构建镜像（tag 用 git sha）并推送到镜像仓库（GHCR / Docker Hub）
+- 通过 SSH 到服务器执行 `docker-compose pull && docker-compose up -d` 拉新镜像重启
+- 用 `needs: test` 保证测试不过不部署；服务器 host、用户名、SSH key 走 GitHub Secrets，不写进仓库
+
+**3. 环境变量怎么分层管理？**
+
+- `.env` 放基础配置，`.env.local` 本地覆盖且不提交 Git，`.env.production` 部署时手动配置、不建议提交 Git
+- 原则是代码不包含任何密钥，生产密钥通过 CI/CD Secrets 或云平台环境变量注入
+- Nest 用 `@nestjs/config` 的 `ConfigModule.forRoot()`，FastAPI 用 pydantic-settings 的 `BaseSettings`
+- 别踩的坑：`.env` 一旦进了 Git 或被打进镜像，密钥就等于公开了，`.gitignore` 和 `.dockerignore` 都要覆盖它
+
+**4. PM2 在这套部署里解决什么问题？**
+
+- cluster 模式配 `instances: 'max'` 按 CPU 核数起多个进程，充分利用多核
+- `max_memory_restart` 内存超限自动重启，进程挂了由 PM2 拉起
+- `pm2 startup` + `pm2 save` 配置开机自启，服务器重启后服务自动恢复
+- 加分：能说出日常运维命令——`pm2 logs` 看日志、`pm2 monit` 实时监控、`pm2 restart` 重启
+
+**5. 为什么要加一层 nginx 反向代理，Node 直接对公网不行吗？**
+
+- 证书（Let's Encrypt 的 fullchain.pem）和 443 监听放在 nginx，80 端口 301 跳转到 HTTPS
+- 静态文件（如 `/uploads/`）由 nginx 直接 alias 返回并配 `expires 30d` 缓存，不占 Node 的事件循环
+- 代理转发时带上 `X-Real-IP`、`X-Forwarded-For`、`X-Forwarded-Proto`，后端才能拿到真实客户端 IP 和协议
+- 别踩的坑：WebSocket 代理必须加 `proxy_http_version 1.1` 和 `Upgrade` / `Connection "upgrade"` 两组头，否则握手升不了级

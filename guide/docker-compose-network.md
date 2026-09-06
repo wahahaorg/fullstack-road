@@ -1,3 +1,7 @@
+---
+title: Compose、网络与进程守护
+---
+
 # Compose、网络与进程守护
 
 > 一个后端服务从来不是孤零零跑的。这篇讲清多容器怎么编排、容器之间凭什么能互相访问、数据怎么不丢，以及「容器里到底还要不要 PM2」这个争议问题的答案。
@@ -448,3 +452,38 @@ docker compose start mysql
 ## PM2 与容器：结论先说
 
 <!--MORE-->
+
+---
+
+## 面试问答
+
+**1. 容器里连 localhost:3306 报 ECONNREFUSED，为什么？**
+
+- net namespace 让每个容器有独立的网络栈，容器里的 `127.0.0.1` 指的是这个容器自己，里面只有一个 Node 进程，没有 MySQL
+- Compose 会创建 bridge 网络并在网络里跑一个内嵌 DNS（`127.0.0.11`），把服务名解析成容器 IP，所以连接串写服务名 `mysql`，不是 localhost
+- 端口用容器内的端口：`ports: ["8080:3000"]` 只影响宿主机怎么访问，容器之间访问 api 用的还是 `api:3000`
+- 反过来应用必须监听 `0.0.0.0`，监听 `127.0.0.1` 时别的容器和宿主机都连不上
+
+**2. depends_on 写了 mysql，api 起来还是连不上数据库？**
+
+- 短语法只保证「mysql 容器进入 running 状态」，不保证 MySQL 能接受连接——容器 running 之后 MySQL 还要十几秒初始化
+- 正解是给依赖方加 `healthcheck` 并用 `condition: service_healthy` 解决启动期，应用侧连接重试解决运行期（生产环境数据库会在运行中重启，光靠启动顺序不够）
+- 别踩的坑：在启动脚本里 `sleep 30` 能跑，但会在最忙的那天失效
+
+**3. 数据库端口映射有什么安全风险？**
+
+- `ports` 写 `"3306:3306"` 不加前缀等于绑 `0.0.0.0`，云服务器上就是把数据库直接开到公网
+- 更阴的是：Linux 上 Docker 通过 iptables 的 DNAT 规则实现映射，这些规则插在 `ufw` 的链之前——你以为防火墙拦住了 3306，其实没有
+- 数据库和缓存根本不发布端口，同一个 Compose 网络内用服务名互访；本地 GUI 客户端需要时用 `"127.0.0.1:3306:3306"` 加 SSH 端口转发
+
+**4. bind mount 和 named volume 怎么选？**
+
+- 判断标准：这份数据需要用编辑器直接改吗？配置文件、源码用 bind mount；数据库数据用 named volume
+- macOS / Windows 上 bind mount 要跨 Docker Desktop 的 Linux 虚拟机做文件系统转发，数据库那种随机小 IO 慢一个量级，还可能碰到文件锁语义差异导致数据损坏
+- 别踩的坑：开发热更新只挂 `./src`，别把整个项目目录挂到 `/app`——宿主机的 node_modules 会覆盖容器里那份，症状是各种 `invalid ELF header`
+
+**5. restart 用 always 还是 unless-stopped？**
+
+- 平时行为一样，区别只在 Docker daemon 重启（服务器重启）那一刻显现：`always` 会把你昨天特意手动 stop 的容器又拉起来，`unless-stopped` 不会
+- 长期服务的默认选择是 `unless-stopped`，避免运维上的「惊喜」
+- 加分：能说出版本细节——`version: '3.8'` 已废弃（V2 忽略并警告），`docker compose`（无横线）是 V2 CLI 插件，带横线的 `docker-compose` 是停止维护的 Python 版

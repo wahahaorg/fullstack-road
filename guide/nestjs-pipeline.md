@@ -1,3 +1,7 @@
+---
+title: NestJS 请求生命周期
+---
+
 # NestJS 请求生命周期
 
 > 一个请求从进入到返回，要穿过 Middleware、Guard、Interceptor、Pipe、Exception Filter 五层切面。这篇讲清它们的执行顺序、各自的职责边界，以及什么逻辑该放在哪一层。
@@ -492,3 +496,33 @@ if (!roles?.length) return true   // 没标注 = 不限制
 - **顺序**：Middleware → Guard → Interceptor（前置）→ Pipe → Handler → Interceptor（后置）→ Exception Filter。每层内部按「全局 → 控制器 → 方法」生效，Interceptor 的后置部分逆序。
 - **Middleware 和 Interceptor 的区别**：Middleware 在 HTTP 平台层，拿不到 `ExecutionContext`，读不到路由元数据也改不了响应体；Interceptor 在 Nest 内部，能读元数据、能用 RxJS 加工响应、能短路。
 - **为什么全局切面推荐用 `APP_GUARD` 这类 token 注册**：`useGlobalXxx(new X())` 传的是手动 new 的实例，不在 IoC 容器里，注入不了 Provider。
+
+---
+
+## 面试问答
+
+**1. 说一下一个请求的完整执行顺序。**
+
+- Middleware → Guard → Interceptor（前置）→ Pipe → Handler → Interceptor（后置）→ 异常统一由 Exception Filter 收口；每层内部按「全局 → 控制器 → 方法」生效，Interceptor 的后置部分逆序。
+- 加分：Guard 是短路链——`@UseGuards(A, B)` 里 A 返回 false 或抛异常，B 和后面的一切都不执行，「先认证再授权」靠的就是这个顺序；Interceptor 是洋葱，执行是 `A前 → B前 → handler → B后 → A后`，所以「响应包装」这种要包在最外面的必须最先注册。
+
+**2. Middleware 和 Interceptor 的区别是什么？**
+
+- Middleware 跑在 HTTP 平台层：拿不到 `ExecutionContext`，读不到路由元数据；`next()` 不返回 Promise，之后也拿不到响应体，handler 的返回值由 Nest 直接写进 socket。
+- Interceptor 拿到的是「handler 执行」这条 Observable，天然能在前后插逻辑、能用 RxJS 改写响应、能短路（缓存命中直接 `return of(cached)`，handler 根本不执行）。
+- 加分：Middleware 里抛的异常在 HTTP 平台层就被截住了，可能绕过你定义的 Filter（表现为一坨默认错误页）——需要抛业务异常走统一错误格式的逻辑，放 Guard 或更里层。
+
+**3. Guard 里 `return false` 和抛异常有什么区别？**
+
+- `return false` 一律是 403；想返回 401、想带上具体原因，就自己抛异常——token 无效或过期用 401 比 403 准确。
+- Guard 抛的异常同样会被 Exception Filter 接住，和 Pipe、service 深处的异常走同一个出口。
+
+**4. 为什么不能在 Guard 实例上存请求级状态？**
+
+- 全局和控制器级 Guard 是单例，并发请求会互相覆盖——把 user 存在实例字段上，两个用户的数据就串了。
+- 请求级数据挂到 `request` 对象上，或用 `Scope.REQUEST` 的 Provider；后者代价是每个请求都要重新构造依赖树，高 QPS 接口要掂量。
+
+**5. 同一个 Guard 怎么同时服务 HTTP 和 WebSocket？**
+
+- 靠 `ExecutionContext` / `ArgumentsHost` 抽象：`getType()` 判断上下文，`switchToHttp()` / `switchToWs()` 各取所需；把「从上下文取凭证、挂用户信息」收进私有方法，主体逻辑保持与上下文无关。
+- 别踩的坑：Guard 里直接写死 `switchToHttp().getRequest()`，挪到 WebSocket 上会拿到 `undefined`，而且是运行时才炸；另外 WebSocket 只在建立连接时握手一次，token 过期不会自动生效，长连接场景要自己做定期校验。

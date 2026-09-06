@@ -1,3 +1,7 @@
+---
+title: 实时通信：WebSocket 与 SSE
+---
+
 # 实时通信：WebSocket 与 SSE
 
 > 服务端想主动把数据推给浏览器，有四条路。这篇先帮你选对路，再把 WebSocket 协议拆到字节级别手写一遍，然后落到 Nest 的 Gateway：鉴权、房间、多实例广播、消息不丢。最后是 SSE —— AI 流式回复现在几乎都走它。
@@ -666,15 +670,39 @@ location /api/chat {
 - **多实例为什么会丢消息**：`server.to(room).emit()` 只遍历本进程内存里的连接表。解法是换 `@socket.io/redis-adapter`，用 Redis Pub/Sub 把 emit 广播到所有实例。另外 socket.io 默认要粘性会话，除非直接 `transports: ['websocket']`。
 - **消息怎么保证不丢**：WebSocket 本身不保证送达。消息先落库拿到自增 id，再推送；客户端重连时带最后收到的 id 拉增量；用客户端生成的 msgId 加唯一索引做幂等去重。
 
+---
 
+## 面试问答
 
+**1. WebSocket 握手成功返回什么状态码？`Sec-WebSocket-Accept` 算出来的意义是什么？**
 
+- 返回 101 Switching Protocols，不是 200；握手成功后这条 TCP 连接上再也没有 HTTP，两端按二进制帧收发，头部最少 2 字节。
+- 服务端把客户端的 `Sec-WebSocket-Key` 和协议里写死的魔法字符串拼接，做 SHA1 再 base64 放进 `Sec-WebSocket-Accept`。这不是加密也防不了任何人，作用是证明对面真的懂 WebSocket。
+- 浏览器 JS API 发不出协议级 ping 帧（收到的 ping 由浏览器自动回 pong），客户端主动探活只能在应用层模拟——这正是 socket.io 要自造一套应用层心跳的原因。
+- 加分：掩码只要求客户端到服务端方向，防的是代理缓存投毒而不是窃听——不掩码的话攻击者能构造出让老式代理误认为是 HTTP 请求的 payload。
 
+**2. 服务端单向推送，为什么选 SSE 而不是 WebSocket？**
 
+- SSE 就是一个普通 HTTP 响应：现有的鉴权、限流、日志、网关、链路追踪全部复用，浏览器还自带自动重连和 `Last-Event-ID` 续传。
+- WebSocket 要自己管心跳、重连、房间、多实例广播，只有双向高频交互（聊天要发也要收、协同编辑、游戏）才值这个成本。
+- 别踩的坑：socket.io 的协议是私有的，`new WebSocket()` 连不上它，必须用 `socket.io-client`；换成裸 `ws` 的 `WsAdapter` 后，namespace、房间这些 socket.io 特性也一起消失——它们不是 Nest 提供的。
 
+**3. 扩到两个实例后「有时候收得到有时候收不到」，为什么？怎么解决？**
 
+- `server.to(room).emit()` 遍历的是当前进程内存里的连接表，实例 1 完全不知道实例 2 上还有谁在同一个房间。
+- 解法是换 `@socket.io/redis-adapter`：pub / sub 两条 Redis 连接（进入订阅模式的连接不能再发普通命令），每次 emit 通过 Redis Pub/Sub 广播给所有实例，各实例再投给自己手上的连接。
+- adapter 解决的是「广播能到达所有实例」，不解决「消息不丢」——Redis Pub/Sub 是 fire-and-forget 不持久化，不丢要靠落库加客户端拉增量。
+- 别踩的坑：socket.io 默认先用 HTTP 长轮询握手再升级，那几个请求必须落到同一实例（否则报 `Session ID unknown`），要么负载均衡开会话保持，要么直接 `transports: ['websocket']`。
 
+**4. WebSocket 怎么保证消息不丢？**
 
+- 先纠正直觉：TCP 只保证连接不断时字节不丢；连接一断，内核发送缓冲区里的帧和还没发出的消息全部消失，发送方通常收不到任何错误。
+- 顺序永远是先落库拿到自增 id——这是唯一可信的真相，再推送；推送只是「顺便快一点」，正确性由客户端重连后带最后收到的消息 id 拉增量兜底。
+- 去重靠客户端生成的 `clientMsgId` 加数据库唯一索引，网络抖动重发时第二次写入命中索引冲突，返回已存在的那条即可。
+- 加分：重连要配随机抖动（`randomizationFactor`）——一次发布让 5000 个连接同时断开，重连间隔完全一致就会在同一毫秒回来，形成自己制造的 DDoS。
 
+**5. WebSocket 的鉴权和 HTTP 有什么不一样？token 过期了长连接怎么办？**
 
-
+- 浏览器 `new WebSocket(url, protocols)` 只有两个参数，没有地方放请求头，HTTP 那套 `Authorization` 头直接用不了。推荐 socket.io 的 `auth` 参数——放在握手包体里，不进 URL、不进代理日志；query 传 token 会进 nginx access log 和浏览器历史。
+- 鉴权动作放 `handleConnection` 里，不通过就当场断开，别让未认证的连接进来占资源；Guard 里取上下文用 `switchToWs().getClient()` 而不是 `switchToHttp()`。
+- 校验粒度是握手时验一次、之后长期有效——token 过期不会让已建立的连接自动失效，中途封号它照样收消息。补法：按 token 的 `exp` 定时 `disconnect` 踢下线让客户端重连，或关键事件在 handler 里再查一次授权状态。

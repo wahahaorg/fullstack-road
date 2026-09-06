@@ -1,3 +1,7 @@
+---
+title: NestJS 装饰器体系
+---
+
 # NestJS 装饰器体系
 
 > Nest 的功能几乎全部通过装饰器暴露。这篇把内置装饰器按用途分类理清，再讲怎么造自己的、以及它们到底在什么时候执行。
@@ -323,4 +327,35 @@ export class OrdersController {
 | 给 handler 贴上供 Guard 判断的标记 | 包一层 `@SetMetadata` |
 | 把一组固定搭配的装饰器收成一个 | `applyDecorators` |
 | 理解上面这些为什么能生效 | [元数据与 Reflector](/guide/nestjs-metadata-reflector) |
+
+---
+
+## 面试问答
+
+**1. 装饰器是什么时候执行的？为什么装饰器里拿不到 request？**
+
+- 类 / 方法 / 参数装饰器都在「类定义被求值」时执行一次，也就是模块被 import 的那一刻，不是每次请求——那时进程刚启动，一个请求都还没来。
+- 请求期做事只有两条路：装饰器阶段用 `@SetMetadata` 写元数据，Guard / Interceptor 里用 `Reflector` 读；或者用 `createParamDecorator`，传进去的工厂函数每次请求都会执行。
+- 加分：求值和应用是两步——装饰器表达式（工厂调用）自上而下求值，返回的装饰器函数自下而上应用，「距离方法最近的先生效」说的是第二步。
+
+**2. 注入 `@Res()` 之后会发生什么？**
+
+- Nest 放弃自动响应：handler 的返回值被忽略，不自己发响应请求就挂到超时。只是想设 header / cookie 用 `@Res({ passthrough: true })`，返回值照旧由 Nest 序列化并发送。
+- 别踩的坑：passthrough 下不要再调 `res.send()` / `res.json()`，那是双重响应；注入了 `@Res()` 的 handler，Interceptor 对返回值的改写（比如统一响应包装）会失效，因为压根没有返回值流过去。
+
+**3. 全局 Guard 用 `useGlobalGuards` 还是 `APP_GUARD` 注册？**
+
+- `app.useGlobalGuards(new X())` 是手动 new 的实例，不在 IoC 容器里，Guard 构造函数里的 `Reflector` 注入不进来；`{ provide: APP_GUARD, useClass: X }` 由容器实例化，推荐这种写法。
+- 同理 `@UseGuards(X)` 要传类而不是实例，`@UseGuards(new RolesGuard())` 的依赖注入会静默失效。
+
+**4. `applyDecorators` 打包复合装饰器有什么限制？**
+
+- 只能组合类 / 方法 / 属性装饰器，参数装饰器组合不了。
+- 路由声明留在原处：把 `@Get(path)` 塞进复合装饰器会让路由表散落在自定义装饰器里，搜不到路径。
+- 加分：动机是「少写一行不会报错，只会静默出问题」——忘了 `@ApiBearerAuth()`，Swagger 上没有锁图标，前端以为不用带 token。
+
+**5. 自定义参数装饰器和内置的 `@Query` 是什么关系？**
+
+- 内置的 `@Query` / `@Headers` / `@Ip` 本质就是 `createParamDecorator` 实现的，所以自定义参数装饰器和内置的完全平级——一样可以在后面挂 Pipe：`@CurrentUser('id', ParseUUIDPipe)`。
+- `createParamDecorator` 返回的签名里参数值是 `any`，`@CurrentUser('id') userId: number` 这种明显写错的类型标注编译期不会报错；团队公共装饰器值得自己包一层带重载的工厂让字段名有编译期检查，一次性的不用。
 

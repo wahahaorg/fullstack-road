@@ -1,3 +1,7 @@
+---
+title: 微服务与跨语言通信
+---
+
 # 微服务与跨语言通信
 
 > 什么时候不该拆微服务，拆了之后消息怎么走、契约怎么定、异常怎么传。重点在 gRPC——它是 Node 网关调用 Python 侧 Agent / embedding 服务的标准答案。
@@ -553,3 +557,39 @@ flowchart LR
 回到开篇那句话：**边界先在单体里立住，再谈拆。** 从模块化单体走到 Monorepo 多 app 的工作量接近于搬目录；而边界没立住就拆出来的只会是分布式单体——所有缺点，没有优点。
 
 四类典型系统各自该落在这条路线的哪一段，见[项目架构蓝图](/guide/nestjs-project-blueprint)。
+
+---
+
+## 面试问答
+
+**1. 什么时候才值得把单体拆成微服务？**
+
+- 三个前提**全部满足**才考虑：负载特征差异大需要独立扩容、发布节奏差一个数量级、边界已经在单体里稳定。技术栈不同（Node 网关 + Python 推理服务）是唯一能单独成立的理由。
+- 微服务解决的是组织和部署问题，不是代码整洁问题。代码乱是模块边界没立住，拆开只会得到分布式单体——所有缺点，没有优点。
+- 加分：能说出渐进路线——模块化单体 → Monorepo 多 app → 真微服务，每一步都能停下来，前一步的工作量接近于搬目录。
+
+**2. Nest 内置的 TCP 传输为什么不能当生产骨架？**
+
+- 它是一个私有的「JSON over TCP」协议：没有 broker、没有确认、没有重试、没有负载均衡，客户端写死一个 `host:port`，一次网络抖动就丢消息。
+- 协议是 Nest 私有的，别的语言没有现成客户端，跨语言也不行。
+- 选型三句话：要保证不丢就走 broker；要低延迟同步拿返回值就用 gRPC；要跨语言就用 gRPC 或 broker。
+
+**3. `send` 和 `emit` 的区别？冷热 Observable 会怎么咬人？**
+
+- `send` + `@MessagePattern` 是「我要一个答案」，返回的 Observable 是冷的——不订阅就根本不会发出去，必须 `return` 它或 `firstValueFrom` 一下。
+- `emit` + `@EventPattern` 是「我通知一件已经发生的事」，是热的，忘了 `await` 消息照样发出去，但拿不到 broker 的确认，要确认就得 `await lastValueFrom(...)`。
+- 命名跟着语义走：`send` 的 pattern 用动词（`doc.count`），`emit` 的用过去式事件名（`doc.published`），看到 `emit('doc.count')` 就知道写错了。
+- 别踩的坑：传输层的 `retryAttempts` 管的是连接重建，不是这次调用的重试；调用级别必须自己上 RxJS operator——超时必须设、重试只给读操作、要有上限和退避。
+
+**4. 微服务里抛 `NotFoundException` 为什么不行？异常怎么跨进程？**
+
+- rpc 上下文没有 HTTP 状态码这个概念，`NotFoundException` 序列化到调用方只是一个形状不可预期的对象。跨进程要抛 `RpcException`（gRPC 是 code + message）。
+- 被调方用 Filter 把内部抛的 `HttpException` 统一翻译成 `RpcException`，别让它原样漏出去；调用方把 gRPC code 翻回 HTTP 语义：`NOT_FOUND` → 404、`INVALID_ARGUMENT` → 400、`UNAVAILABLE` → 503。
+- 下游的错误码不要原样透给前端，翻译表收口在网关一处，别每个 controller 各抄一遍。
+
+**5. gRPC 上生产有哪些必踩的坑？**
+
+- 字段编号是线上格式的一部分：只增不改，删字段用 `reserved` 占位防复用；proto3 标量不加 `optional` 分不清「没传」和「传了零值」，`temperature = 0` 这类合法零值必须加 `optional`。
+- 三处命名不一致：`@GrpcMethod` 的第二个参数写 proto 原名 `StreamChat`，`getService()` 返回的 stub 方法是 `streamChat`（首字母小写），字段 `session_id` 到 TS 里变 `sessionId`——配一边 `keepCase: true` 一边不配，就是永远收到 `undefined`。
+- K8s 的 ClusterIP 是 L4 轮询，HTTP/2 长连接建好就粘在一个 Pod 上，扩容后流量不均；用 headless Service + 客户端 `round_robin` 负载均衡，或交给 service mesh。
+- 加分：proto 复制粘贴到各仓库会两边不同步且解析错位不报错，要单独 proto repo 或上 buf 集中管理；默认 4MB 消息上限传 embedding 大数组会报 `RESOURCE_EXHAUSTED`。

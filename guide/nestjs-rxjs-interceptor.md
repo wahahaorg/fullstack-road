@@ -1,3 +1,7 @@
+---
+title: RxJS 与 Interceptor 实战
+---
+
 # RxJS 与 Interceptor 实战
 
 > Nest 的 Interceptor 返回的是 Observable。不懂 RxJS 就只会写个 `tap` 打日志，超时熔断、缓存短路、异常转换这些活儿全做不了。这篇只教 Interceptor 里真正用得上的那一小撮 operator，然后写六个能直接抄进项目的拦截器。
@@ -421,3 +425,40 @@ catchError(() => of([]))    // 降级返回空数组：Filter 收不到、监控
 **6. 配对逻辑要放 `finalize`**
 
 客户端提前断开时 Nest 会取消订阅，此时 `tap` 不执行、`finalize` 会执行。所以「并发计数 +1 / -1」「获取锁 / 释放锁」这类配对操作必须放 `finalize`，否则计数只增不减，慢慢就把限流阈值占满了。
+
+---
+
+## 面试问答
+
+**1. `handle()` 返回的是什么？拦截器忘了 return 会发生什么？**
+
+- 它返回的 Observable 代表「路由处理函数的执行」，而且是惰性的：Nest 订阅它的那一刻，Pipe 才跑、handler 才被调用。
+- 忘了 return，Nest 收不到流，请求会一直挂着直到客户端或网关超时；更隐蔽的是 `pipe` 返回的是新流，把没包装的原始流 return 回去等于安静地什么都没做。
+- 别踩的坑：后置逻辑要异步时写成 `.pipe(map(async (data) => ...))`，得到的是一个 Promise 对象，会被原样序列化成 `{}`，必须用 `switchMap`。
+- 加分：能说出 `switchMap` / `mergeMap` 只在上游发多个值（SSE、WebSocket）时才需要认真区分——前者会取消未完成的内层流，后者让它们并发跑完。
+
+**2. `tap` 和 `finalize` 有什么区别？耗时日志该用哪个？**
+
+- `tap` 只在正常返回时执行，`tap({ error })` 能拿到异常；`finalize` 在成功、异常、客户端断开取消订阅时都会执行，但什么都拿不到。
+- 只用 `tap(() => ...)` 计时，接口一报错就没有耗时日志——恰恰是最需要耗时数据的时候。所以要 `finalize` 记时间、`tap({ error })` 记异常，两个都挂。
+- 配对操作（并发计数 +1 / -1、获取锁 / 释放锁）必须放 `finalize`：客户端提前断开时 Nest 会取消订阅，`tap` 不执行，计数只增不减会慢慢把限流阈值占满。
+
+**3. `timeout` 抛的 `TimeoutError` 为什么要转成 `RequestTimeoutException`？它真的取消了下游操作吗？**
+
+- `TimeoutError` 是 RxJS 的普通 Error，不是 `HttpException` 的子类，Nest 内置 Filter 只认 `HttpException`，其余一律当未知错误返回 500；转成 `RequestTimeoutException` 前端才能拿到 408 语义，区分「超时可重试」和「服务器炸了别重试」。
+- `timeout` 的含义只是「我不等了」，不会终止 handler 里正在跑的那条 SQL 或 HTTP 请求，连接池占用照旧；真正的取消要靠下游支持（statement timeout、axios 的 `signal`）。
+- 别踩的坑：全局启用会把 SSE、长轮询、大文件下载一起掐断，这类接口要么用元数据开后门，要么只在需要的模块局部注册。
+
+**4. 把底层异常翻译成语义化异常，该放 Interceptor 还是 Exception Filter？**
+
+- 别两处都做，否则线上排查要看两个地方。选择看作用范围：只有用 TypeORM 的模块才需要翻译 `QueryFailedError`，就绑在那几个模块的 Interceptor 上。
+- 全站统一策略收口在 Exception Filter 更合适——它是全站唯一出口，连没进 handler 的 404、参数校验失败都能兜住。
+- 已经语义化的 `HttpException` 不要二次包装；上游 5xx 对我们的调用方而言是 502（网关错误），不是 500。
+- 加分：知道 `throwError(() => err)` 的箭头函数不能省——RxJS 7 起直接传值的写法已废弃，那样异常会在流构建时就被求值。
+
+**5. 缓存拦截器最严重的事故是什么？**
+
+- key 忘了带用户维度，就是把别人的数据发给你——缓存拦截器最常见也最严重的事故。key 必须带上 `user.id`，或者明确只缓存与身份无关的公共数据。
+- 只缓存 GET；写缓存失败不能影响正常响应，所以不 await、吞掉错误，但降级本身必须打日志或上报，否则等于把故障藏起来。
+- 短路时外层后置链照常执行：响应包装、耗时日志都还在，监控里能看到「缓存命中的请求耗时 2ms」。
+- 简单场景直接用 `@nestjs/cache-manager` 的 `CacheInterceptor` 配 `@CacheKey()` / `@CacheTTL()`；自己写是为了自定义 key 策略和多维度失效。

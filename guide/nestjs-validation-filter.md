@@ -1,3 +1,7 @@
+---
+title: 参数校验与异常处理
+---
+
 # 参数校验与异常处理
 
 > Pipe 管「进来的数据对不对」，Exception Filter 管「出错了返回什么」。这两件事配置好，controller 里就不用再写一行 `if (!xxx) throw new BadRequestException()`。
@@ -535,3 +539,36 @@ export class AppModule {}
 - 注册顺序对 Filter 没意义（只按 `@Catch()` 类型就近匹配），但对 Interceptor 有意义（决定洋葱层次）、对 Guard 有意义（决定短路顺序）。
 - 全局切面默认是**单例**。想拿请求级数据就从 `ArgumentsHost` / `ExecutionContext` 里取，不要往实例字段上存——并发请求会互相覆盖。确实需要请求级实例时才声明 `Scope.REQUEST`，代价是每个请求都要重新构造依赖树（见[依赖注入](/guide/nestjs-di)）。
 - 用 `APP_GUARD` 注册全局鉴权后，公开接口要用元数据开后门（`@Public()`），不要在 Guard 里维护路径白名单。
+
+---
+
+## 面试问答
+
+**1. Pipe 绑定时传类和传实例有什么区别？**
+
+- 传类：Nest 自己实例化并放进 IoC 容器，这个 Pipe 能注入依赖；传实例：自己 `new`，能传配置，但拿不到依赖注入。
+- 白名单放在构造参数里的 Pipe（比如排序字段白名单，顺带把非法字段拦在 service 之外防 SQL 注入）必须用实例形态绑定——同一个 Pipe 才能给不同接口配不同白名单。
+- 加分：同一参数上的多个 Pipe 从左到右依次执行，`DefaultValuePipe` 要写在 `ParseIntPipe` 前面；顺序反了，不传参数时先拿到 `undefined` 直接抛 400，默认值根本轮不到。
+
+**2. query 里的 `page=2` 为什么过不了 `@IsInt()`？**
+
+- HTTP 的 query string、路径参数、`multipart/form-data` 字段在协议层就只有字符串，`page` 到手是 `'2'`。解法：字段上写 `@Type(() => Number)`（推荐），或全局开 `enableImplicitConversion`。
+- 别踩的坑：隐式转换的规则由 class-transformer 决定，空字符串、`'false'`、`'abc'` 这些边界值的结果不直观，容易出现「校验通过但值不对」；`@Body()` 接 JSON 通常不需要 `@Type()`，因为 JSON 本身有类型。
+
+**3. 全局切面在 `main.ts` 里手动 new 和用 `APP_FILTER` 注册有什么区别？**
+
+- 手动 new 的实例不在 IoC 容器里，注入不了任何依赖；`{ provide: APP_FILTER, useClass: X }` 由容器创建，想注入什么注入什么——几乎所有真实项目都该用后者。
+- 继承 `BaseExceptionFilter` 还需要 HTTP adapter：`APP_FILTER` 注册时 Nest 自动注入，`useGlobalFilters` 就得手动传 `app.get(HttpAdapterHost)` 拿到的 `httpAdapter`。
+- 加分：注册顺序对 Filter 没意义（只按 `@Catch()` 类型就近匹配），但对 Guard 有意义（短路顺序）、对 Interceptor 有意义（洋葱层次）。
+
+**4. 一个异常能先让日志 Filter 记一笔、再让格式化 Filter 输出吗？**
+
+- 不能。Nest 按「方法 → 控制器 → 全局」的顺序找第一个 `@Catch()` 类型能 `instanceof` 匹配上的 Filter，命中即停，第二个永远不会执行。
+- 要么在一个 Filter 里做完两件事，要么把异常日志 / 上报放到 Interceptor 的 `catchError` 里。
+- 加分：全局兜底 Filter 的 `@Catch()` 必须不传参数——第三类要接住的是原生 `Error`、被 reject 的字符串、第三方库抛的普通对象，`@Catch(HttpException)` 拦不到它们。
+
+**5. 400 和 422 怎么分工？自定义业务异常为什么要继承 `HttpException`？**
+
+- 格式错误用 400（前端高亮表单字段），业务规则不通过用 422（余额不足、库存不够，前端弹业务提示）；限流没有内置异常类，用 `new HttpException(msg, HttpStatus.TOO_MANY_REQUESTS)` 或 `@nestjs/throttler`。
+- 继承之后内置 Filter 和自己的 Filter 都能通过 `instanceof` 认出它，状态码语义也在；裸 class 必须为它专门写一个 Filter，漏了就是 500。
+- 别踩的坑：自定义全局 Filter 上线后，参数校验的错误提示全变成 `undefined`——`ValidationPipe` 的 `message` 是数组，不处理数组分支就是最常见 bug；另外 `res.headersSent` 时不不再写响应，否则抛 `ERR_HTTP_HEADERS_SENT`。

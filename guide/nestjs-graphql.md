@@ -1,3 +1,7 @@
+---
+title: GraphQL：另一种接口契约
+---
+
 # GraphQL：另一种接口契约
 
 > 前端调过 GraphQL 客户端，但没写过服务端。这篇讲清 GraphQL 到底替 REST 解决了什么、代价在哪，以及在 Nest 里用 code-first 写出一套带 DataLoader、限流和字段级鉴权的可上线服务。
@@ -672,11 +676,40 @@ export class AppModule {}
 - **安全三件套**：深度限制、复杂度预算、生产环境关掉 introspection 和落地页；再往前一步是持久化查询白名单。
 - **错误处理**：永远 200 + `errors` 数组，前端不能靠状态码判断，业务码放 `extensions.code`；GraphQL 的 Filter 是 return 错误而不是写 response。
 
+---
 
+## 面试问答
 
+**1. code-first 和 schema-first 怎么选？**
 
+- code-first 单一真源：TS class + 装饰器就是 schema，resolver 返回类型对不上直接编译报错；schema-first 改了 schema 忘跑 codegen、或 resolver 和 schema 不匹配，编译期发现不了。
+- 和 Nest 的心智模型一致：Controller 用装饰器声明路由，Resolver 用装饰器声明字段。契约评审的诉求没丢——`autoSchemaFile` 把 `schema.gql` 落盘提交进仓库，CI 里跑 schema diff 拦住误删字段。
+- schema-first 仍然适合多语言团队：同一份 schema 可以给别的语言实现，这是 code-first 给不了的。
+- 加分：知道 code-first 靠反射生成 schema 的局限——`number` 反射只得到 `Number`，`@Field(() => Int)` 必须显式写，漏了 schema 里会长出一堆 `Float` 类型的 id，数组元素类型同理。
 
+**2. GraphQL 的 N+1 为什么不能靠 join 一劳永逸？DataLoader 有哪两个致命坑？**
 
+- 执行计划是客户端决定的：写 `posts` resolver 的时候不知道客户端会不会查 `author`，无条件预先 join，只查 title 的请求也要白付一次 join 的成本。
+- 坑一：DataLoader 自带一层无过期缓存，必须做成请求级实例。单例会导致数据永不刷新，批量函数带权限过滤时直接把 A 用户的结果发给 B 用户——越权且不报错。在 context 工厂里每请求 new 一份比 `Scope.REQUEST` 好，后者会把注入它的 resolver 也传染成请求级。
+- 坑二：batch 返回值必须和入参 keys 等长、同序。`WHERE id IN` 返回的顺序通常按主键排，DataLoader 按下标分发，静默返回错的数据且不抛异常。固定写法三步：查回来 → 建 Map → 按 keys 映射。
+- 加分：几乎总是被一起查的热点关联（`Post.author`），可以在上一层用 `@Info()` 判断客户端要不要它，要就直接 join 取回让字段级 resolver 根本不执行——只在压测出来的热点上做。
 
+**3. GraphQL 的 HTTP 状态码永远是 200，前端和异常处理要怎么配合？**
 
+- 业务错误在响应体的 `errors` 数组里，`data` 对应字段置 null。前端拦截器改查 `response.errors` 是否非空，401 按 `extensions.code === 'UNAUTHENTICATED'` 判断，不要去 `message` 里做字符串匹配。
+- 可以部分成功：列表里一条的 `author` 解析失败，`data.posts[3].author` 是 null、`errors` 里多一条——UI 要能渲染局部缺失的数据。
+- 非空传播决定了降级语义：`T!` 字段 resolve 失败时 null 沿 schema 往上冒，直到遇见第一个可空的祖先字段把那一整块置空。可空性是在设计降级策略，不只是在写类型。
+- GraphQL 的 Filter 是 `return` 一个错误对象（被收进 `errors` 数组），不是往 response 上写。别踩的坑：把 REST 的 `{ code, data, message }` 响应包装套到 GraphQL 上，会破坏 schema 契约。
 
+**4. GraphQL 独有的字段级鉴权，能力和代价分别是什么？**
+
+- 能力：在 `@ResolveField` 上贴 `@Roles('admin')`，就能让 `Post.revenue` 只有管理员能查；REST 里想让同一个接口对不同角色返回不同字段，得靠序列化分组绕。
+- 代价：字段级 Guard 会在列表里执行 N 次，查 100 条就是 100 次鉴权，所以里面绝对不能查库——权限信息在入口 Guard 一次性挂到 `req.user` 上，字段级只做内存判断。
+- 别踩的坑：`@nestjs/passport` 的 `AuthGuard('jwt')` 默认按 HTTP 参数位置取 request，在 GraphQL 上拿到 `undefined`，要继承它并覆写 `getRequest()`，返回 `GqlExecutionContext.create(context).getContext().req`。
+
+**5. 对外暴露 GraphQL 端点，安全上必须做哪几件事？**
+
+- 深度限制（`depthLimit(7)` 挂在 `validationRules`，在校验阶段就拒掉）加复杂度预算——给字段标成本、分页字段把成本乘以条数，超预算就拒。Nest 不内置复杂度插件，要自己写 Apollo 插件或用 `graphql-armor` 这类聚合方案。
+- 生产关掉 `introspection` 和落地页：introspection 会把完整 schema 吐出来，等于把所有实体、字段名和关联关系交给攻击者做侦察；关掉后前端 codegen 读 CI 里生成的 `schema.gql` 文件，不去线上 introspect。
+- 每个列表字段的 `first` 都要 `@Max()` 强制上限，别信 `defaultValue`；终极手段是持久化查询白名单——客户端只传 query 的 hash，复杂度攻击直接从威胁模型里消失。
+- 别踩的坑：深度限制挡不住 `{ posts(first: 10000) { title } }`——只有两层照样能打死库，所以深度和复杂度缺一不可。

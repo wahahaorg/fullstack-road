@@ -1,3 +1,7 @@
+---
+title: 元数据与 Reflector：Nest 魔法的底层
+---
+
 # 元数据与 Reflector：Nest 魔法的底层
 
 > 为什么加一个 `@Injectable()` 就能被注入？为什么构造函数里写个类型，实例就自动来了？这篇把装饰器背后的元数据机制讲透，最后手写一个能跑的迷你 IoC 容器。
@@ -473,3 +477,37 @@ if (isPublic) return true
 
 装饰器怎么用见 [装饰器体系](/guide/nestjs-decorators)，容器怎么装配见 [依赖注入](/guide/nestjs-di)，切面怎么消费元数据见 [请求管道](/guide/nestjs-pipeline)。
 
+---
+
+## 面试问答
+
+**1. 为什么不写 `@Injectable()` 会报 `Nest can't resolve dependencies`？DI 按类型注入的原理是什么？**
+
+- DI 的全部秘密是 `design:paramtypes` 这条元数据：tsc 开启 `emitDecoratorMetadata` 后，给有装饰器的类写入构造器参数类型数组，Nest 把每一项当 token 去容器里查实例，然后 `new`。
+- tsc 只在目标**有装饰器**时才 emit 这些元数据。不写 `@Injectable()`，`design:paramtypes` 压根不存在，Nest 只能拿到空数组，于是报 can't resolve——这是新手最高频的错误。
+- 加分：能说出装饰器本身不存数据，它只是一次调用 `Reflect.defineMetadata` 的时机；元数据本质是一个以 target 为 key 的 WeakMap，挂在类上而不是实例上。
+
+**2. 为什么 interface 不能当注入 token？怎么解决？**
+
+- `interface` 是纯类型，编译后一点痕迹都不剩，`design:paramtypes` 里那一位退化成 `Object`，Nest 拿 `Object` 当 token 去容器里找，当然找不到。
+- 解法一：string / Symbol 当 token 配 `@Inject()`；解法二更优雅：抽象类当 token——编译后还在，既是类型又是值，还能被 IDE 跳转。
+- 别踩的坑：同一套机制决定了 DTO 上不写 class-validator 装饰器就没有任何校验——类型标注在运行时不存在，规则必须由装饰器实打实写进元数据。
+
+**3. `getAllAndOverride` 和 `getAllAndMerge` 用错了会怎样？**
+
+- Override 返回第一个非空值（方法级压过类级），Merge 是数组拼接、对象浅合并。
+- 权限收窄必须用 Override：类上 `@Roles('operator')`、方法上 `@Roles('admin')`，用 Merge 会得到 `['admin', 'operator']`，配上 `some()` 判断 operator 也能删了——这是个安全漏洞。
+- 能力叠加才用 Merge（缓存标签、审计分类这类「类上写共性、方法上加特性」的场景）。选哪个是语义问题，不是偏好问题。
+- 加分：知道 `getMetadata` 会沿原型链往上找，所以子类 Controller 能自动继承基类上声明的元数据。
+
+**4. 把 Nest 项目换成 esbuild 构建、或升级到 TS 5 标准装饰器，会发生什么？**
+
+- `emitDecoratorMetadata` 是 tsc 编译器特性，esbuild / tsx 不支持，DI 直接失效；SWC 要显式开 `legacyDecorator` + `decoratorMetadata` 才行。
+- TS 5 的标准装饰器没有这个特性，这正是 Nest 至今仍用 legacy 装饰器的原因——整个 DI 依赖它。
+- 别踩的坑：别为了「构建更快」去掉 `experimentalDecorators` 选项，或把 Nest 项目直接换成 esbuild 跑。
+
+**5. 什么情况下该用元数据，而不是在 handler 里写 if？**
+
+- 判断标准：这条信息属于「某个接口的声明」，而处理它的逻辑要在别处统一实现。
+- 最实用的是 `@Public()`：全局 Guard 里第一句读它放行登录注册接口，比维护路径白名单可靠得多——白名单会随重构失效（改了 `@Controller` 前缀就漏了），元数据贴在 handler 上跟着代码走。
+- 其余典型场景：审计日志、响应缓存的 key 和 TTL、幂等控制、限流阈值，都是「声明写进元数据、Interceptor / Guard 用 Reflector 统一读」这一个形状。

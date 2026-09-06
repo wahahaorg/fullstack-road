@@ -1,3 +1,7 @@
+---
+title: NestJS 简介与架构概览
+---
+
 # NestJS 简介与架构概览
 
 > Nest 是 Node 生态里的 Spring。它不让接口变快，它让第 20 个接口和第 1 个接口长得一样。这篇是整个 Nest 板块的入口和地图。
@@ -593,4 +597,38 @@ export class EmbeddingService {
 ```
 
 跨进程调用必须显式设超时并把失败转成 Nest 的异常，否则一个卡住的下游会把事件循环上的其他请求一起拖住。gRPC 和消息队列的完整写法见 [微服务](/guide/nestjs-microservice)。
+
+---
+
+## 面试问答
+
+**1. NestJS 和 Express 的本质区别是什么？什么时候选 Nest？**
+
+- Express 是极简请求处理库，分层和依赖管理靠团队自觉；Nest 是意见性框架，用 IoC 接管对象创建与装配、用 AOP 抽走横切逻辑，核心价值是让第 20 个接口和第 1 个接口长得一样。
+- 中大型业务系统、多人协作选 Nest；小应用、BFF、网关 Express 更轻。
+- 加分：能说出 Nest 并没有依赖 Express——它内部只依赖一层 `HttpServer` 抽象，Express 和 Fastify 都只是适配器的实现。
+
+**2. Nest 是怎么做到既跑 Express 又跑 Fastify 的？切换的代价在哪？**
+
+- 适配器模式：`HttpServer` 接口声明一个 HTTP 库要提供哪些能力，`AbstractHttpAdapter` 包成统一形状，`platform-express` / `platform-fastify` 分别实现。`new FastifyAdapter()` 是运行时真正换平台的东西，泛型 `<NestFastifyApplication>` 只决定 `app.` 后面能提示出哪些平台专有方法。
+- Module / Controller / Provider / Guard / Pipe 完全不用动，要动的全是碰到底层对象的地方：`@Res()` 的类型、multer 文件上传、静态资源、session、Express 中间件兼容性。
+- 别踩的坑：泛型不写，`app.useStaticAssets()` 这类平台专有方法的类型提示出不来，TS 只知道基础的 `INestApplication`。
+
+**3. 什么时候值得从 Express 切到 Fastify？**
+
+- 压测显示瓶颈在 HTTP 解析 / JSON 序列化、QPS 高且响应体小，才值得试；瓶颈在数据库、外部 API、业务计算（绝大多数项目）时，换了没有可测量收益。
+- 一句话：先压测定位瓶颈再决定动不动平台。
+- 别踩的坑：照着 benchmark 图迁移——迁移成本集中在上传、静态资源这些边角，收益却只在那一种负载形状下看得出来。
+
+**4. 前后端联调时，五种传输方式最容易踩哪些坑？**
+
+- form-data 手动设 `Content-Type`：boundary 是浏览器随机生成后拼进 header 的，手写就把它覆盖了，服务端报 `Multipart: Boundary not found`——传 `FormData` 让浏览器自己填 header。
+- `@Param` / `@Query` 拿到的永远是 string，哪怕 URL 里写的是数字，要加 `ParseIntPipe` 或 DTO 里 `@Type(() => Number)`。
+- urlencoded 里所有值都是字符串：`gift=false` 到手是 truthy 的 `'false'`，要类型就发 JSON。
+- 别踩的坑：`@Get('search')` 写在 `@Get(':id')` 后面，Nest 按声明顺序匹配路由，`/orders/search` 会被 `:id` 吃掉。
+
+**5. 用 REPL 调试 Service 有什么局限？**
+
+- REPL 只是从容器取实例然后普通函数调用，不走 Pipe / Guard / Interceptor——用它验证 `ValidationPipe` 的校验逻辑会得到错误结论。
+- 测 Service 方法很顺手（`get(OrdersService).findOne(1024)`），测 Controller 的入参校验不行。
 

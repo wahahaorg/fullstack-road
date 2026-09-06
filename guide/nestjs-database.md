@@ -1,3 +1,7 @@
+---
+title: NestJS 数据库操作：TypeORM 实战
+---
+
 # NestJS 数据库操作：TypeORM 实战
 
 > Entity 怎么写、三种关系怎么映射、查询该用 `find` 还是 QueryBuilder 还是裸 SQL、生产为什么必须上 migration。这篇是 TypeORM 在 Nest 里的完整落地路径。
@@ -378,3 +382,37 @@ await this.articleRepo.save(article)      // 只有中间表的 DELETE / INSERT
 ```
 
 <!-- NEXT -->
+
+---
+
+## 面试问答
+
+**1. `synchronize: true` 为什么是生产灾难？**
+
+- 它每次应用启动对比 Entity 和真实表结构，自动执行 DDL：删掉一个属性直接 `DROP COLUMN`，该列所有数据立刻消失，没有确认、没有备份；属性改名它看不出，执行 DROP + ADD，数据不会搬过去。
+- 雪上加霜的是 `start:dev` 每次保存都会重启，等于每次保存都可能重跑一轮 DDL，表结构随部署来回抖动。
+- 规则：`synchronize` 只在本地开发库上开，其他任何环境一律 `false`，改表走 migration。
+
+**2. 金额字段为什么不能声明成 `number`？**
+
+- MySQL 的 `decimal` 在 TypeORM 里映射成 `string`——JS 的 `number` 存不住任意精度小数，直接标成 `number` 会在算钱的地方出现精度错误。
+- 要么接受 `string` 然后用 decimal 库运算，要么干脆用 `int` 存「分」。
+- 加分：`@VersionColumn()` 是乐观锁的最省事实现——写的时候 TypeORM 自动带上 `WHERE version = ?`，被人抢先改过就抛 `OptimisticLockVersionMismatchError`，适合「不想覆盖别人修改」的编辑场景。
+
+**3. `cascade` 和 `onDelete` 有什么区别？**
+
+- `cascade` 是 ORM 层：`save()` 时 TypeORM 在应用进程里翻译成多条 SQL 连带写关联，`queryRunner.query()`、别的服务、DBA 手工 SQL 都不受影响，改它不用迁移。`onDelete` 是数据库层：写进外键约束，任何途径的删除都会触发，改它要走迁移。
+- 实践建议：引用完整性交给 `onDelete`（数据库才是最后一道防线），写入的便利性才用 `cascade`；`cascade: true` 把 insert/update/remove 全打开，写成数组只开需要的动作。
+- 别踩的坑：`eager: true` 会让所有 `find` 都带上这个 join 且调用处关不掉；懒加载在循环里就是 N+1——预加载在调用处显式写 `relations`。
+
+**4. 一对多关系映射有哪几条硬规则？**
+
+- `@OneToMany` 必须配 `@ManyToOne` 并写反向函数：「一」的一侧没有外键，不写 TypeORM 不知道该查哪一列，运行时直接报错；反过来 `@ManyToOne` 可以单独存在——它自己有外键。
+- 外键永远在「多」的一侧，位置没有歧义，`@JoinColumn` 写它只为改列名；`cascade` 只能配在一侧，两边都开会互相触发、无限递归。
+- 加分：贯穿所有关系的总规则——外键（或中间表）落在哪一侧，哪一侧就是拥有方；另外 `orphanedRowAction` 默认 `'nullify'` 会留下一堆 `order_id = NULL` 的孤儿行，明细被移除通常该配 `'delete'`。
+
+**5. 主键选自增还是 UUID？**
+
+- 自增：顺序写、B+ 树尾部追加，性能好、人能读，但可枚举（`/orders/1001` 猜得到别人的单），分库分表会撞号。UUID：随机写页分裂多、二级索引变大，但天然唯一、不可枚举、客户端就能生成。
+- 默认选自增；需要「ID 不能被枚举」或「多个源同时写」时才上 UUID。
+- 折中方案：主键仍用自增、对外再暴露一个带唯一索引的 `orderNo`——写入性能和防枚举都要。

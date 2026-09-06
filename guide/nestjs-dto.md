@@ -1,3 +1,7 @@
+---
+title: NestJS DTO、序列化与 Swagger
+---
+
 # NestJS DTO、序列化与 Swagger
 
 > 请求进来要校验、响应出去要脱敏、接口文档还得跟着代码走。这三件事共用一套东西：DTO 类 + 一把装饰器。写对了就不需要手写 VO、不需要维护 md 文档。
@@ -704,3 +708,37 @@ npx @compodoc/compodoc -p tsconfig.json -s --theme postmark --coverageTest 60
 > ⚠️ 最后一个容易忘的细节：`@Exclude()` 只影响运行时的响应，**不影响 Swagger schema**——文档里那个字段还在。要让文档也一致，同一个属性上再加一个 `@ApiHideProperty()`。
 
 数据持久化那一侧（Entity 怎么写、关系怎么映射、迁移怎么管）见 [数据库操作与 TypeORM](/guide/nestjs-database)；换 Prisma 的话，schema 就是唯一真源，DTO 的类型可以直接从生成的 client 里取，见 [Prisma：另一条 ORM 路线](/guide/nestjs-prisma)。
+
+---
+
+## 面试问答
+
+**1. 为什么不能直接把 Entity 当出入参？**
+
+- 安全边界：直接 `repo.save(body)` 是 mass assignment，攻击者传一个 `{ "role": "admin" }` 就提权了；Entity 直接序列化出去，`passwordHash` 这类内部字段跟着泄露，泄露一次就是安全事故。
+- 工程原因：耦合数据库结构、校验规则没处放（「创建时必填、更新时可空」一个 Entity 表达不了）、接口无法独立演进。
+- 结论：入参必须是独立的 DTO，没有商量空间；出参可以复用 Entity，但要配 class-transformer 装饰器裁剪。
+
+**2. `@ValidateNested()` 写了，嵌套字段却一个都没校验，为什么？**
+
+- 必须配 `@Type(() => AddressDto)`：`@Type()` 属于 class-transformer，负责把普通对象实例化成 DTO；`@ValidateNested()` 属于 class-validator，负责递归进去校验。TypeScript 的类型注解编译后就没了，运行时不知道该 new 哪个类。
+- 别踩的坑：漏写 `@Type()` 不报错，嵌套字段的规则全部静默跳过；数组场景还要 `each: true`，否则只校验数组本身、不看元素。
+
+**3. 出参手写 VO 和 Entity + `ClassSerializerInterceptor` 怎么选？**
+
+- Entity + 装饰器：加一个字段改 1 处，`@Exclude()` 一次全局生效，一个 Entity 用 `groups` 出多种视图；手写 VO 每加一个字段改三处，映射是纯手工活，漏抄一个字段编译器也不会管。
+- 响应形状和表结构差异大（聚合多张表、字段全部重命名）时才单独建类，这是默认选择之外的例外。
+- 别踩的坑：`return { ...user }`、`user.toJSON()`、原生 SQL 返回的都是普通对象，序列化依赖运行时类，装饰器全部失效——`passwordHash` 就这么泄露的。要么保持返回实例，要么 `plainToInstance` 还原，分页壳给字段加 `@Type()`。
+- 加分：对外 API 用白名单（`excludeExtraneousValues`）——黑名单漏标一次就泄露，白名单漏标只是少个字段。
+
+**4. `PartialType` 该从哪个包导入？**
+
+- 项目装了 `@nestjs/swagger` 就一律从它导入：`@nestjs/mapped-types` 的版本不继承 `@ApiProperty` 元数据，症状很典型——校验一切正常，Swagger 里派生 DTO 的 schema 却是空的。
+- 两个包混用是最隐蔽的一种：单独看每处 import 都对，只有文档默默丢字段。
+- 加分：`PartialType` 靠给每个字段补 `@IsOptional()` 实现，基类上的 `@IsNotEmpty()` 会「看起来失效」——这正是 PATCH 想要的语义，某字段更新时也必传就在子类里重新声明。
+
+**5. 生产环境 Swagger 要不要关？**
+
+- 文档页面完整暴露接口清单、参数结构、字段约束，等于给攻击者一份地图：对公网开放的服务生产关掉，或挂内网域名 / 走网关鉴权；内部系统也至少加 Basic Auth。
+- `jsonDocumentUrl` 产出的 JSON 也要一起管控——很多人只挡了 UI 页面。
+- 加分：更好的做法是 OpenAPI JSON 在 CI 里生成、推到内部文档平台，生产进程根本不加载 Swagger，省下运行时扫描开销和内存里的文档对象。
