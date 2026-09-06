@@ -1,3 +1,7 @@
+---
+title: Go 进阶：并发模式与工程实践
+---
+
 # Go 进阶：并发模式与工程实践
 
 > Context 传递链路、sync 包同步原语、select 调度模式、Worker Pool、并发陷阱——用好 goroutine 只是开始。

@@ -1,3 +1,7 @@
+---
+title: FastAPI 进阶：生产级用法
+---
+
 # FastAPI 进阶：生产级用法
 
 > 基于 Python 3.11+、Pydantic v2、SQLAlchemy 2.x，覆盖从设计到部署的核心实践。

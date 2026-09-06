@@ -1,3 +1,7 @@
+---
+title: EventEmitter、Buffer 与 Stream
+---
+
 # EventEmitter、Buffer 与 Stream
 
 > Node 处理数据的三大基础抽象，从事件到字节再到流。

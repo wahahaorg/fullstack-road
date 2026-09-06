@@ -1,3 +1,7 @@
+---
+title: 深入理解 Python 类
+---
+
 # 深入理解 Python 类
 
 > 面向对象是 FastAPI、SQLAlchemy 等框架的基础，理解这些概念才能看懂并修改 AI 生成的代码。

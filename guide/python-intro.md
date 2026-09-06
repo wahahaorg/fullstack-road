@@ -1,3 +1,7 @@
+---
+title: Python 语法快速入门
+---
+
 # Python 语法快速入门
 
 > 面向有 JavaScript 经验的开发者，快速掌握 Python 语法差异与核心用法。
