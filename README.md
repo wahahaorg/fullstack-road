@@ -65,11 +65,24 @@ Python 快速入门
 
 更多按目标划分的入口见[知识地图](./guide/knowledge-map.md)。
 
-## Agentic RAG 综合实战
+## 配套实战工程矩阵
 
-仓库提供一套 17 章的 **Python + FastAPI + LangGraph 企业知识库 Agentic RAG 教程**。正文从产品边界和最小 RAG 开始，依次覆盖文档上传与审核、异步入库、混合检索、引用回答、权限隔离、多轮检索、工具调用、Checkpoint、SSE、可靠性、评测、部署和求职复盘。先打开[项目代码入口与运行](./guide/agentic-rag-project-code)，可以直接进入完整源码目录和本地启动说明。
+仓库提供真实、独立、可在本地一键拉起依赖并编译运行的代码工程，与正文理论紧密配合，拒绝纯代码块堆砌：
 
-教程围绕 Alice、Bob、Carol 使用同一套企业文档的业务场景展开，不把普通 CRUD 写成逐行操作记录，也不把 NestJS 项目简单翻译成 Python。第 1 至第 16 章的核心本地链路已经在同一项目中实现并有自动化验证，第 17 章整理真实能力与边界；Redis Relay、持久化 Checkpoint、租约索引切换和 OpenTelemetry 等生产扩展在正文中明确标为规划项。从[第 1 章：项目目标与架构](./guide/agentic-rag-project.md)开始；最终可在[第 17 章：项目复盘与求职表达](./guide/agentic-rag-project-career.md)查看整体交付画像。完整范围与发布标准见 [Agentic RAG 实战教程写作契约](./AGENTIC_RAG_PROJECT_SPEC.md)。
+| 项目名称 | 所属技术栈 | 难度 / 定位 | 代码仓库目录 | 配套教程指引 |
+|---|---|---|---|---|
+| **企业知识库 Agentic RAG 系统** | Python 3.12, FastAPI, LangGraph, Qdrant, PostgreSQL, Docker | 生产级综合项目 (L5) | [`projects/agentic-rag/`](./projects/agentic-rag) | [企业知识库 RAG 实战 17 章](./guide/agentic-rag-project.md) |
+| **学习时间记录系统 (Study Tracker)** | Java 17, Spring Boot 3, MyBatis-Plus, MySQL 8, JWT | 企业级后端入门实战 | [`projects/study-tracker/`](./projects/study-tracker) | [Java 实战项目教程](./guide/java-project-practice.md) |
+
+### 1. Agentic RAG 综合实战 (`projects/agentic-rag`)
+
+仓库提供一套 17 章的 **Python + FastAPI + LangGraph 企业知识库 Agentic RAG 教程**。正文从产品边界和最小 RAG 开始，依次覆盖文档上传与审核、异步入库、混合检索、引用回答、权限隔离、多轮检索、工具调用、Checkpoint、SSE、可靠性、评测、部署和求职复盘。先打开[项目代码入口与运行](./guide/agentic-rag-project-code.md)，可以直接进入完整源码目录和本地启动说明。
+
+教程围绕 Alice、Bob、Carol 使用同一套企业文档的业务场景展开，第 1 至第 16 章的核心本地链路已经在同一项目中实现并有自动化验证，第 17 章整理真实能力与边界；从[第 1 章：项目目标与架构](./guide/agentic-rag-project.md)开始；最终可在[第 17 章：项目复盘与求职表达](./guide/agentic-rag-project-career.md)查看整体交付画像。完整范围与发布标准见 [Agentic RAG 实战教程写作契约](./AGENTIC_RAG_PROJECT_SPEC.md)。
+
+### 2. Java 学习时间记录系统 (`projects/study-tracker`)
+
+包含完整的 Maven Spring Boot 3 工程，集成 MyBatis-Plus、MySQL 8 容器化编排、无状态 JWT 认证拦截、分页查询插件与基于 Java 8 Stream 的时长分组统计。详见[第九部分：实战项目 — 学习时间记录系统](./guide/java-project-practice.md)。
 
 ## 内容原则
 

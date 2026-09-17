@@ -68,7 +68,7 @@ description: 按目标、技术栈与能力层级浏览全栈知识站的全部�
 ### 4. 工程、部署与实战
 
 - **部署（建议顺序）**：[Docker 与部署](./docker-deployment) → [Dockerfile 进阶](./dockerfile-practice) → [Compose、网络与进程守护](./docker-compose-network) → [Nginx：反向代理与流量治理](./nginx-core)
-- **完整项目**：[企业知识库 Agentic RAG](./agentic-rag-project) · [FastAPI + MySQL 项目](./fastapi-mysql-project) · [Java 学习时间记录系统](./java-project-practice)
+- **完整实战项目**：[企业知识库 Agentic RAG 实战（配套 projects/agentic-rag）](./agentic-rag-project) · [FastAPI + MySQL 项目结构](./fastapi-mysql-project) · [Java 学习时间记录系统（配套 projects/study-tracker）](./java-project-practice)
 - **代码阅读**：[阅读陌生 Java 项目](./java-reading-project)
 - **练习与面试**：[综合练习](./exercises) · [Node.js 实战练习](./node-practice) · [Java 招聘要求判断](./java-job-requirements)
 - **怎么学**：[这套教程怎么学](./learning-path)（按求职目标分流的最短路径）

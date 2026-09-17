@@ -75,9 +75,16 @@ features:
 | 让自然语言查询变成可控的 SQL | [Text2SQL 与 Schema Linking](/guide/agent-text2sql) | [Agent 与 RAG 评测方法](/guide/agent-eval) |
 | 从前端转向 Python 后端 | [Python 快速入门](/guide/python-intro) | [FastAPI + MySQL 项目](/guide/fastapi-mysql-project) |
 | 准备 Node.js / NestJS 面试 | [Node.js 运行时](/guide/node-runtime) | [NestJS 架构概览](/guide/nestjs-intro) |
-| 接手 Java / Spring Boot 项目 | [Java 学习路线](/guide/java-learning-path) | [阅读陌生项目](/guide/java-reading-project) |
+| 接手 Java / Spring Boot 项目 | [Java 学习路线](/guide/java-learning-path) | [实战项目（配套工程）](/guide/java-project-practice) → [企业级进阶](/guide/java-enterprise-path) |
 | 处理慢接口、重复任务和并发写入 | [后端思维补齐](/guide/backend-thinking) | [并发、事务与一致性](/guide/concurrency-transaction) |
 | 把服务部署到生产环境 | [Docker 与部署](/guide/docker-deployment) | [Worker 与异步任务](/guide/background-worker) |
+
+### 🛠️ 配套实战工程矩阵
+
+| 项目名称 | 所属技术栈 | 难度 / 定位 | 本地代码目录 | 详细实战教程 |
+|---|---|---|---|---|
+| **企业知识库 Agentic RAG 系统** | Python 3.12, FastAPI, LangGraph, Qdrant, PostgreSQL | 生产级综合项目 (L5) | `projects/agentic-rag/` | [企业知识库 RAG 实战 17 章](/guide/agentic-rag-project) |
+| **学习时间记录系统 (Study Tracker)** | Java 17, Spring Boot 3, MyBatis-Plus, MySQL 8, JWT | 企业级后端入门实战 | `projects/study-tracker/` | [Java 实战项目教程](/guide/java-project-practice) |
 
 ## 分方向学习
 
