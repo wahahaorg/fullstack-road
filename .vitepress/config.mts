@@ -28,6 +28,10 @@ export default withMermaid(defineConfig({
           {
             text: 'Agent 工程',
             items: [
+              { text: '系统学习路线', link: '/guide/python-ai-agent-path' },
+              { text: 'LLM 与 Prompt 基础', link: '/guide/llm-prompt-foundations' },
+              { text: '框架生态与进阶能力', link: '/guide/agent-frameworks-and-capabilities' },
+              { text: '项目阶梯与生产交付', link: '/guide/agent-projects-and-delivery' },
               { text: '工程总览', link: '/guide/agent-intro' },
               { text: '范式与框架选型', link: '/guide/agent-patterns' },
               { text: 'LangGraph 状态机', link: '/guide/agent-langgraph' },
@@ -147,6 +151,10 @@ export default withMermaid(defineConfig({
         text: 'Java',
         items: [
           { text: '学习路线', link: '/guide/java-learning-path' },
+          { text: '企业级进阶路线', link: '/guide/java-enterprise-path' },
+          { text: 'JVM 与并发基础', link: '/guide/java-jvm-concurrency' },
+          { text: 'Spring、数据与中间件', link: '/guide/java-spring-data-middleware' },
+          { text: '分布式、云原生与架构', link: '/guide/java-distributed-cloud-architecture' },
           { text: '1. Java 去陌生化', link: '/guide/java-intro' },
           { text: '2. Java 核心语法', link: '/guide/java-core-syntax' },
           { text: '3. 常用数据结构', link: '/guide/java-data-structures' },
@@ -179,6 +187,10 @@ export default withMermaid(defineConfig({
             text: 'Agent 工程',
             collapsed: false,
             items: [
+              { text: '系统学习路线（基础 → 工程化）', link: '/guide/python-ai-agent-path' },
+              { text: 'LLM 与 Prompt 基础', link: '/guide/llm-prompt-foundations' },
+              { text: '框架生态与进阶能力', link: '/guide/agent-frameworks-and-capabilities' },
+              { text: '项目阶梯与生产交付', link: '/guide/agent-projects-and-delivery' },
               { text: '工程总览', link: '/guide/agent-intro' },
               { text: '范式与框架选型', link: '/guide/agent-patterns' },
               { text: 'LangGraph 状态机与 Checkpoint', link: '/guide/agent-langgraph' },
@@ -374,10 +386,14 @@ export default withMermaid(defineConfig({
         ]
       },
       {
-        text: '☕ Java 快速入门',
+        text: '☕ Java',
         collapsed: true,
         items: [
           { text: '学习路线', link: '/guide/java-learning-path' },
+          { text: '企业级进阶路线', link: '/guide/java-enterprise-path' },
+          { text: 'JVM 与并发基础', link: '/guide/java-jvm-concurrency' },
+          { text: 'Spring、数据与中间件', link: '/guide/java-spring-data-middleware' },
+          { text: '分布式、云原生与架构', link: '/guide/java-distributed-cloud-architecture' },
           { text: '1. Java 去陌生化', link: '/guide/java-intro' },
           { text: '2. Java 核心语法', link: '/guide/java-core-syntax' },
           { text: '3. 常用数据结构', link: '/guide/java-data-structures' },

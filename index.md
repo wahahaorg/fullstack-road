@@ -105,14 +105,17 @@ RAG 入库链路（解析 / 切分 / 元数据 / 增量重建）
 
 底座能力可横向补：[Worker 与异步任务](/guide/background-worker)、[Redis 深入](/guide/redis-deep)、[FastAPI 进阶](/guide/fastapi-advanced)、[并发与事务](/guide/concurrency-transaction)。
 
-### 🐍 Python 全栈后端（FastAPI 方向）
+### 🐍 Python 全栈后端（FastAPI / Agent 底座）
 
 ```
 Python 语法入门 → 深入理解类 → Python 工程进阶 → FastAPI 基础
-  → FastAPI 进阶（Pydantic/Depends/鉴权）
-  → MySQL 建模 → SQL 查询 → FastAPI + MySQL 项目
-  → 并发事务 → 综合练习
+  → FastAPI 进阶（Depends / JWT / SSE / Worker 边界）
+  → PostgreSQL（JSONB / pgvector / RLS）→ SQL 与建模
+  → 消息队列（异步入库投递）→ Worker 与异步任务
+  → 并发事务 / 锁 / 分布式一致性
 ```
+
+做 Agent / RAG 时，这一条是主底座；概念篇见上方「Agent 与 RAG 工程」。
 
 ### 🟢 Node.js 与 NestJS 后端
 
@@ -133,20 +136,29 @@ Node 运行时与事件循环 → 模块系统（CJS/ESM）
 ### 🐳 部署与基础设施（所有方向通用）
 
 ```
-Docker 与部署 → Worker 与异步任务 → Redis 深入 → 消息队列
-  → 综合练习串联 → 完整项目实战
+Docker 与部署 → Dockerfile 进阶 → Compose 与进程守护 → Nginx 流量治理
+  → Worker 与异步任务 → Redis 深入 → Redis 实战场景
+  → 消息队列（异步入库投递）→ 网络排障
+```
+
+### 🗄️ 数据库与一致性
+
+```
+表结构设计 → SQL 基础 → SQL 进阶 / 外键 / 备份恢复
+  → PostgreSQL（pgvector · RLS · 连接池）
+  → 并发与事务 → 锁机制 → 分布式一致性与可靠消息
 ```
 
 ### 🔵 Go 语言（高性能服务方向）
 
 ```
-Go 快速入门 → 类型系统与泛型 → 并发模式与工程实践 → 工程化实战
+Go 学习路线 → 快速入门 → 类型系统与泛型 → 并发模式与工程实践 → 工程化实战
 ```
 
 ### ☕ Java（企业级后端方向）
 
 ```
-Java 去陌生化 → 核心语法 → 数据结构 → 理解 Java 工程
+Java 学习路线 → 去陌生化 → 核心语法 → 数据结构 → 理解 Java 工程
   → Spring Boot 入门 → 数据库基础 → 登录与鉴权
   → 调用 Python Agent → 实战项目 → 阅读项目方法 → 招聘判断
 ```
@@ -155,13 +167,14 @@ Java 去陌生化 → 核心语法 → 数据结构 → 理解 Java 工程
 
 | 模块 | 章节数 | 核心内容 |
 |---|---|---|
-| **🤖 Agent 工程与生产化** | 12 章 | 范式与编排 / Tool Calling 与 MCP / 流式与 Text2SQL / 安全守护栏 / 可观测性 / 可靠性 / 上下文工程 / 评测 |
-| **🔍 RAG 检索** | 4 章 | 入库链路（解析·切分·元数据）/ 混合检索（BM25+向量+RRF+Rerank）/ 引用溯源与拒答降级 / 多模态文档与区域级引用 |
-| **Python 与 FastAPI** | 6 章 | Python 语法、类与工程化 → FastAPI 基础、MySQL 项目与进阶 |
-| **数据库与建模** | 4 章 | 表结构设计 / SQL 基础 / SQL 进阶与查询优化 / MongoDB 与 Mongoose |
-| **并发事务** | 2 章 | 事务原理 + 综合练习 |
+| **🤖 Agent 工程与生产化** | 14 章 | 范式与编排 / LangGraph / Tool Calling 与 MCP / Multi-Agent / SSE 流式 / AI 前端 / Text2SQL / 安全 / 可观测性 / 可靠性 / 上下文工程 / 评测 / 部署 |
+| **🏗️ Agentic RAG 综合实战** | 18 章 | 从最小闭环到权限、异步入库、混合检索、LangGraph、安全越权测试、评测与求职表达 |
+| **🔍 RAG 检索** | 4 章 | 入库链路 / 混合检索（BM25+向量+RRF+Rerank）/ 引用溯源与拒答 / 多模态文档 |
+| **Python 与 FastAPI** | 6 章 | Python 语法、类与工程化 → FastAPI 基础、项目结构与进阶（Depends / SSE / 鉴权 / Worker 边界） |
+| **数据库与建模** | 7 章 | MySQL 建模 / SQL 基础 / SQL 进阶 / 外键 / 备份恢复 / PostgreSQL（含 pgvector 与 RLS）/ MongoDB |
+| **并发与一致性** | 4 章 | 事务原理 / 锁机制 / 分布式一致性与可靠消息 / 综合练习 |
 | **Node.js 与 NestJS** | 28 章 | Node.js 运行时与编程模型 → NestJS 核心、请求处理、数据认证、工程与架构 |
 | **Docker 与部署** | 4 章 | 容器化与部署 / Dockerfile 进阶 / Compose 与进程守护 / Nginx 流量治理 |
-| **基础设施** | 4 章 | Worker 与异步任务 / Redis 深入 / Redis 实战场景 / 消息队列 |
-| **Go** | 4 章 | 快速入门 → 类型与泛型 → 并发模式 → 工程化实战 |
-| **☕ Java** | 11 章 | 去陌生化 → 语法 → 数据结构 → 工程 → Spring Boot → 数据库 → 鉴权 → 调用 Python → 实战 → 阅读项目 → 招聘判断 |
+| **基础设施** | 5 章 | Worker / Redis 深入 / Redis 实战 / 消息队列（异步入库投递）/ 网络排障 |
+| **Go** | 5 章 | 学习路线 → 快速入门 → 类型与泛型 → 并发模式 → 工程化实战 |
+| **☕ Java** | 12 章 | 学习路线 → 去陌生化 → 语法 → 数据结构 → 工程 → Spring Boot → 数据库 → 鉴权 → 调用 Python → 实战 → 阅读项目 → 招聘判断 |

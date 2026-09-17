@@ -17,11 +17,11 @@
 
 | 方向 | 主要内容 | 推荐入口 |
 |---|---|---|
-| Agent 工程 | Agent 范式、LangGraph、Tool Calling、Multi-Agent、流式输出、安全、可靠性、评测与可观测性 | [Agent 工程总览](./guide/agent-intro.md) |
+| Agent 工程 | 从 LLM / Prompt 基础、框架选型到 Agent 编排、RAG、安全、可靠性、评测与可观测性 | [Agent 系统学习路线](./guide/python-ai-agent-path.md) |
 | RAG | 文档入库、结构化切分、混合检索、RRF、Rerank、引用、拒答和多模态文档 | [RAG 入库链路](./guide/rag-pipeline.md) |
 | Python 后端 | Python 语言、工程化、FastAPI、Pydantic、SQLAlchemy 和项目结构 | [Python 快速入门](./guide/python-intro.md) |
 | Node.js 与 NestJS | 运行时、异步模型、Stream、依赖注入、AOP、鉴权、数据层、微服务与生产清单 | [Node.js 运行时](./guide/node-runtime.md) · [NestJS 架构](./guide/nestjs-intro.md) |
-| Java | 面向 TS、Node.js 和 Python 开发者的 Java、Spring Boot、数据库、鉴权与项目实战 | [Java 学习路线](./guide/java-learning-path.md) |
+| Java | 从接手 Spring Boot 项目到 JVM、并发、微服务、云原生与架构设计 | [Java 学习路线](./guide/java-learning-path.md) · [企业级进阶路线](./guide/java-enterprise-path.md) |
 | Go | 语言迁移、类型与泛型、goroutine、channel、并发模式和工程化 | [Go 学习路线与能力地图](./guide/go-learning-path.md) |
 | 数据与一致性 | SQL、MySQL、PostgreSQL、外键、事务、锁、分布式一致性和可靠消息 | [数据库与一致性路线](./guide/knowledge-map.md) |
 | 工程与部署 | Worker、Redis、消息队列、Docker、Compose、Nginx 和 CI/CD | [Docker 与部署](./guide/docker-deployment.md) |
@@ -32,6 +32,7 @@
 
 ```text
 Agent 工程总览
+  → LLM / Prompt 基础与框架选型
   → Agent 范式与框架选型
   → LangGraph 状态机
   → Tool Calling 与 MCP
@@ -122,8 +123,8 @@ npm run docs:build
 ## 从哪里开始
 
 - 第一次访问：从[全栈知识地图](./guide/knowledge-map.md)选择目标。
-- 学 Agent：[Agent 工程总览](./guide/agent-intro.md)。
+- 系统学 Agent：[Agent 系统学习路线](./guide/python-ai-agent-path.md)。
 - 学 RAG：[RAG 入库链路](./guide/rag-pipeline.md)。
 - 转 Python：[Python 快速入门](./guide/python-intro.md)。
 - 系统学习 NestJS：[NestJS 架构概览](./guide/nestjs-intro.md)。
-- 准备 Java 岗位：[Java 学习路线](./guide/java-learning-path.md)。
+- 准备 Java 岗位：先读 [Java 学习路线](./guide/java-learning-path.md)，再按需进入 [企业级进阶路线](./guide/java-enterprise-path.md)。

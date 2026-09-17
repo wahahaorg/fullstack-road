@@ -1,118 +1,119 @@
 ---
 title: 这套教程怎么学
+description: 按求职目标分流：Python Agent、NestJS、Java，给出最短阅读顺序
 ---
 
 # 这套教程怎么学
 
+本站已经超过 100 篇。**不要从侧边栏第一篇读到最后一篇。** 先选一个目标，只走主线；遇到陌生概念再横向跳到关联篇。
+
+更细的「按目标 / 按能力层」表见[全栈知识地图](./knowledge-map)。
+
 ## 读者画像
 
-这套教程默认你具备这些基础：
+默认你具备：
 
-- 有多年 Web 前端经验。
-- 能理解 HTTP、接口、JSON、鉴权、前后端联调。
-- 会用 NestJS 或至少理解 Controller、Service、DTO、Module 这些概念。
-- 正在用 AI 写 Python 项目，但对后端建模、数据库事务、项目分层还不够踏实。
+- 多年 Web 前端经验，熟悉 HTTP、JSON、鉴权、前后端联调
+- 至少理解一种组件化框架（React / Vue）的状态与副作用模型
+- 正在补后端，或已经在用 AI 写 Python / Node 项目
 
-它不默认你具备：
+不默认你具备：系统的数据库设计经验、分布式系统经验、科班算法 / ML 背景。
 
-- 系统的数据库设计经验。
-- 熟练的 Python 后端项目经验。
-- 深入的并发编程或分布式系统经验。
+解释后端概念时，本站会尽量用前端心智模型类比（DI ≈ Context、Interceptor ≈ axios 拦截器、Guard ≈ 路由守卫）。
 
-## 读完后你应该能做什么
+## 三条最短路径（先选一条）
 
-目标不是背概念，而是完成这几个动作：
+### A. 求职 Python Agent / RAG 工程师（推荐主线）
 
-1. 根据业务需求拆出实体、关系、字段和约束。
-2. 写出常见 CRUD、JOIN、聚合、分页和事务 SQL。
-3. 用 FastAPI 写出清晰的接口、请求模型、响应模型和错误处理。
-4. 把代码拆成 router、schema、model、service、repository。
-5. 知道什么时候用事务、行锁、唯一约束、乐观锁、幂等键。
-6. 在面试中把“我会写接口”升级成“我能设计业务数据流和一致性方案”。
+目标：能讲清一条「可恢复、可审计、带引用」的 Agent + RAG 链路，并有可运行项目支撑。
 
-## 学习路线
+```
+1. 概念地图（建立词汇）
+   Agent 工程总览 → LangGraph → Tool Calling 与 MCP → RAG 入库 → 混合检索 → 引用与拒答
 
-### 第一阶段：建立后端视角
+2. 底座（否则概念落不了地）
+   FastAPI 进阶（Depends / SSE / 鉴权 / Worker 边界）
+   → PostgreSQL（JSONB / pgvector / RLS）
+   → 消息队列（异步入库投递）→ Worker 与异步任务
 
-先读：
+3. 综合实战（把概念焊死）
+   企业知识库 Agentic RAG 实战（十七章 + 代码入口）
+   → 安全 / 评测 / 部署 三章务必做完
 
-- [后端思维补齐](./backend-thinking)
-- [MySQL 表结构设计](./mysql-table-design)
-
-这一阶段重点不是代码，而是纠正一个常见误区：
-
-> 表不是页面表单，接口不是函数入口，后端核心是业务状态的长期正确性。
-
-### 第二阶段：掌握可用的 SQL
-
-再读：
-
-- [SQL 基础与查询](./sql-basics)
-
-你不需要一开始就成为 SQL 专家，但必须能写：
-
-```sql
-SELECT ... WHERE ...
-JOIN ...
-GROUP BY ...
-ORDER BY ... LIMIT ...
-UPDATE ... WHERE ...
+4. 面试表达
+   项目复盘与求职表达 → Agent 评测方法
 ```
 
-并且知道哪些 SQL 会影响索引、事务和并发。
+时间不够时，**先做实战第 1–8 章 + 评测 + 复盘**，再回头补概念深水区。
 
-### 第三阶段：迁移到 FastAPI
+基础或框架选型有缺口时，走补充线（对应 [Python AI Agent 路线融合指南](./python-ai-agent-path)）：
 
-再读：
-
-- [Python 工程进阶](./python-engineering)
-- [FastAPI 基础](./fastapi-basics)
-- [FastAPI + MySQL 项目结构](./fastapi-mysql-project)
-
-你可以把 NestJS 经验迁移过来：
-
-| NestJS | FastAPI |
-| --- | --- |
-| Controller | APIRouter |
-| DTO | Pydantic Schema |
-| Provider / Service | 普通 service 函数或类 |
-| Pipe | Pydantic 校验 + Depends |
-| Guard | Depends 鉴权依赖 |
-| Exception Filter | exception_handler |
-| Module | Python package / router 组合 |
-
-### 第四阶段：补真实后端坑
-
-最后读：
-
-- [并发、事务与一致性](./concurrency-transaction)
-- [锁机制与并发控制](./locking)
-- [分布式一致性与可靠消息](./distributed-consistency)
-- [HTTP、TCP、TLS 与网络排障](./network-troubleshooting)
-- [MySQL 日志、备份恢复与复制](./mysql-recovery)
-- [数据库外键：理论、实践与取舍](./foreign-keys)
-- [PostgreSQL 基础与实战](./postgresql)
-- [综合练习](./exercises)
-
-后端面试和实战经常卡在这里：
-
-```txt
-重复提交怎么办？
-多个用户同时更新怎么办？
-库存为什么会超卖？
-状态流转如何防止覆盖？
-AI 文件解析任务如何避免重复执行？
+```
+LLM 与 Prompt 基础（手写最小 LLM 调用封装）
+→ 框架生态与进阶能力（LangGraph / LlamaIndex / CrewAI / AutoGen 取舍）
+→ 项目阶梯与生产交付（L1-L5 分级，选一个垂直项目扩展作品集）
 ```
 
-这些不是单纯 FastAPI 语法问题，而是“状态 + 数据 + 并发”的问题。
+### B. 系统掌握 NestJS / Node 后端
+
+目标：能独立搭一套可维护的企业级接口骨架。
+
+```
+NestJS 简介与架构 → 装饰器 → 元数据与 Reflector → 依赖注入 → 动态模块
+  → 请求生命周期 → RxJS 与 Interceptor → 校验与异常
+  → DTO / TypeORM（或 Prisma）→ 认证 → 授权
+  → 日志 / 生产清单 → 项目架构蓝图
+```
+
+Node 运行时七章按需补（面试常问事件循环 / Stream 时再读）。不必先读完 Java / Go。
+
+### C. 接手 Java / Spring Boot 项目
+
+目标：能读懂并参与现有 Java 后端，而不是从零成为 Java 专家。
+
+```
+Java 学习路线 → 去陌生化 → 核心语法 → 理解 Java 工程
+  → Spring Boot 入门 → 数据库 → 登录鉴权
+  → 调用 Python Agent（前后端协作场景）
+  → 阅读陌生项目 → 招聘要求判断
+```
+
+接手项目之后想进企业级深水区，走进阶线（对应 [Java 企业级进阶路线](./java-enterprise-path)）：
+
+```
+JVM 与并发基础（运行模型、GC、线程池）
+→ Spring、数据与中间件（事务、测试、Security、Redis、MQ）
+→ 分布式、云原生与架构（微服务、可观测性、架构表达）
+```
+
+## 读完一条主线后你应该能做什么
+
+| 主线 | 最低交付 |
+|---|---|
+| A. Agent | 本地跑通带权限过滤的 RAG 问答；能解释为何过滤在打分前；有离线评测数字 |
+| B. NestJS | 一个模块化单体：鉴权、DTO 校验、迁移、日志、健康检查齐全 |
+| C. Java | 能画出现有项目的包结构，并独立改一个垂直功能（含测试） |
+
+进阶线走完后，交付升级一档：
+
+| 主线 | 进阶交付 |
+|---|---|
+| A + Agent 融合路线 | 能手搭最小 Agent、说清五个框架取舍；有 L1-L5 中的两个分级项目交付 |
+| C + Java 进阶路线 | 一份 JVM/GC 排查笔记；一个带事务、缓存、MQ 的状态流转流程；3 分钟项目链路讲述 |
 
 ## 每章怎么读
 
-建议你按四步走：
+1. 先看业务问题，自己想表结构 / 接口 / 失败模式
+2. 再看示例与取舍表
+3. 用自己的话复述「为什么这样选、什么情况下不该这样」
+4. 能写进项目或面试口述，再进入下一章
 
-1. 先看业务问题。
-2. 自己想表结构或接口。
-3. 再看示例答案。
-4. 最后用自己的话复述一遍面试表达。
+只复制代码会得到「能跑的仓库」；能解释取舍，才算补上工程能力。
 
-如果只复制代码，你会得到“能跑的项目”；如果能解释取舍，你才真正补上后端能力。
+## 相关入口
+
+- [全栈知识地图](./knowledge-map)：按目标与能力层浏览
+- [后端思维补齐](./backend-thinking)：纠正「表 = 表单、接口 = 函数」的误区
+- [企业知识库 Agentic RAG 实战](./agentic-rag-project)：主线 A 的综合项目
+- [Java 企业级进阶路线](./java-enterprise-path)：主线 C 的进阶线
+- [Python AI Agent 路线融合指南](./python-ai-agent-path)：主线 A 的基础补充与项目阶梯

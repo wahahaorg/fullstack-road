@@ -23,18 +23,21 @@ description: 按目标、技术栈与能力层级浏览全栈知识站的全部�
 | 强化 Node.js 面试 | [Node.js 运行时](./node-runtime) | [异步编程](./node-async) → [性能与稳定性](./node-perf) → [实战练习](./node-practice) | 能从运行时原理解释线上问题 |
 | 系统掌握 NestJS | [NestJS 架构概览](./nestjs-intro) | [依赖注入](./nestjs-di) → [请求生命周期](./nestjs-pipeline) → [认证与登录状态](./nestjs-auth) → [项目架构蓝图](./nestjs-project-blueprint) | 一套可维护的企业级接口骨架 |
 | 转向 Java / Spring Boot | [Java 学习路线](./java-learning-path) | [核心语法](./java-core-syntax) → [理解工程](./java-engineering) → [Spring Boot](./java-springboot-intro) | 能读懂并参与 Java 后端项目 |
+| Java 进阶到企业级后端 | [Java 企业级进阶路线](./java-enterprise-path) | [JVM 与并发](./java-jvm-concurrency) → [Spring、数据与中间件](./java-spring-data-middleware) → [分布式、云原生与架构](./java-distributed-cloud-architecture) | 能参与微服务拆分、中间件治理与架构评审 |
+| 补齐 Agent 系统基础与框架选型 | [Python AI Agent 路线融合指南](./python-ai-agent-path) | [LLM 与 Prompt 基础](./llm-prompt-foundations) → [框架生态与进阶能力](./agent-frameworks-and-capabilities) → [项目阶梯与生产交付](./agent-projects-and-delivery) | 能手搭最小 Agent、说清框架取舍、交付分级项目 |
 | 学习 Go 高并发服务 | [Go 快速入门](./go-intro) | [类型与泛型](./go-advanced-types) → [并发模式](./go-advanced-concurrency) → [工程化](./go-advanced-engineering) | 能写并解释并发 HTTP 服务 |
-| 补齐数据库与一致性 | [后端思维补齐](./backend-thinking) | [表结构设计](./mysql-table-design) → [SQL](./sql-basics) → [事务与一致性](./concurrency-transaction) | 能设计数据模型并处理并发写入 |
-| 掌握部署与异步架构 | [Docker 与部署](./docker-deployment) | [Worker](./background-worker) → [Redis](./redis-deep) → [消息队列](./message-queue) | 能拆分 Web、任务与基础设施 |
+| 补齐数据库与一致性 | [后端思维补齐](./backend-thinking) | [表结构设计](./mysql-table-design) → [SQL](./sql-basics) → [PostgreSQL](./postgresql) → [事务](./concurrency-transaction) → [锁](./locking) → [分布式一致性](./distributed-consistency) | 能设计数据模型并处理并发写入 |
+| 掌握部署与异步架构 | [Docker 与部署](./docker-deployment) | [Dockerfile 进阶](./dockerfile-practice) → [Compose](./docker-compose-network) → [Nginx](./nginx-core) → [消息队列](./message-queue) → [Worker](./background-worker) | 能拆分 Web、任务与基础设施 |
 
 ## 能力分层
 
 ### 0. Agent 与 RAG（AI 应用层）
 
-- **Agent 编排**：[工程总览](./agent-intro) · [范式与框架选型](./agent-patterns) · [LangGraph 状态机](./agent-langgraph) · [Tool Calling 与 MCP](./agent-tool-calling) · [Multi-Agent 与人工兜底](./agent-multi-agent)
+- **Agent 编排**：[工程总览](./agent-intro) · [范式与框架选型](./agent-patterns) · [框架生态与进阶能力](./agent-frameworks-and-capabilities) · [LangGraph 状态机](./agent-langgraph) · [Tool Calling 与 MCP](./agent-tool-calling) · [Multi-Agent 与人工兜底](./agent-multi-agent)
 - **检索增强**：[入库链路](./rag-pipeline) · [混合检索与 Rerank](./rag-retrieval) · [引用溯源与拒答](./rag-citation) · [多模态文档](./rag-multimodal)
 - **数据问答**：[Text2SQL 与 Schema Linking](./agent-text2sql)
 - **交互与度量**：[SSE 流式与阶段事件](./agent-streaming) · [AI 应用前端](./agent-frontend) · [评测方法](./agent-eval)
+- **基础与项目阶梯**：[LLM 与 Prompt 基础](./llm-prompt-foundations) · [项目阶梯与生产交付](./agent-projects-and-delivery)
 - **上生产**：[Prompt 注入攻防](./agent-security) · [可观测性与成本](./agent-observability) · [预算与熔断](./agent-reliability) · [上下文工程](./agent-context) · [部署与交付](./agent-deploy)
 - **综合实战**：[企业知识库 Agentic RAG：项目目标与架构](./agentic-rag-project)
 
@@ -45,28 +48,30 @@ description: 按目标、技术栈与能力层级浏览全栈知识站的全部�
 - **Python**：[语法入门](./python-intro) · [类与 OOP](./python-class) · [工程进阶](./python-engineering)
 - **Node.js**：[运行时](./node-runtime) · [模块系统](./node-module-system) · [异步模型](./node-async) · [Stream](./node-stream)
 - **Go**：[快速入门](./go-intro) · [类型系统](./go-advanced-types) · [并发模型](./go-advanced-concurrency)
-- **Java**：[去陌生化](./java-intro) · [核心语法](./java-core-syntax) · [数据结构](./java-data-structures) · [工程结构](./java-engineering)
+- **Java**：[去陌生化](./java-intro) · [核心语法](./java-core-syntax) · [数据结构](./java-data-structures) · [工程结构](./java-engineering) · [JVM 与并发](./java-jvm-concurrency)（进阶）
 
 ### 2. Web 框架与接口设计
 
 - **FastAPI**：[基础](./fastapi-basics) · [MySQL 项目结构](./fastapi-mysql-project) · [生产级进阶](./fastapi-advanced)
 - **NestJS**：[架构](./nestjs-intro) · [装饰器](./nestjs-decorators) · [元数据与 Reflector](./nestjs-metadata-reflector) · [依赖注入](./nestjs-di) · [动态模块](./nestjs-dynamic-module) · [请求生命周期](./nestjs-pipeline) · [RxJS 与 Interceptor](./nestjs-rxjs-interceptor) · [校验与异常](./nestjs-validation-filter) · [DTO 与 Swagger](./nestjs-dto) · [TypeORM](./nestjs-database) · [Prisma](./nestjs-prisma) · [GraphQL](./nestjs-graphql) · [文件上传](./nestjs-file-upload) · [日志](./nestjs-logging) · [定时任务与事件](./nestjs-schedule-events) · [实时通信](./nestjs-realtime) · [微服务](./nestjs-microservice) · [生产清单](./nestjs-advanced) · [项目蓝图](./nestjs-project-blueprint)
-- **Spring Boot**：[框架入门](./java-springboot-intro) · [数据库](./java-database) · [鉴权](./java-auth) · [调用 Python Agent](./java-call-python)
+- **Spring Boot**：[框架入门](./java-springboot-intro) · [数据库](./java-database) · [鉴权](./java-auth) · [调用 Python Agent](./java-call-python) · [Spring、数据与中间件](./java-spring-data-middleware)（进阶） · [分布式、云原生与架构](./java-distributed-cloud-architecture)（进阶）
 - **Node 原生能力**：[HTTP 与 BFF](./node-http) · [性能与稳定性](./node-perf)
 
 ### 3. 数据、状态与可靠性
 
-- **建模与查询**：[MySQL 表结构设计](./mysql-table-design) · [SQL 基础与查询](./sql-basics) · [数据库外键](./foreign-keys) · [MySQL 日志、备份恢复与复制](./mysql-recovery) · [PostgreSQL 基础与实战](./postgresql)
-- **一致性**：[并发、事务与一致性](./concurrency-transaction) · [锁机制与并发控制](./locking) · [分布式一致性与可靠消息](./distributed-consistency) · [Redis 深入](./redis-deep)
-- **异步系统**：[Worker 与异步任务](./background-worker) · [消息队列](./message-queue)
+- **建模与查询**：[MySQL 表结构设计](./mysql-table-design) · [SQL 基础与查询](./sql-basics) · [SQL 进阶与查询优化](./mysql-advanced) · [数据库外键](./foreign-keys) · [MySQL 日志、备份恢复与复制](./mysql-recovery) · [PostgreSQL（JSONB / pgvector / RLS）](./postgresql) · [MongoDB 与 Mongoose](./mongodb-mongoose)
+- **一致性（建议顺序）**：[并发、事务与一致性](./concurrency-transaction) → [锁机制与并发控制](./locking) → [分布式一致性与可靠消息](./distributed-consistency)
+- **缓存（建议顺序）**：[Redis 深入](./redis-deep)（结构与原理）→ [Redis 实战：五个业务场景](./redis-practice)
+- **异步系统（建议顺序）**：[消息队列：异步入库投递](./message-queue) → [Worker 与异步任务](./background-worker)
 - **认证授权**：[NestJS 认证与登录状态](./nestjs-auth) · [授权模型与三方登录](./nestjs-authorization) · [Java 登录与鉴权](./java-auth)
 
 ### 4. 工程、部署与实战
 
-- **部署**：[Docker 与部署](./docker-deployment) · [Dockerfile 进阶](./dockerfile-practice) · [Compose 与进程守护](./docker-compose-network) · [Nginx 流量治理](./nginx-core)
+- **部署（建议顺序）**：[Docker 与部署](./docker-deployment) → [Dockerfile 进阶](./dockerfile-practice) → [Compose、网络与进程守护](./docker-compose-network) → [Nginx：反向代理与流量治理](./nginx-core)
 - **完整项目**：[企业知识库 Agentic RAG](./agentic-rag-project) · [FastAPI + MySQL 项目](./fastapi-mysql-project) · [Java 学习时间记录系统](./java-project-practice)
 - **代码阅读**：[阅读陌生 Java 项目](./java-reading-project)
 - **练习与面试**：[综合练习](./exercises) · [Node.js 实战练习](./node-practice) · [Java 招聘要求判断](./java-job-requirements)
+- **怎么学**：[这套教程怎么学](./learning-path)（按求职目标分流的最短路径）
 
 ## 跨栈对照
 
@@ -99,11 +104,11 @@ flowchart LR
 
 ## 继续补全的方向
 
-网络排障、锁机制、分布式一致性与可靠消息已加入主线。下一阶段按以下顺序补齐：
+网络排障、锁机制、分布式一致性与可靠消息已加入主线。两条外部项目融合路线（[Java 企业级进阶](./java-enterprise-path) 与 [Python AI Agent 路线](./python-ai-agent-path)）也已完成主干吸收。下一阶段按以下顺序补齐：
 
 1. **Linux 与服务故障排查**：从 CPU、内存、磁盘、端口与连接异常定位原因，衔接已有 Nginx 与 Docker 内容。
 2. **后端并发与故障测试实战**：用真实数据库、并发连接和可控故障验证超卖、重复消费与恢复路径。
-3. **Java 求职分支**：JVM、Java 并发与性能诊断，按具体求职目标深入。
+3. **Java / Agent 融合路线的逐篇深化**：按 [Java 企业级进阶路线](./java-enterprise-path) 与 [Python AI Agent 路线融合指南](./python-ai-agent-path) 的阶段，按需把综述中一笔带过的专题（如 WebFlux、DDD、K8s、多租户）扩成独立文章。
 
 已完成的 [MySQL 日志、备份恢复与复制](./mysql-recovery) 以及已有的 [SQL 进阶与查询优化](./mysql-advanced)、[Redis 实战](./redis-practice)、[Nginx 流量治理](./nginx-core) 继续作为深入入口。新增章节以“解释机制、复现问题、验证恢复”为标准；通用测试章还未完成，各章练习不等于已有可运行测试工程。
 

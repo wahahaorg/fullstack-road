@@ -4,7 +4,7 @@ title: 从视频导出超时，理解 Worker 与异步任务
 
 # 从视频导出超时，理解 Worker 与异步任务
 
-> Worker 不是什么神秘组件。它本质上是一个长期运行的后台消费者：不断领取任务、执行任务、记录结果。真正困难的不是写出循环，而是让任务在并发、失败和重启之后仍然正确。
+> Worker 不是什么神秘组件。它本质上是一个长期运行的后台消费者：不断领取任务、执行任务、记录结果。真正困难的不是写出循环，而是让任务在并发、失败和重启之后仍然正确。任务意图如何经 MQ 可靠投递、ACK / 幂等 / 死信怎么设计，见 [消息队列](./message-queue)。
 
 ## 先看一个真实问题
 
@@ -807,7 +807,7 @@ pending → running → success / failed
 - [Microsoft：ASP.NET Core 中的后台任务](https://learn.microsoft.com/aspnet/core/fundamentals/host/hosted-services)
 - [Celery：First Steps](https://docs.celeryq.dev/en/stable/getting-started/first-steps-with-celery.html)
 - [BullMQ 官方指南](https://docs.bullmq.io/)
-- [本站：消息队列基础](/guide/message-queue)
+- [本站：消息队列（异步入库投递）](/guide/message-queue)
 - [本站：并发、事务与一致性](/guide/concurrency-transaction)
 
 ---
