@@ -21,151 +21,148 @@ export default withMermaid(defineConfig({
     siteTitle: '全栈知识站',
     nav: [
       { text: '首页', link: '/' },
-      { text: '知识地图', link: '/guide/knowledge-map' },
+      {
+        text: '学习指南',
+        items: [
+          { text: '🗺️ 全栈知识地图', link: '/guide/knowledge-map' },
+          { text: '🧭 这套教程怎么学', link: '/guide/learning-path' },
+          { text: '💡 后端思维补齐', link: '/guide/backend-thinking' },
+          { text: '📝 综合场景练习', link: '/guide/exercises' },
+        ]
+      },
       {
         text: 'AI 工程',
         items: [
           {
-            text: 'Agent 工程',
+            text: 'Agent 核心工程',
             items: [
               { text: '系统学习路线', link: '/guide/python-ai-agent-path' },
               { text: 'LLM 与 Prompt 基础', link: '/guide/llm-prompt-foundations' },
+              { text: '工程总览与心智模型', link: '/guide/agent-intro' },
               { text: '框架生态与进阶能力', link: '/guide/agent-frameworks-and-capabilities' },
-              { text: '项目阶梯与生产交付', link: '/guide/agent-projects-and-delivery' },
-              { text: '工程总览', link: '/guide/agent-intro' },
-              { text: '范式与框架选型', link: '/guide/agent-patterns' },
               { text: 'LangGraph 状态机', link: '/guide/agent-langgraph' },
               { text: 'Tool Calling 与 MCP', link: '/guide/agent-tool-calling' },
-              { text: 'Multi-Agent 与人工兜底', link: '/guide/agent-multi-agent' },
-              { text: 'SSE 流式', link: '/guide/agent-streaming' },
-              { text: 'AI 应用前端', link: '/guide/agent-frontend' },
-              { text: 'Text2SQL', link: '/guide/agent-text2sql' },
+              { text: 'Text2SQL 工程实践', link: '/guide/agent-text2sql' },
             ]
           },
           {
-            text: 'RAG 检索',
+            text: 'RAG 检索系统',
             items: [
               { text: '入库链路', link: '/guide/rag-pipeline' },
               { text: '混合检索与 Rerank', link: '/guide/rag-retrieval' },
               { text: '引用溯源与拒答', link: '/guide/rag-citation' },
-              { text: '多模态文档', link: '/guide/rag-multimodal' },
+              { text: '多模态文档与区域引用', link: '/guide/rag-multimodal' },
             ]
           },
           {
-            text: '综合实战',
+            text: '综合实战项目',
             items: [
-              { text: '项目代码入口与运行', link: '/guide/agentic-rag-project-code' },
-              { text: '企业知识库 Agentic RAG', link: '/guide/agentic-rag-project' },
+              { text: '项目目标与架构', link: '/guide/agentic-rag-project' },
               { text: '最小 RAG 闭环', link: '/guide/agentic-rag-project-minimal' },
+              { text: '项目代码入口与运行', link: '/guide/agentic-rag-project-code' },
               { text: '权限与文档生命周期', link: '/guide/agentic-rag-project-permissions' },
-              { text: '检索与 Agentic RAG', link: '/guide/agentic-rag-project-retrieval' },
-              { text: '安全、评测与部署', link: '/guide/agentic-rag-project-security' },
               { text: '项目复盘与求职表达', link: '/guide/agentic-rag-project-career' },
             ]
           },
           {
-            text: '生产化',
+            text: '生产化与交付',
             items: [
+              { text: '项目阶梯与生产交付', link: '/guide/agent-projects-and-delivery' },
+              { text: 'Agent 与 RAG 评测方法', link: '/guide/agent-eval' },
               { text: 'Prompt 注入攻防', link: '/guide/agent-security' },
               { text: '可观测性、成本与性能', link: '/guide/agent-observability' },
-              { text: '生产可靠性', link: '/guide/agent-reliability' },
-              { text: '上下文工程', link: '/guide/agent-context' },
-              { text: 'Agent 与 RAG 评测', link: '/guide/agent-eval' },
+              { text: '生产可靠性：预算与熔断', link: '/guide/agent-reliability' },
               { text: '部署与交付', link: '/guide/agent-deploy' },
             ]
           },
         ]
       },
       {
-        text: 'Python 后端',
+        text: '后端技术栈',
         items: [
           {
-            text: 'Python',
+            text: 'Python & FastAPI',
             items: [
-              { text: '语法入门', link: '/guide/python-intro' },
-              { text: '深入理解类', link: '/guide/python-class' },
-              { text: '工程进阶', link: '/guide/python-engineering' },
+              { text: 'Python 快速入门', link: '/guide/python-intro' },
+              { text: 'Python 工程进阶', link: '/guide/python-engineering' },
+              { text: 'FastAPI 基础', link: '/guide/fastapi-basics' },
+              { text: 'FastAPI MySQL 项目', link: '/guide/fastapi-mysql-project' },
+              { text: 'FastAPI 生产进阶', link: '/guide/fastapi-advanced' },
             ]
           },
           {
-            text: 'FastAPI',
+            text: 'Node.js & NestJS',
             items: [
-              { text: '基础', link: '/guide/fastapi-basics' },
-              { text: 'MySQL 项目实战', link: '/guide/fastapi-mysql-project' },
-              { text: '进阶', link: '/guide/fastapi-advanced' },
+              { text: 'Node.js 运行时原理', link: '/guide/node-runtime' },
+              { text: '异步编程与 Stream', link: '/guide/node-async' },
+              { text: 'NestJS 核心架构', link: '/guide/nestjs-intro' },
+              { text: 'NestJS 认证与授权', link: '/guide/nestjs-auth' },
+              { text: 'NestJS 项目架构蓝图', link: '/guide/nestjs-project-blueprint' },
+            ]
+          },
+          {
+            text: 'Java & Spring Boot',
+            items: [
+              { text: 'Java 快速接手路线', link: '/guide/java-learning-path' },
+              { text: 'Java 企业级进阶路线', link: '/guide/java-enterprise-path' },
+              { text: 'Spring Boot 入门', link: '/guide/java-springboot-intro' },
+              { text: 'JVM 与并发基础', link: '/guide/java-jvm-concurrency' },
+              { text: 'Spring、数据与中间件', link: '/guide/java-spring-data-middleware' },
+              { text: '分布式、云原生与架构', link: '/guide/java-distributed-cloud-architecture' },
+            ]
+          },
+          {
+            text: 'Go 语言',
+            items: [
+              { text: '学习路线与能力地图', link: '/guide/go-learning-path' },
+              { text: 'Go 快速入门', link: '/guide/go-intro' },
+              { text: '类型系统与泛型', link: '/guide/go-advanced-types' },
+              { text: '并发模式与工程实践', link: '/guide/go-advanced-concurrency' },
+              { text: '工程化实战', link: '/guide/go-advanced-engineering' },
             ]
           },
         ]
       },
       {
-        text: 'Node 后端',
+        text: '架构与运维',
         items: [
           {
-            text: 'Node.js',
+            text: '数据库与建模',
             items: [
-              { text: '运行时原理', link: '/guide/node-runtime' },
-              { text: '模块系统', link: '/guide/node-module-system' },
-              { text: '异步与错误处理', link: '/guide/node-async' },
-              { text: 'Stream 与 Buffer', link: '/guide/node-stream' },
-              { text: 'HTTP 与 BFF', link: '/guide/node-http' },
-              { text: 'HTTP、TCP、TLS 与网络排障', link: '/guide/network-troubleshooting' },
+              { text: '表结构设计与规范', link: '/guide/mysql-table-design' },
+              { text: 'SQL 基础与高级查询', link: '/guide/sql-basics' },
+              { text: 'SQL 进阶与查询优化', link: '/guide/mysql-advanced' },
+              { text: 'PostgreSQL 基础与实战', link: '/guide/postgresql' },
+              { text: 'MySQL 日志与容灾备份', link: '/guide/mysql-recovery' },
             ]
           },
           {
-            text: 'NestJS',
+            text: '并发与事务',
             items: [
-              { text: '核心原理', link: '/guide/nestjs-intro' },
-              { text: '请求生命周期', link: '/guide/nestjs-pipeline' },
-              { text: '数据与接口', link: '/guide/nestjs-dto' },
-              { text: '认证与授权', link: '/guide/nestjs-auth' },
-              { text: '工程与通信', link: '/guide/nestjs-advanced' },
-              { text: '项目架构蓝图', link: '/guide/nestjs-project-blueprint' },
+              { text: '并发、事务与一致性', link: '/guide/concurrency-transaction' },
+              { text: '锁机制与并发控制', link: '/guide/locking' },
+              { text: '分布式一致性与可靠消息', link: '/guide/distributed-consistency' },
             ]
           },
-        ]
-      },
-      {
-        text: '运维',
-        items: [
-          { text: 'Docker 与部署', link: '/guide/docker-deployment' },
-          { text: 'Dockerfile 进阶', link: '/guide/dockerfile-practice' },
-          { text: 'Compose 与进程守护', link: '/guide/docker-compose-network' },
-          { text: 'Nginx 流量治理', link: '/guide/nginx-core' },
-          { text: 'Worker 与异步任务', link: '/guide/background-worker' },
-          { text: 'Redis 深入', link: '/guide/redis-deep' },
-          { text: 'Redis 实战场景', link: '/guide/redis-practice' },
-          { text: '消息队列', link: '/guide/message-queue' },
-        ]
-      },
-      {
-        text: 'Go',
-        items: [
-          { text: '学习路线与能力地图', link: '/guide/go-learning-path' },
-          { text: 'Go 快速入门', link: '/guide/go-intro' },
-          { text: '类型系统与泛型', link: '/guide/go-advanced-types' },
-          { text: '并发模式与工程实践', link: '/guide/go-advanced-concurrency' },
-          { text: '工程化实战', link: '/guide/go-advanced-engineering' },
-        ]
-      },
-      {
-        text: 'Java',
-        items: [
-          { text: '学习路线', link: '/guide/java-learning-path' },
-          { text: '企业级进阶路线', link: '/guide/java-enterprise-path' },
-          { text: 'JVM 与并发基础', link: '/guide/java-jvm-concurrency' },
-          { text: 'Spring、数据与中间件', link: '/guide/java-spring-data-middleware' },
-          { text: '分布式、云原生与架构', link: '/guide/java-distributed-cloud-architecture' },
-          { text: '1. Java 去陌生化', link: '/guide/java-intro' },
-          { text: '2. Java 核心语法', link: '/guide/java-core-syntax' },
-          { text: '3. 常用数据结构', link: '/guide/java-data-structures' },
-          { text: '4. 理解 Java 工程', link: '/guide/java-engineering' },
-          { text: '5. Spring Boot 入门', link: '/guide/java-springboot-intro' },
-          { text: '6. 数据库基础', link: '/guide/java-database' },
-          { text: '7. 登录与鉴权', link: '/guide/java-auth' },
-          { text: '8. 调用 Python Agent', link: '/guide/java-call-python' },
-          { text: '9. 实战项目', link: '/guide/java-project-practice' },
-          { text: '10. 阅读陌生项目', link: '/guide/java-reading-project' },
-          { text: '11. 招聘要求判断', link: '/guide/java-job-requirements' },
+          {
+            text: '中间件与异步',
+            items: [
+              { text: 'Redis 深入与底层原理', link: '/guide/redis-deep' },
+              { text: 'Redis 实战：业务场景', link: '/guide/redis-practice' },
+              { text: '消息队列：解耦与异步', link: '/guide/message-queue' },
+              { text: 'Worker 与异步任务', link: '/guide/background-worker' },
+            ]
+          },
+          {
+            text: '容器与部署',
+            items: [
+              { text: 'Docker 与部署', link: '/guide/docker-deployment' },
+              { text: 'Dockerfile 进阶实践', link: '/guide/dockerfile-practice' },
+              { text: 'Compose 与进程守护', link: '/guide/docker-compose-network' },
+              { text: 'Nginx：反代与流量治理', link: '/guide/nginx-core' },
+              { text: '网络排障与系统诊断', link: '/guide/network-troubleshooting' },
+            ]
+          },
         ]
       },
     ],
@@ -389,22 +386,34 @@ export default withMermaid(defineConfig({
         text: '☕ Java',
         collapsed: true,
         items: [
-          { text: '学习路线', link: '/guide/java-learning-path' },
-          { text: '企业级进阶路线', link: '/guide/java-enterprise-path' },
-          { text: 'JVM 与并发基础', link: '/guide/java-jvm-concurrency' },
-          { text: 'Spring、数据与中间件', link: '/guide/java-spring-data-middleware' },
-          { text: '分布式、云原生与架构', link: '/guide/java-distributed-cloud-architecture' },
-          { text: '1. Java 去陌生化', link: '/guide/java-intro' },
-          { text: '2. Java 核心语法', link: '/guide/java-core-syntax' },
-          { text: '3. 常用数据结构', link: '/guide/java-data-structures' },
-          { text: '4. 理解 Java 工程', link: '/guide/java-engineering' },
-          { text: '5. Spring Boot 入门', link: '/guide/java-springboot-intro' },
-          { text: '6. 数据库基础', link: '/guide/java-database' },
-          { text: '7. 登录与鉴权', link: '/guide/java-auth' },
-          { text: '8. 调用 Python Agent', link: '/guide/java-call-python' },
-          { text: '9. 实战项目', link: '/guide/java-project-practice' },
-          { text: '10. 阅读陌生项目', link: '/guide/java-reading-project' },
-          { text: '11. 招聘要求判断', link: '/guide/java-job-requirements' },
+          {
+            text: '进阶与架构',
+            collapsed: false,
+            items: [
+              { text: 'Java 学习路线', link: '/guide/java-learning-path' },
+              { text: '企业级进阶路线', link: '/guide/java-enterprise-path' },
+              { text: 'JVM 与并发基础', link: '/guide/java-jvm-concurrency' },
+              { text: 'Spring、数据与中间件', link: '/guide/java-spring-data-middleware' },
+              { text: '分布式、云原生与架构', link: '/guide/java-distributed-cloud-architecture' },
+            ]
+          },
+          {
+            text: '快速接手主线（1-11章）',
+            collapsed: false,
+            items: [
+              { text: '1. Java 去陌生化', link: '/guide/java-intro' },
+              { text: '2. Java 核心语法', link: '/guide/java-core-syntax' },
+              { text: '3. 常用数据结构', link: '/guide/java-data-structures' },
+              { text: '4. 理解 Java 工程', link: '/guide/java-engineering' },
+              { text: '5. Spring Boot 入门', link: '/guide/java-springboot-intro' },
+              { text: '6. 数据库基础', link: '/guide/java-database' },
+              { text: '7. 登录与鉴权', link: '/guide/java-auth' },
+              { text: '8. 调用 Python Agent', link: '/guide/java-call-python' },
+              { text: '9. 实战项目', link: '/guide/java-project-practice' },
+              { text: '10. 阅读陌生项目', link: '/guide/java-reading-project' },
+              { text: '11. 招聘要求判断', link: '/guide/java-job-requirements' },
+            ]
+          },
         ]
       },
     ],
