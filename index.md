@@ -174,7 +174,7 @@ Java 学习路线 → 去陌生化 → 核心语法 → 数据结构 → 理解 
 
 | 模块 | 章节数 | 核心内容 |
 |---|---|---|
-| **🤖 Agent 工程与生产化** | 14 章 | 范式与编排 / LangGraph / Tool Calling 与 MCP / Multi-Agent / SSE 流式 / AI 前端 / Text2SQL / 安全 / 可观测性 / 可靠性 / 上下文工程 / 评测 / 部署 |
+| **🤖 Agent 工程与生产化** | 15 章 | 范式与编排 / LangGraph / Tool Calling 与 MCP / Multi-Agent / SSE 流式 / AI 前端 / Text2SQL / 安全 / 可观测性 / 可靠性 / 上下文工程 / 记忆系统 / 评测 / 部署 |
 | **🏗️ Agentic RAG 综合实战** | 17 章 | 从最小闭环到权限、异步入库、混合检索、LangGraph、安全越权测试、评测与求职表达 |
 | **🔍 RAG 检索** | 4 章 | 入库链路 / 混合检索（BM25+向量+RRF+Rerank）/ 引用溯源与拒答 / 多模态文档 |
 | **Python 与 FastAPI** | 6 章 | Python 语法、类与工程化 → FastAPI 基础、项目结构与进阶（Depends / SSE / 鉴权 / Worker 边界） |

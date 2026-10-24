@@ -61,6 +61,7 @@ description: 将 umlink/python-ai-agent 的阶段化学习路线吸收到本站�
 - [LangGraph 状态图](./agent-langgraph)
 - [Tool Calling 与 MCP](./agent-tool-calling)
 - [Agent 上下文工程](./agent-context)
+- [Agent 记忆系统：目录化与意图检索](./agent-memory)
 - [Agent 流式输出](./agent-streaming)
 
 外部路线的 ReAct、Plan-and-Execute、Reflexion、LangChain、LangGraph、CrewAI、AutoGen，可以合并到这一阶段。注意 AutoGen 已进入维护/迁移期，微软主线转向 Microsoft Agent Framework，选型时应优先评估 MAF 或 LangGraph。本站主线的默认选择仍是 LangGraph，因为它更容易表达可恢复、可观测、可测试的生产状态图。

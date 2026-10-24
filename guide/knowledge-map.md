@@ -38,7 +38,7 @@ description: 按目标、技术栈与能力层级浏览全栈知识站的全部�
 - **数据问答**：[Text2SQL 与 Schema Linking](./agent-text2sql)
 - **交互与度量**：[SSE 流式与阶段事件](./agent-streaming) · [AI 应用前端](./agent-frontend) · [评测方法](./agent-eval)
 - **基础与项目阶梯**：[LLM 与 Prompt 基础](./llm-prompt-foundations) · [项目阶梯与生产交付](./agent-projects-and-delivery)
-- **上生产**：[Prompt 注入攻防](./agent-security) · [可观测性与成本](./agent-observability) · [预算与熔断](./agent-reliability) · [上下文工程](./agent-context) · [部署与交付](./agent-deploy)
+- **上生产**：[Prompt 注入攻防](./agent-security) · [可观测性与成本](./agent-observability) · [预算与熔断](./agent-reliability) · [上下文工程](./agent-context) · [记忆系统](./agent-memory) · [部署与交付](./agent-deploy)
 - **综合实战**：[企业知识库 Agentic RAG：项目目标与架构](./agentic-rag-project)
 
 这一层依赖下面所有层：Agent 的异步入库要用[Worker](./background-worker)，会话记忆要用[Redis](./redis-deep)，元数据要靠[表结构设计](./mysql-table-design)，流式接口要靠[FastAPI 进阶](./fastapi-advanced)。**Agent 做不稳，问题通常不在 Prompt，而在这些底座上。**

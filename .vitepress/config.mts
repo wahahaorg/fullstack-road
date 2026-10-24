@@ -72,6 +72,7 @@ export default withMermaid(defineConfig({
               { text: 'Prompt 注入攻防', link: '/guide/agent-security' },
               { text: '可观测性、成本与性能', link: '/guide/agent-observability' },
               { text: '生产可靠性：预算与熔断', link: '/guide/agent-reliability' },
+              { text: '记忆系统：目录化与意图检索', link: '/guide/agent-memory' },
               { text: '部署与交付', link: '/guide/agent-deploy' },
             ]
           },
@@ -217,6 +218,7 @@ export default withMermaid(defineConfig({
               { text: '可观测性、成本与性能', link: '/guide/agent-observability' },
               { text: '生产可靠性：预算与熔断', link: '/guide/agent-reliability' },
               { text: '上下文工程与长任务', link: '/guide/agent-context' },
+              { text: '记忆系统：目录化与意图检索', link: '/guide/agent-memory' },
               { text: 'Agent 与 RAG 评测方法', link: '/guide/agent-eval' },
               { text: '部署与交付：从本地 Demo 到可上线', link: '/guide/agent-deploy' },
             ]
