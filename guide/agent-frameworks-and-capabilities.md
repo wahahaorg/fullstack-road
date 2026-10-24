@@ -1,6 +1,6 @@
 ---
 title: Agent 框架生态与进阶能力：选型边界与全局图谱
-description: LangChain、LangGraph、LlamaIndex、CrewAI、AutoGen 的适用边界，以及 ReAct、Plan-and-Execute、MCP、记忆、多智能体等进阶能力的全局图谱。
+description: LangChain、LangGraph、LlamaIndex、CrewAI、AutoGen 及其后继 Microsoft Agent Framework 的适用边界，以及 ReAct、Plan-and-Execute、MCP、记忆、多智能体等进阶能力的全局图谱。
 ---
 
 # Agent 框架生态与进阶能力：选型边界与全局图谱
@@ -27,7 +27,9 @@ description: LangChain、LangGraph、LlamaIndex、CrewAI、AutoGen 的适用边�
 | LangChain | 组件库：模型接入、工具、向量库适配 | 快速接模型、复用工具/检索组件 | 复杂控制流（用它底层组件 + LangGraph） |
 | LlamaIndex | 数据感知型框架 | RAG 数据层：索引、检索、文档解析 | 复杂多 Agent 编排 |
 | CrewAI | 多智能体快速开发 | 原型验证、角色分工明确的协作任务 | 生产系统（状态与恢复能力弱） |
-| AutoGen | 微软多智能体框架 | 研究探索、对话式多 Agent 实验 | 生产工程化（迭代快，API 不稳定） |
+| AutoGen | 微软多智能体框架（维护/迁移期） | 研究探索、对话式多 Agent 实验 | 生产工程化；新项目应评估后继的 Microsoft Agent Framework |
+
+> 框架状态会变：AutoGen 已进入维护/迁移阶段，微软主线转向 Microsoft Agent Framework（MAF）。新项目优先评估 MAF 或 LangGraph，不要把 AutoGen 当作长期生产基座。
 
 本站主线的默认选择：**LangGraph 编排 + LangChain 组件 + LlamaIndex 做 RAG 数据层（可选）**。理由是 LangGraph 的 `StateGraph` 能显式表达节点、边和条件路由，配合 checkpointer 天然支持断点恢复，这对生产系统的可测试、可观测是刚需。详见 [LangGraph 状态图](./agent-langgraph)。
 
@@ -36,11 +38,14 @@ description: LangChain、LangGraph、LlamaIndex、CrewAI、AutoGen 的适用边�
 下面用 LangGraph 搭一个最小 ReAct 循环（思考 → 调工具 → 看结果 → 再思考 → 总结）。框架 API 会变，这个循环结构不会：
 
 ```python
+import os
+
 from langgraph.graph import StateGraph, MessagesState, START, END
 from langgraph.prebuilt import ToolNode
 from langchain_openai import ChatOpenAI
 
-llm = ChatOpenAI(model="gpt-4o-mini").bind_tools([get_weather, calculator])
+# 模型名走配置，避免把某一代模型写死
+llm = ChatOpenAI(model=os.environ["OPENAI_MODEL"]).bind_tools([get_weather, calculator])
 
 def think(state: MessagesState):
     return {"messages": [llm.invoke(state["messages"])]}

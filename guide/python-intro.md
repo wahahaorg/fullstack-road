@@ -460,15 +460,19 @@ pip install -r requirements.txt
 deactivate
 ```
 
-**poetry（更现代的依赖管理，类似 package.json）：**
+**uv（当前推荐的依赖管理，类似 package.json + lockfile）：**
 
 ```bash
-pip install poetry
-poetry init           # 创建 pyproject.toml
-poetry add fastapi    # 安装依赖
-poetry install        # 根据 pyproject.toml 安装
-poetry shell          # 进入虚拟环境
+# 安装 uv（macOS/Linux；也可以 pip install uv）
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+uv init               # 创建 pyproject.toml、.python-version
+uv add fastapi uvicorn  # 安装依赖并写入 pyproject.toml
+uv sync               # 按 uv.lock 创建/同步 .venv
+uv run uvicorn main:app --reload   # 在项目环境里执行命令
 ```
+
+`uv.lock` 要提交到 Git，CI 用 `uv sync --frozen` 保证本地与流水线装出完全一致的依赖。Poetry 也是常见选择，命令风格类似；本站配套项目统一使用 uv。
 
 ### .gitignore 中要忽略的
 
@@ -486,7 +490,7 @@ build/
 
 ## 类型标注（Type Hints）
 
-Python 3.10+ 原生支持类型标注，是 FastAPI 和 Pydantic 的基础：
+Python 从 3.0 起支持类型标注，3.10 起可以用 `X | Y` 写联合类型；这些标注是 FastAPI 和 Pydantic 的基础：
 
 ```python
 # 基础类型

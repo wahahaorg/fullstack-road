@@ -8,7 +8,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.0</version>
+        <version>4.1.2</version>
         <relativePath/>
     </parent>
 
@@ -16,11 +16,11 @@
     <artifactId>study-tracker</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>study-tracker</name>
-    <description>学习时间记录系统 - Spring Boot 3 + MyBatis-Plus + JWT 企业实战工程</description>
+    <description>学习时间记录系统 - Spring Boot 4.1 + MyBatis-Plus + JWT 企业实战工程</description>
 
     <properties>
         <java.version>17</java.version>
-        <mybatis-plus.version>3.5.7</mybatis-plus.version>
+        <mybatis-plus.version>3.5.17</mybatis-plus.version>
         <jjwt.version>0.12.5</jjwt.version>
     </properties>
 
@@ -47,7 +47,13 @@
         <!-- MyBatis-Plus -->
         <dependency>
             <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+            <artifactId>mybatis-plus-spring-boot4-starter</artifactId>
+            <version>${mybatis-plus.version}</version>
+        </dependency>
+        <!-- 分页插件依赖：3.5.9 起从 extension 拆到独立模块 -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-jsqlparser</artifactId>
             <version>${mybatis-plus.version}</version>
         </dependency>
 

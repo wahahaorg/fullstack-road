@@ -9,7 +9,7 @@ title: 第八部分：Java 调用 Python Agent 服务
 读完本章后，你应该能：
 
 1. 理解 Java + Python 混合架构的设计动机
-2. 用 `RestTemplate` 从 Java 发起 HTTP 请求调用 Python 服务
+2. 用 `RestClient` 从 Java 发起 HTTP 请求调用 Python 服务
 3. 处理超时、异常、日志记录
 4. 设计统一错误码
 5. 理解同步请求和异步任务的区别
@@ -43,29 +43,34 @@ title: 第八部分：Java 调用 Python Agent 服务
 
 ---
 
-## 8.3 配置 RestTemplate
+## 8.3 配置 RestClient
+
+> `RestTemplate` 自 Spring Framework 6.1 起进入维护模式，只修 bug 不加新能力。新代码用同步的 `RestClient`；需要非阻塞流式响应时再用 `WebClient`。
 
 ```java
-// 文件：src/main/java/com/example/studytracker/config/RestTemplateConfig.java
+// 文件：src/main/java/com/example/studytracker/config/RestClientConfig.java
 package com.example.studytracker.config;
 
+import java.time.Duration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 
 @Configuration
-public class RestTemplateConfig {
+public class RestClientConfig {
 
     @Bean
-    public RestTemplate restTemplate() {
+    public RestClient restClient(RestClient.Builder builder) {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-        factory.setConnectTimeout(5000);   // 连接超时 5 秒
-        factory.setReadTimeout(30000);     // 读取超时 30 秒（AI 可能较慢）
-        return new RestTemplate(factory);
+        factory.setConnectTimeout(Duration.ofSeconds(5));   // 连接超时 5 秒
+        factory.setReadTimeout(Duration.ofSeconds(30));     // 读取超时 30 秒（AI 可能较慢）
+        return builder.requestFactory(factory).build();
     }
 }
 ```
+
+Spring Boot 会自动提供 `RestClient.Builder`，这里只需要补上请求工厂和超时；不要自己 `new RestClient()`，否则会丢掉 Boot 的自动配置。
 
 **对比 Python 的 httpx：**
 
@@ -141,8 +146,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 
@@ -151,7 +156,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AgentService {
 
-    private final RestTemplate restTemplate;
+    private final RestClient restClient;
     private final PythonAgentConfig config;
 
     /**
@@ -161,30 +166,26 @@ public class AgentService {
     public AgentChatResponse chat(AgentChatRequest request) {
         String url = config.getBaseUrl() + config.getEndpoints().get("chat");
 
-        // 构建请求头
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        // 构建请求体
-        HttpEntity<AgentChatRequest> entity = new HttpEntity<>(request, headers);
-
         long startTime = System.currentTimeMillis();
         try {
             log.info("调用 Python Agent: url={}, question={}", url, request.getQuestion());
 
-            ResponseEntity<AgentChatResponse> response = restTemplate.postForEntity(
-                url, entity, AgentChatResponse.class
-            );
+            AgentChatResponse response = restClient.post()
+                .uri(url)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(request)
+                .retrieve()
+                .body(AgentChatResponse.class);
 
             long elapsed = System.currentTimeMillis() - startTime;
             log.info("Python Agent 响应: taskId={}, 耗时={}ms",
-                response.getBody() != null ? response.getBody().getTaskId() : "null", elapsed);
+                response != null ? response.getTaskId() : "null", elapsed);
 
-            if (response.getBody() == null) {
+            if (response == null) {
                 throw new BusinessException("Agent 服务返回空响应");
             }
 
-            return response.getBody();
+            return response;
         } catch (RestClientException e) {
             long elapsed = System.currentTimeMillis() - startTime;
             log.error("调用 Python Agent 失败: url={}, 耗时={}ms", url, elapsed, e);
@@ -200,10 +201,10 @@ public class AgentService {
         String url = config.getBaseUrl() + endpoint.replace("{taskId}", taskId);
 
         try {
-            ResponseEntity<AgentChatResponse> response = restTemplate.getForEntity(
-                url, AgentChatResponse.class
-            );
-            return response.getBody();
+            return restClient.get()
+                .uri(url)
+                .retrieve()
+                .body(AgentChatResponse.class);
         } catch (RestClientException e) {
             log.error("查询任务状态失败: taskId={}", taskId, e);
             throw new BusinessException("查询任务状态失败");
@@ -369,9 +370,10 @@ public class AgentService {
 
 | 操作 | 代码 |
 |------|------|
-| 发送 POST | `restTemplate.postForEntity(url, entity, ResponseType.class)` |
-| 发送 GET | `restTemplate.getForEntity(url, ResponseType.class)` |
-| 设置超时 | `SimpleClientHttpRequestFactory` |
+| 发送 POST | `restClient.post().uri(url).body(req).retrieve().body(ResponseType.class)` |
+| 发送 GET | `restClient.get().uri(url).retrieve().body(ResponseType.class)` |
+| 设置超时 | `RestClient.Builder` + `SimpleClientHttpRequestFactory` |
+| 客户端选择 | 同步用 `RestClient`；非阻塞/流式用 `WebClient`；`RestTemplate` 已进入维护模式 |
 | 异步执行 | `CompletableFuture.runAsync(() -> { ... })` |
 | 调用日志 | `log.info("调用耗时={}ms", elapsed)` |
 | 异常处理 | `catch (RestClientException e)` |

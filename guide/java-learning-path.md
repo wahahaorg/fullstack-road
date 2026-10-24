@@ -176,7 +176,7 @@ title: ☕ Java 快速入门：面向前端与 AI 应用开发者
 
 1. 为什么企业项目可能采用这种架构
 2. Java 与 Python 的职责划分
-3. Java 如何发送 HTTP 请求（RestTemplate / WebClient）
+3. Java 如何发送 HTTP 请求（RestClient / WebClient；RestTemplate 已进入维护模式）
 4. 如何传递 JSON
 5. 如何处理超时
 6. 如何处理 Python 服务异常

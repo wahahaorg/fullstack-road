@@ -37,8 +37,10 @@ flowchart LR
 ## 上手流程
 
 ```bash
-npm i -D prisma && npm i @prisma/client
-npx prisma init --datasource-provider mysql   # 生成 prisma/schema.prisma 和 .env
+# Prisma 7：CLI、Client 与 MySQL driver adapter 分开安装
+npm i -D prisma@7
+npm i @prisma/client@7 @prisma/adapter-mariadb@7
+npx prisma init --datasource-provider mysql   # 生成 schema、prisma.config.ts 和 .env 骨架
 # 编辑 schema.prisma，写 model
 npx prisma migrate dev --name init            # 生成并执行迁移 SQL，顺带 generate
 npx prisma studio                             # 想肉眼看数据时
@@ -46,10 +48,18 @@ npx prisma studio                             # 想肉眼看数据时
 
 五步：装包 → `init` → 写 model → `migrate dev` → 用 Client。`migrate dev` 内部已经调过 `generate`，所以本地开发通常不用单独跑它。
 
+::: warning Prisma 7 的五个硬变化
+1. **生成器换了**：`provider = "prisma-client"`（不是 `prisma-client-js`），且 `output` 必填，生成物不再默认塞进 `node_modules`。
+2. **配置外移**：数据源 URL 和迁移路径写在 `prisma.config.ts`，CLI 不再自动加载 `.env`，需要 `import 'dotenv/config'`。
+3. **必须用 driver adapter**：MySQL 用 `@prisma/adapter-mariadb`，在 `new PrismaClient({ adapter })` 时传入。连接池参数也改由 adapter 管理。
+4. **`$use` 已移除**：中间件统一改用 `$extends` 的 `query` 扩展。
+5. **生成物的导入路径变了**：从 `output` 目录导入 `PrismaClient`（例如 `../generated/prisma/client`），不再从 `@prisma/client` 直接导入。
+:::
+
 ### 命令速查
 | 命令 | 干什么 | 什么时候用 |
 |---|---|---|
-| `prisma init` | 建 `schema.prisma` 和 `.env` 骨架 | 项目第一次接 Prisma |
+| `prisma init` | 建 `schema.prisma`、`prisma.config.ts` 和 `.env` 骨架 | 项目第一次接 Prisma |
 | `prisma migrate dev` | 按 schema 差异生成迁移 SQL、执行、再 `generate`（还会跑 seed） | **只在本地开发** |
 | `prisma migrate deploy` | 只按文件名顺序执行 `migrations/` 里还没跑过的 SQL，不生成、不比对、不重置 | **CI / 预发 / 生产的唯一选择** |
 | `prisma migrate reset` | 删库重建、重跑全部迁移、重跑 seed | 本地迁移历史乱了，想推平重来 |
@@ -75,12 +85,12 @@ npx prisma studio                             # 想肉眼看数据时
 
 ```prisma
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")      // 只能从环境变量读，写死会被 validate 拦下来
+  provider = "mysql"                  // Prisma 7 的 url 配在 prisma.config.ts
 }
 
 generator client {
-  provider = "prisma-client-js"       // 不指定 output 就生成到 node_modules 里
+  provider = "prisma-client"          // Prisma 7 的新生成器
+  output   = "../src/generated/prisma" // 必填：生成物输出目录
 }
 
 enum DocStatus { DRAFT  PUBLISHED  ARCHIVED }
@@ -121,6 +131,19 @@ model Tag {
   docs Doc[]
   @@map("tags")
 }
+```
+
+配套的 `prisma.config.ts`（Prisma 7 的 CLI 配置入口）：
+
+```typescript
+import 'dotenv/config'                       // Prisma 7 不再自动加载 .env
+import { defineConfig, env } from 'prisma/config'
+
+export default defineConfig({
+  schema: 'prisma/schema.prisma',
+  migrations: { path: 'prisma/migrations' },
+  datasource: { url: env('DATABASE_URL') },
+})
 ```
 
 ### 字段：类型、修饰符、属性
@@ -468,11 +491,25 @@ serverless（云函数、边缘运行时）是重灾区：每个实例独立进�
 
 ```typescript
 // prisma.service.ts
+import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
+import { PrismaMariaDb } from '@prisma/adapter-mariadb'
+import { PrismaClient } from '../generated/prisma/client'
+
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   constructor(config: ConfigService) {
+    const adapter = new PrismaMariaDb({
+      host: config.get('DB_HOST', 'localhost'),
+      port: config.get<number>('DB_PORT', 3306),
+      user: config.getOrThrow('DB_USER'),
+      password: config.getOrThrow('DB_PASSWORD'),
+      database: config.getOrThrow('DB_NAME'),
+      connectionLimit: 10,
+    })
+
     super({
-      datasources: { db: { url: config.getOrThrow<string>('DATABASE_URL') } },
+      adapter,
       log: config.get('NODE_ENV') === 'production'
         ? [{ emit: 'event', level: 'error' }]
         : [{ emit: 'stdout', level: 'query' }, { emit: 'stdout', level: 'warn' }],
@@ -489,7 +526,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
 
 配套在 `main.ts` 里 `app.enableShutdownHooks()`，否则 `SIGTERM` 到来时 `onModuleDestroy` 根本不会执行。
 
-> ⚠️ 网上大量教程写的是在 `PrismaService` 里加一个 `enableShutdownHooks(app)` 方法、内部监听 `this.$on('beforeExit', ...)`。**Prisma 5 之后 `beforeExit` 已经不适用于默认的 library engine**，那份代码在新版本上是死代码。现在的正确形态就是上面这样：`OnModuleDestroy` 里 `$disconnect()`，加 `app.enableShutdownHooks()`。钩子的完整执行顺序和优雅退出细节见[依赖注入](/guide/nestjs-di)。
+> ⚠️ 网上大量教程写的是在 `PrismaService` 里加一个 `enableShutdownHooks(app)` 方法、内部监听 `this.$on('beforeExit', ...)`。**Prisma 5 起 `beforeExit` 在默认 library engine 上已不适用，Prisma 7 也不再依赖这套钩子**，那份代码在新版本上是死代码。现在的正确形态就是上面这样：`OnModuleDestroy` 里 `$disconnect()`，加 `app.enableShutdownHooks()`。钩子的完整执行顺序和优雅退出细节见[依赖注入](/guide/nestjs-di)。
 
 包成模块。全应用只该有一个连接池，且几乎每个业务模块都要用，属于典型的横切基础设施——这是少数适合 `@Global()` 的情况：
 
@@ -563,7 +600,7 @@ export function withSoftDelete(prisma: PrismaClient) {
 ```
 
 ::: warning 别写 $use
-Prisma 4 时代的 `prisma.$use(async (params, next) => ...)` 中间件已经被 `$extends` 取代，在 Prisma 5 里废弃、之后移除。老教程里 `params.action === 'delete'` 那套写法不要再抄。
+Prisma 4 时代的 `prisma.$use(async (params, next) => ...)` 中间件已经被 `$extends` 取代，Prisma 5 废弃，**Prisma 7 已完全移除**。老教程里 `params.action === 'delete'` 那套写法不要再抄。
 :::
 
 两个必须知道的代价。第一，`$extends` 返回的是**一个新的 client 实例**，原实例不受影响——所以要么在 Provider 的 `useFactory` 里包装完再交给容器，要么把包装结果挂成 `PrismaService` 上的一个属性，直接在 `PrismaService` 里调一下 `$extends` 是没用的。第二，`query` 扩展是**逐个方法生效**的：只改了 `findMany`，那 `findFirst`、`findUnique`、`count`、以及别人 `include` 里的嵌套查询照样能看见已删除的行。软删除想做严密，成本比想象中高——动手前先问一句：这张表是不是真的需要软删除，还是只需要一张操作日志表？
@@ -624,4 +661,4 @@ Prisma 4 时代的 `prisma.$use(async (params, next) => ...)` 中间件已经被
 
 - `PrismaService extends PrismaClient`，`onModuleInit` 里 `$connect`（懒连接也能跑，但那样启动期发现不了配错的连接串）、`onModuleDestroy` 里 `$disconnect`，`main.ts` 里 `app.enableShutdownHooks()`，包成 `@Global()` 的 `PrismaModule`——横切基础设施正是少数适合全局的情况。
 - 软删除用 `$extends` 的 `query` 扩展，不是已废弃的 `$use`；它返回的是一个新 client 实例（直接在 `PrismaService` 里调一下没用，要在 `useFactory` 里包装完再交给容器），而且逐方法生效——只拦 `findMany`，`findFirst`、`count`、嵌套查询照样能看见已删除的行。
-- 别踩的坑：网上教程里 `$on('beforeExit', ...)` 那套，在 Prisma 5 之后的默认 library engine 上是死代码。
+- 别踩的坑：网上教程里 `$on('beforeExit', ...)` 那套，在 Prisma 5 之后已不适用，Prisma 7 也不再需要；`$use` 在 Prisma 7 已移除，统一用 `$extends`。

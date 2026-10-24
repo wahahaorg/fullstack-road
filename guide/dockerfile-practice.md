@@ -28,7 +28,7 @@ flowchart TD
 | 你熟悉的 | Docker 里的对应 | 共同点 |
 |---|---|---|
 | `git commit` | 镜像层 | 只存差异，历史不可改，改动只能追加新的一层 |
-| 被多个包共用的同一份依赖 | 多个镜像共享的基础层 | 内容相同就只存一份，本地 10 个 Node 镜像不占 10 份 `node:20` |
+| 被多个包共用的同一份依赖 | 多个镜像共享的基础层 | 内容相同就只存一份，本地 10 个 Node 镜像不占 10 份 `node:24` |
 | Vite / webpack 的构建缓存 | 层缓存 | 输入没变就跳过这一步 |
 | CSS 的层叠 | 联合挂载 | 上层覆盖下层的同名内容 |
 
@@ -82,7 +82,7 @@ Debian 系的 `apt-get` 同理，`rm -rf /var/lib/apt/lists/*` 必须和 `apt-ge
 ### ENV vs ARG：构建期和运行期是两个世界
 
 ```dockerfile
-FROM node:20-alpine
+FROM node:24-alpine
 
 ARG BUILD_VERSION=dev          # 构建期变量，docker build --build-arg BUILD_VERSION=1.4.2 传入
 ENV APP_VERSION=$BUILD_VERSION # 想让运行时读到，必须转存成 ENV
@@ -163,7 +163,7 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=20s --retries=3 \
 ### v1：能跑，但每一条都踩了
 
 ```dockerfile
-FROM node:20
+FROM node:24
 
 WORKDIR /app
 COPY . .
@@ -179,7 +179,7 @@ CMD npm run start:prod
 ### v2：只调一行顺序，构建时间从 90s 掉到 15s
 
 ```dockerfile
-FROM node:20
+FROM node:24
 WORKDIR /app
 
 COPY package*.json ./
@@ -195,14 +195,14 @@ CMD ["node", "dist/main.js"]
 ### v3：多阶段构建，把源码和构建依赖甩掉
 
 ```dockerfile
-FROM node:20 AS builder
+FROM node:24 AS builder
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY . .
 RUN npm run build
 
-FROM node:20 AS runner
+FROM node:24 AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 COPY package*.json ./
@@ -214,14 +214,14 @@ CMD ["node", "dist/main.js"]
 
 ### v4：基础镜像换成 alpine
 
-只把两处 `FROM node:20` 改成 `FROM node:20-alpine`，体积再掉一半以上。前提是项目没有不兼容的原生模块，判断依据见技巧三。
+只把两处 `FROM node:24` 改成 `FROM node:24-alpine`，体积再掉一半以上。前提是项目没有不兼容的原生模块，判断依据见技巧三。
 
 ### v5：生产版
 
 在 v4 基础上只动 runner 阶段的四处：
 
 ```dockerfile
-FROM node:20-alpine AS runner
+FROM node:24-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 COPY package*.json ./
@@ -243,7 +243,7 @@ CMD ["node", "dist/main.js"]                             # 3. exec form
 
 | 版本 | 关键改动 | 镜像体积 | 改一行业务代码后重建 |
 |---|---|---|---|
-| v1 | `COPY . .` 后 `npm install`，`node:20` | ~1.5 GB | ~95 s（每次重装依赖） |
+| v1 | `COPY . .` 后 `npm install`，`node:24` | ~1.5 GB | ~95 s（每次重装依赖） |
 | v2 | 依赖层前置 | ~1.5 GB | ~14 s |
 | v3 | 多阶段 + `--omit=dev` | ~460 MB | ~14 s |
 | v4 | 基础镜像换 alpine | ~185 MB | ~12 s |
@@ -283,9 +283,9 @@ COPY . .
 改前是上面的 v2：一个阶段干到底，`typescript`、`jest`、`eslint` 和全部源码都留在最终镜像里。改后是 v3 那个结构：
 
 ```dockerfile
-FROM node:20-alpine AS builder     # 装全量依赖、编译
+FROM node:24-alpine AS builder     # 装全量依赖、编译
 # ...
-FROM node:20-alpine AS runner      # 只装生产依赖、只收产物
+FROM node:24-alpine AS runner      # 只装生产依赖、只收产物
 RUN npm ci --omit=dev
 COPY --from=builder /app/dist ./dist
 ```
@@ -306,9 +306,9 @@ COPY --from=builder /app/dist ./dist
 
 | 镜像 | 量级 | libc | 适用 |
 |---|---|---|---|
-| `node:20` | ~1.1 GB | glibc（Debian） | 需要编译原生模块、需要完整工具链的 builder 阶段 |
-| `node:20-slim` | ~240 MB | glibc（Debian，裁掉大部分工具） | **默认首选**。兼容性和体积的平衡点 |
-| `node:20-alpine` | ~140 MB | musl（Alpine） | 体积敏感、且确认原生模块兼容 |
+| `node:24` | ~1.1 GB | glibc（Debian） | 需要编译原生模块、需要完整工具链的 builder 阶段 |
+| `node:24-slim` | ~240 MB | glibc（Debian，裁掉大部分工具） | **默认首选**。兼容性和体积的平衡点 |
+| `node:24-alpine` | ~140 MB | musl（Alpine） | 体积敏感、且确认原生模块兼容 |
 | `gcr.io/distroless/nodejs20` | ~120 MB | glibc | 安全要求高的生产环境。没有 shell，`exec -it` 进不去 |
 
 **alpine 的坑在 libc**。Alpine 用 musl 而不是 glibc，这不是「功能少一点」，而是另一套 C 标准库实现。后果：
@@ -318,9 +318,9 @@ COPY --from=builder /app/dist ./dist
 - musl 的 DNS 解析行为和 glibc 有差异，历史上出过一些线上问题
 - 部分场景下 musl 的内存分配器在高并发下表现不如 glibc
 
-判断顺序：**先用 `node:20-slim`；只有体积真的成为瓶颈、且项目没有原生依赖时才换 alpine**。为了 100 MB 去和 musl 搏斗通常不划算，而 slim 相对完整镜像已经省了 80%。
+判断顺序：**先用 `node:24-slim`；只有体积真的成为瓶颈、且项目没有原生依赖时才换 alpine**。为了 100 MB 去和 musl 搏斗通常不划算，而 slim 相对完整镜像已经省了 80%。
 
-无论选哪个，都要**把 tag 钉死**。`FROM node:20` 会随上游滚动，同一份 Dockerfile 上周和这周构建出的镜像不一样。写 `FROM node:20.19-alpine3.21`，最严格的做法是钉 digest：`FROM node:20-alpine@sha256:...`。
+无论选哪个，都要**把 tag 钉死**。`FROM node:24` 会随上游滚动，同一份 Dockerfile 上周和这周构建出的镜像不一样。写 `FROM node:24.22.1-alpine`，最严格的做法是钉 digest：`FROM node:24-alpine@sha256:...`。
 
 ### 技巧四：.dockerignore
 
@@ -384,7 +384,7 @@ USER node
 
 文件权限的处理要点：
 
-- `node:20*` 官方镜像**已内置 `node` 用户**（uid 1000），不用自己 `adduser`。换基础镜像时才需要 `RUN addgroup -S app && adduser -S app -G app`
+- `node:24*` 官方镜像**已内置 `node` 用户**（uid 1000），不用自己 `adduser`。换基础镜像时才需要 `RUN addgroup -S app && adduser -S app -G app`
 - `USER` 之前的 `COPY` 属主是 root，切了用户就读不到写不了。用 `COPY --chown` 一步解决，比事后 `RUN chown -R` 好——后者会把整个目录复制一遍到新层，镜像凭空变大
 - 要写日志、上传目录时，先 `RUN mkdir -p /app/uploads && chown node:node /app/uploads` 再 `USER node`
 - 非 root **不能监听 1024 以下端口**。这不是问题：容器内监听 3000，映射到宿主机 80 就行
@@ -414,7 +414,7 @@ Docker Engine 23 之后 BuildKit 是默认构建器，三个能力直接能用�
 
 ```dockerfile
 # syntax=docker/dockerfile:1
-FROM node:20-slim AS builder
+FROM node:24-slim AS builder
 WORKDIR /app
 COPY package*.json ./
 RUN --mount=type=cache,target=/root/.npm npm ci                          # 下载缓存
@@ -617,9 +617,9 @@ docker inspect --format '{{json .State}}' <容器> | jq    # 看 OOMKilled、Err
 **4. alpine 镜像最小，为什么不能无脑换上去？**
 
 - alpine 用 musl 不是 glibc：npm 上的预编译二进制大多只提供 glibc 版本，sharp、bcrypt 要现场编译或直接失败，Prisma 要显式声明 `binaryTargets` 才能拿到正确的 query engine
-- 判断顺序：先用 `node:20-slim`（默认首选），体积真的成为瓶颈且项目没有原生依赖时才换 alpine
-- 无论用哪个，tag 都要钉死——`FROM node:20` 会随上游滚动，同一份 Dockerfile 上周和这周构建出的镜像不一样
-- 加分：能说出最严格的做法是钉 digest（`FROM node:20-alpine@sha256:...`）
+- 判断顺序：先用 `node:24-slim`（默认首选），体积真的成为瓶颈且项目没有原生依赖时才换 alpine
+- 无论用哪个，tag 都要钉死——`FROM node:24` 会随上游滚动，同一份 Dockerfile 上周和这周构建出的镜像不一样
+- 加分：能说出最严格的做法是钉 digest（`FROM node:24-alpine@sha256:...`）
 
 **5. HEALTHCHECK 探测失败会自动重启容器吗？**
 

@@ -18,7 +18,7 @@ docker run -d --name mysql --network app-net \
   -e MYSQL_ROOT_PASSWORD=... -e MYSQL_DATABASE=bookmarks \
   -v mysql-data:/var/lib/mysql mysql:8.4
 # 等它真的能连上……手动 sleep 或者反复 docker logs
-docker run -d --name redis --network app-net -v redis-data:/data redis:7-alpine
+docker run -d --name redis --network app-net -v redis-data:/data redis:8-alpine
 docker run -d --name api --network app-net -p 3000:3000 \
   -e DB_HOST=mysql -e REDIS_URL=redis://redis:6379 --restart unless-stopped api:1.4.2
 docker run -d --name nginx --network app-net -p 80:80 \
@@ -245,7 +245,7 @@ services:
       retries: 5
 
   redis:
-    image: redis:7-alpine
+    image: redis:8-alpine
     restart: unless-stopped
     command: ["redis-server", "--appendonly", "yes"]
     volumes:

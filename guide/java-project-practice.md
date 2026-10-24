@@ -1,11 +1,11 @@
 ---
 title: 第九部分：实战项目 — 学习时间记录系统
-description: 基于 Spring Boot 3 + Java 17 + MyBatis-Plus + MySQL + JWT 的企业级实战工程，提供完整可运行工程源码、架构分层解析与本地联调指南。
+description: 基于 Spring Boot 4.1 + Java 17 + MyBatis-Plus + MySQL 8.4 + JWT 的企业级实战工程，提供完整可运行工程源码、架构分层解析与本地联调指南。
 ---
 
 # 第九部分：实战项目 — 学习时间记录系统
 
-本章带你从零落地一个完整的企业级 Spring Boot 3 后端工程。本站不提倡在教程里直接堆砌成百上千行代码让读者肉眼阅读，而是提供了**完整、规范且可直接独立编译运行的工程代码库**。
+本章带你从零落地一个完整的企业级 Spring Boot 4.1 后端工程。本站不提倡在教程里直接堆砌成百上千行代码让读者肉眼阅读，而是提供了**完整、规范且可直接独立编译运行的工程代码库**。
 
 ::: tip 💻 完整工程代码入口
 本项目完整源码位于仓库根目录的 [`projects/study-tracker/`](https://github.com/wahahaorg/fullstack-road/tree/main/projects/study-tracker) 目录中。
@@ -42,7 +42,7 @@ sequenceDiagram
     participant Ctrl as Controller (控制器)
     participant Svc as Service (业务层)
     participant MP as Mapper (持久层)
-    participant DB as MySQL 8.0 数据库
+    participant DB as MySQL 8.4 数据库
 
     Note over C,Ctrl: 认证阶段 (无需拦截)
     C->>Ctrl: POST /api/auth/login (账号密码)
@@ -73,8 +73,8 @@ sequenceDiagram
 
 ```text
 projects/study-tracker/
-├── pom.xml                               # Maven 依赖清单 (Spring Boot 3.2.0 + Java 17)
-├── compose.yaml                          # 本地一键拉起 MySQL 8.0 容器
+├── pom.xml                               # Maven 依赖清单 (Spring Boot 4.1.2 + Java 17)
+├── compose.yaml                          # 本地一键拉起 MySQL 8.4 容器
 ├── README.md                             # 独立项目运行与测试说明
 └── src/
     ├── main/
@@ -127,6 +127,8 @@ projects/study-tracker/
 
 在 [`config/MyBatisPlusConfig.java`](https://github.com/wahahaorg/fullstack-road/blob/main/projects/study-tracker/src/main/java/com/example/studytracker/config/MyBatisPlusConfig.java) 中注入 `PaginationInnerInterceptor(DbType.MYSQL)` 分页插件后，分页查询无需手写 `LIMIT offset, size`，也无需单独查询 `count(*)`：
 
+> ⚠️ MyBatis-Plus 3.5.9 起分页插件被拆到独立模块，光有 starter 会编译不过，需要额外引入 `com.baomidou:mybatis-plus-jsqlparser`（版本与 MyBatis-Plus 保持一致）。
+
 ```java
 // StudyServiceImpl.java
 Page<StudyRecord> page = new Page<>(pageNum, pageSize);
@@ -174,7 +176,7 @@ cd projects/study-tracker
 docker compose up -d
 ```
 
-Compose 会在本地 `3306` 端口启动 MySQL 8.0 服务，并自动读取 `src/main/resources/schema.sql` 完成表结构初始化。
+Compose 会在本地 `3306` 端口启动 MySQL 8.4 服务，并自动读取 `src/main/resources/schema.sql` 完成表结构初始化。
 
 ### 2. 编译并启动工程
 

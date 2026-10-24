@@ -267,6 +267,8 @@ this.reflector.getAllAndMerge(ROLES_KEY, [ctx.getHandler(), ctx.getClass()])
 }
 ```
 
+> 这段 `commonjs` 配置只服务本章的最小 IoC 示例；实际 Nest 项目以脚手架生成的配置为准，并注意 11+ 版本在 ESM/CJS 上的差异。
+
 ```bash
 npm i reflect-metadata
 npm i -D typescript ts-node @types/node

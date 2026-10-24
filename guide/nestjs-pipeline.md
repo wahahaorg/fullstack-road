@@ -189,7 +189,7 @@ export class OrdersModule implements NestModule {
 
 `forRoutes()` 接三种参数：控制器类、路径字符串、`{ path, method }` 对象；`exclude()` 接后两种。
 
-> ⚠️ Nest 11 默认跑在 Express 5 上，路径通配符必须命名。想匹配 `admin` 下所有路由要写 `'admin/*path'`，光写 `'admin/*'` 会直接报错。想无条件拦全部请求，在 `main.ts` 里 `app.use()` 更省事。
+> ⚠️ Nest 11 及之后（当前主线 12）默认跑在 Express 5 上，路径通配符必须命名。想匹配 `admin` 下所有路由要写 `'admin/*path'`，光写 `'admin/*'` 会直接报错。想无条件拦全部请求，在 `main.ts` 里 `app.use()` 更省事。
 
 `app.use()` 和模块里的 `configure()` 的区别：
 

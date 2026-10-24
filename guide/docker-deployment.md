@@ -26,14 +26,14 @@ Docker 把应用和它的运行环境打包成一个**镜像**，镜像启动后
 # 多阶段构建（推荐）
 
 # 第一阶段：安装依赖 + 构建
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm ci --omit=dev
 COPY . .
 
 # 第二阶段：最小运行镜像
-FROM node:20-alpine
+FROM node:24-alpine
 WORKDIR /app
 # 从 builder 阶段只复制需要的文件
 COPY --from=builder /app/node_modules ./node_modules
@@ -75,7 +75,7 @@ CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 ```dockerfile
 # 构建阶段
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
@@ -83,7 +83,7 @@ COPY . .
 RUN npm run build
 
 # 运行阶段
-FROM node:20-alpine
+FROM node:24-alpine
 WORKDIR /app
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
@@ -112,12 +112,10 @@ __pycache__
 
 ---
 
-## docker-compose：多容器编排
+## Docker Compose：多容器编排
 
 ```yaml
-# docker-compose.yml
-version: '3.8'
-
+# compose.yaml
 services:
   app:
     build: .
@@ -136,7 +134,7 @@ services:
       - uploads:/app/uploads
 
   db:
-    image: mysql:8.0
+    image: mysql:8.4
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: app
@@ -150,7 +148,7 @@ services:
       timeout: 3s
 
   redis:
-    image: redis:7-alpine
+    image: redis:8-alpine
     ports:
       - "6379:6379"
     volumes:
@@ -162,9 +160,9 @@ volumes:
   uploads:
 ```
 
-启动：`docker-compose up -d`
-查看日志：`docker-compose logs -f app`
-停止并清理：`docker-compose down -v`
+启动：`docker compose up -d`
+查看日志：`docker compose logs -f app`
+停止并清理：`docker compose down -v`
 
 ---
 
@@ -181,7 +179,8 @@ server {
 }
 
 server {
-    listen 443 ssl http2;
+    listen 443 ssl;
+    http2 on;                                  # nginx 1.25.1+；旧版本写在 listen 行里
     server_name api.example.com;
 
     ssl_certificate /etc/letsencrypt/live/api.example.com/fullchain.pem;
@@ -228,7 +227,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
       - run: npm ci
       - run: npm run lint
       - run: npm run test
@@ -253,8 +252,8 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd /opt/app
-            docker-compose pull
-            docker-compose up -d
+            docker compose pull
+            docker compose up -d
 ```
 
 ---
@@ -378,7 +377,7 @@ async def health():
 
 - 第一个 job 跑测试：`npm ci`、lint、test
 - 第二个 job 构建镜像（tag 用 git sha）并推送到镜像仓库（GHCR / Docker Hub）
-- 通过 SSH 到服务器执行 `docker-compose pull && docker-compose up -d` 拉新镜像重启
+- 通过 SSH 到服务器执行 `docker compose pull && docker compose up -d` 拉新镜像重启
 - 用 `needs: test` 保证测试不过不部署；服务器 host、用户名、SSH key 走 GitHub Secrets，不写进仓库
 
 **3. 环境变量怎么分层管理？**

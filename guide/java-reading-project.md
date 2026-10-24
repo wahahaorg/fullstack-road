@@ -199,7 +199,8 @@ grep -r "DB_PASSWORD" .
 
 ```bash
 # 搜索 HTTP 调用相关代码
-grep -r "RestTemplate" src/main/java/
+grep -r "RestClient" src/main/java/
+grep -r "RestTemplate" src/main/java/   # 老项目常见，新代码应优先 RestClient
 grep -r "WebClient" src/main/java/
 grep -r "FeignClient" src/main/java/  # Spring Cloud
 ```
@@ -345,7 +346,7 @@ public OrderVO createOrder(CreateOrderRequest request) {
 | 鉴权方式 | WebConfig + Interceptor |
 | SQL 查询 | Mapper 接口的 @Select 或 XML |
 | 异常处理 | GlobalExceptionHandler |
-| 外部调用 | RestTemplate / WebClient |
+| 外部调用 | RestClient / WebClient（老项目可能是 RestTemplate） |
 
 ---
 

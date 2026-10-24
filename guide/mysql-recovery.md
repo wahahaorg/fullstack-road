@@ -4,7 +4,7 @@ title: MySQL 日志、备份恢复与复制
 
 # MySQL 日志、备份恢复与复制
 
-> 这一章解决“误删、宕机、复制延迟后，数据能不能找回来”。示例以 **MySQL 8.0 + InnoDB** 为前提，所有恢复命令只能在隔离的测试实例演练；不要把恢复导入、`RESET MASTER`、删除 binlog 等命令直接对生产执行。
+> 这一章解决“误删、宕机、复制延迟后，数据能不能找回来”。示例以 **MySQL 8.4 + InnoDB** 为前提，所有恢复命令只能在隔离的测试实例演练；不要把恢复导入、`RESET BINARY LOGS AND GTIDS`、删除 binlog 等命令直接对生产执行。
 
 ## 先分清三类日志
 
@@ -87,7 +87,7 @@ mysqlbinlog --read-from-remote-server \
 ```bash
 SHOW VARIABLES LIKE 'log_bin';
 SHOW BINARY LOGS;
-SHOW MASTER STATUS;
+SHOW BINARY LOG STATUS;   -- 8.4 起使用；旧版 SHOW MASTER STATUS 已弃用
 SHOW BINLOG EVENTS IN 'binlog.000123' LIMIT 20;
 ```
 
@@ -104,13 +104,13 @@ ROW 格式通常比 STATEMENT 更能避免非确定性语句在复制/恢复中�
 - 误删会被复制到所有副本；副本没有独立备份价值。
 - 网络分区或故障切换可能带来已确认事务丢失、重复应用或读旧数据。
 
-MySQL 8.0 支持多线程复制、并行应用与 GTID；是否启用、如何按逻辑时钟调度需结合版本和工作负载验证，不要只看一个 `Seconds_Behind_Source` 数字。延迟指标可能在 SQL 线程停止、网络中断或时钟异常时误导。
+MySQL 8.4 支持多线程复制、并行应用与 GTID；是否启用、如何按逻辑时钟调度需结合版本和工作负载验证，不要只看一个 `Seconds_Behind_Source` 数字。延迟指标可能在 SQL 线程停止、网络中断或时钟异常时误导。
 
 ```sql
 SHOW REPLICA STATUS\G
 ```
 
-排查至少看：IO/receiver 线程是否运行、SQL/applier 线程是否运行、最后错误号和 SQL、source/relay 日志位置、接收与执行 GTID 集合、事务应用延迟、队列大小。MySQL 8.0.23 以前命令和字段可能显示 `SLAVE` 名称，升级时以当前版本文档为准。
+排查至少看：IO/receiver 线程是否运行、SQL/applier 线程是否运行、最后错误号和 SQL、source/relay 日志位置、接收与执行 GTID 集合、事务应用延迟、队列大小。MySQL 8.0.23 以前命令和字段可能显示 `SLAVE` 名称；8.4 已统一为 `REPLICA` / `SOURCE` 术语，旧命令仍可用但已弃用。
 
 ### 读己之写与切换
 

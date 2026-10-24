@@ -343,19 +343,17 @@ async def search_valid_docs(session, tenant_id: int, dept_ids: list[int], query_
 
 ```python
 from openai import AsyncOpenAI
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class LLMSettings(BaseSettings):
     """配置化而不是硬编码，方便在测试环境切到便宜模型"""
+    model_config = SettingsConfigDict(env_prefix="LLM_", env_file=".env")
+
     base_url: str = "https://dashscope.aliyuncs.com/compatible-mode/v1"
     api_key: str
     model: str = "qwen-plus"
     timeout: float = 30.0            # 单次请求超时
     connect_timeout: float = 5.0     # 建连超时单独设，快速失败
-
-    class Config:
-        env_prefix = "LLM_"
-        env_file = ".env"
 
 settings = LLMSettings()
 llm = AsyncOpenAI(

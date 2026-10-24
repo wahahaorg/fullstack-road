@@ -49,7 +49,7 @@ features:
     details: 表结构设计、SQL 查询优化、事务隔离级别、分布式锁，从业务场景出发，不只是背概念。
   - icon: 🐳
     title: Docker 与部署
-    details: Dockerfile、docker-compose、nginx 反向代理、PM2 进程管理、GitHub Actions CI/CD 完整部署工作流。
+    details: Dockerfile、Docker Compose、nginx 反向代理、PM2 进程管理、GitHub Actions CI/CD 完整部署工作流。
   - icon: 📦
     title: Redis · MQ · 基础设施
     details: Redis 五种数据结构和缓存策略，消息队列选型与实战，幂等消费设计，前后端衔接的完整方案。
@@ -83,8 +83,8 @@ features:
 
 | 项目名称 | 所属技术栈 | 难度 / 定位 | 本地代码目录 | 详细实战教程 |
 |---|---|---|---|---|
-| **企业知识库 Agentic RAG 系统** | Python 3.12, FastAPI, LangGraph, Qdrant, PostgreSQL | 生产级综合项目 (L5) | `projects/agentic-rag/` | [企业知识库 RAG 实战 17 章](/guide/agentic-rag-project) |
-| **学习时间记录系统 (Study Tracker)** | Java 17, Spring Boot 3, MyBatis-Plus, MySQL 8, JWT | 企业级后端入门实战 | `projects/study-tracker/` | [Java 实战项目教程](/guide/java-project-practice) |
+| **企业知识库 Agentic RAG 系统** | Python 3.12, FastAPI, LangGraph, SQLite（可选 PostgreSQL/MinIO）, Docker | 生产级综合项目 (L5) | `projects/agentic-rag/` | [企业知识库 RAG 实战 17 章](/guide/agentic-rag-project) |
+| **学习时间记录系统 (Study Tracker)** | Java 17, Spring Boot 4.1, MyBatis-Plus, MySQL 8.4, JWT | 企业级后端入门实战 | `projects/study-tracker/` | [Java 实战项目教程](/guide/java-project-practice) |
 
 ## 分方向学习
 
@@ -175,7 +175,7 @@ Java 学习路线 → 去陌生化 → 核心语法 → 数据结构 → 理解 
 | 模块 | 章节数 | 核心内容 |
 |---|---|---|
 | **🤖 Agent 工程与生产化** | 14 章 | 范式与编排 / LangGraph / Tool Calling 与 MCP / Multi-Agent / SSE 流式 / AI 前端 / Text2SQL / 安全 / 可观测性 / 可靠性 / 上下文工程 / 评测 / 部署 |
-| **🏗️ Agentic RAG 综合实战** | 18 章 | 从最小闭环到权限、异步入库、混合检索、LangGraph、安全越权测试、评测与求职表达 |
+| **🏗️ Agentic RAG 综合实战** | 17 章 | 从最小闭环到权限、异步入库、混合检索、LangGraph、安全越权测试、评测与求职表达 |
 | **🔍 RAG 检索** | 4 章 | 入库链路 / 混合检索（BM25+向量+RRF+Rerank）/ 引用溯源与拒答 / 多模态文档 |
 | **Python 与 FastAPI** | 6 章 | Python 语法、类与工程化 → FastAPI 基础、项目结构与进阶（Depends / SSE / 鉴权 / Worker 边界） |
 | **数据库与建模** | 7 章 | MySQL 建模 / SQL 基础 / SQL 进阶 / 外键 / 备份恢复 / PostgreSQL（含 pgvector 与 RLS）/ MongoDB |

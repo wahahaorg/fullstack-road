@@ -114,16 +114,16 @@ Node 支持互操作，但有边界：
 import cjsModule from './legacy.cjs'
 const { add } = cjsModule
 
-// CJS require ESM ❌ — 不能直接 require
-const esmModule = require('./modern.mjs')  // Error!
+// CJS require ESM：Node 20.19+ / 22.12+ 默认支持同步 ESM
+const esmModule = require('./modern.mjs')  // 返回模块命名空间对象
 
-// CJS 加载 ESM 要用动态 import()
-const { add } = await import('./modern.mjs')
+// 含 top-level await 的 ESM 仍不能用 require，需要动态 import()
+const { add } = await import('./modern-async.mjs')
 ```
 
 **混用时最容易踩坑的点：**
-- 默认导出 vs 命名导出的映射关系
-- top-level await（只有 ESM 支持）
+- 默认导出 vs 命名导出的映射关系（`require(esm)` 拿到的是命名空间，不是自动拍平的 `module.exports`）
+- 含 top-level await 的 ESM 无法同步 `require`，会抛 `ERR_REQUIRE_ASYNC_MODULE`
 - 执行时机不同（CJS 同步，ESM 异步）
 
 > 项目里最好尽量统一模块风格，尤其在基础库与构建配置上。

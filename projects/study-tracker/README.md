@@ -2,7 +2,7 @@
 
 > 对应教程章节：[Java 实战项目 — 学习时间记录系统](../../guide/java-project-practice.md)
 
-基于 **Spring Boot 3 + Java 17 + MyBatis-Plus + MySQL 8 + JWT** 实现的企业级后端入门实战工程。
+基于 **Spring Boot 4.1 + Java 17 + MyBatis-Plus + MySQL 8.4 + JWT** 实现的企业级后端入门实战工程。
 
 ## 🎯 业务功能清单
 
@@ -16,8 +16,8 @@
 
 ```text
 projects/study-tracker/
-├── pom.xml                               # Maven 依赖配置 (Spring Boot 3.2, Java 17)
-├── compose.yaml                          # Docker Compose 本地 MySQL 8.0 一键启动
+├── pom.xml                               # Maven 依赖配置 (Spring Boot 4.1, Java 17)
+├── compose.yaml                          # Docker Compose 本地 MySQL 8.4 一键启动
 ├── README.md                             # 项目说明与接口测试指南
 └── src/
     ├── main/
@@ -49,7 +49,7 @@ projects/study-tracker/
 docker compose up -d
 ```
 
-Compose 会启动 MySQL 8.0 容器，并自动挂载执行 `schema.sql` 完成建库与建表。
+Compose 会启动 MySQL 8.4 容器，并自动挂载执行 `schema.sql` 完成建库与建表。
 
 ### 2. 编译并启动 Spring Boot 应用
 

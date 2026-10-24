@@ -114,8 +114,8 @@ graph TD
 
 | 项目名称 | 所属技术栈 | 难度 / 定位 | 代码仓库目录 | 配套教程指引 |
 |---|---|---|---|---|
-| **企业知识库 Agentic RAG 系统** | Python 3.12, FastAPI, LangGraph, Qdrant, PostgreSQL, Docker | 生产级综合项目 (L5) | [`projects/agentic-rag/`](https://github.com/wahahaorg/fullstack-road/tree/main/projects/agentic-rag) | [企业知识库 RAG 实战 17 章](./agentic-rag-project) |
-| **学习时间记录系统 (Study Tracker)** | Java 17, Spring Boot 3, MyBatis-Plus, MySQL 8, JWT | 企业级后端入门实战 | [`projects/study-tracker/`](https://github.com/wahahaorg/fullstack-road/tree/main/projects/study-tracker) | [Java 实战项目教程](./java-project-practice) |
+| **企业知识库 Agentic RAG 系统** | Python 3.12, FastAPI, LangGraph, SQLite（可选 PostgreSQL/MinIO）, Docker | 生产级综合项目 (L5) | [`projects/agentic-rag/`](https://github.com/wahahaorg/fullstack-road/tree/main/projects/agentic-rag) | [企业知识库 RAG 实战 17 章](./agentic-rag-project) |
+| **学习时间记录系统 (Study Tracker)** | Java 17, Spring Boot 4.1, MyBatis-Plus, MySQL 8.4, JWT | 企业级后端入门实战 | [`projects/study-tracker/`](https://github.com/wahahaorg/fullstack-road/tree/main/projects/study-tracker) | [Java 实战项目教程](./java-project-practice) |
 
 ---
 

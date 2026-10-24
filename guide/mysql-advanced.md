@@ -6,7 +6,7 @@ title: SQL 进阶与查询优化
 
 > 会写 `SELECT` 和 `LEFT JOIN` 之后，真正拉开差距的是这几件事：JOIN 的条件该放 `ON` 还是 `WHERE`、`IN` 和 `EXISTS` 谁快、窗口函数怎么一句话解决分组 Top N、以及为什么加了索引却没走索引。
 
-事务、隔离级别、锁和并发一致性不在这篇，见 [并发、事务与一致性](/guide/concurrency-transaction)；建表、字段类型和约束设计见 [MySQL 表结构设计](/guide/mysql-table-design)；`SELECT` / `WHERE` / 分页的基础语法见 [SQL 基础与查询](/guide/sql-basics)。下面默认 MySQL 8.0 / InnoDB。
+事务、隔离级别、锁和并发一致性不在这篇，见 [并发、事务与一致性](/guide/concurrency-transaction)；建表、字段类型和约束设计见 [MySQL 表结构设计](/guide/mysql-table-design)；`SELECT` / `WHERE` / 分页的基础语法见 [SQL 基础与查询](/guide/sql-basics)。下面默认 MySQL 8.4 / InnoDB。
 
 本篇用一组固定的示例表：
 

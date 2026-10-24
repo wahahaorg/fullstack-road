@@ -435,7 +435,7 @@ async def close_expired_approvals():
 
 | 约束 | 做法 | 违反后的现象 |
 |---|---|---|
-| Checkpointer 必须外部化，恢复只依赖 `thread_id` | Postgres / Redis，不能用 `MemorySaver`，进程内不留状态 | 恢复请求落到另一个副本就接不上，滚动发布后挂起任务全部失效 |
+| Checkpointer 必须外部化，恢复只依赖 `thread_id` | Postgres / Redis，不能用 `InMemorySaver`，进程内不留状态 | 恢复请求落到另一个副本就接不上，滚动发布后挂起任务全部失效 |
 | 同一 thread 的恢复要串行 | 按 `thread_id` 加 Redis 分布式锁，见 [Redis 深入](./redis-deep) | 用户和审批人同时触发恢复，写操作执行两次 |
 | 下游写操作必须幂等 | 用 `approval_id` 作幂等键 | 任何一次重试都可能导致重复退款 |
 

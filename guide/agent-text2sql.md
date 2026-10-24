@@ -377,7 +377,7 @@ def detect_ambiguities(question: str, metric_hits: list[dict]) -> list[str]:
 SYSTEM_PROMPT = """你是企业 BI 的 SQL 生成器。根据候选表结构和指标口径，把用户问题翻译成一条 MySQL 查询。
 
 硬性规则：
-1. 方言为 MySQL 8.0，只能生成一条 SELECT 语句，不带分号，不写注释。
+1. 方言为 MySQL 8.4，只能生成一条 SELECT 语句，不带分号，不写注释。
 2. 只能使用下面列出的表和字段，禁止使用未列出的任何字段名，宁可澄清也不要猜。
 3. 所有字段必须带表别名限定（如 o.pay_amount），禁止裸字段名。
 4. 命中指标时，度量表达式、固定过滤条件、时间字段必须与给定口径完全一致。

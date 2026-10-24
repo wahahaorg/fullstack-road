@@ -124,7 +124,9 @@ def merge_docs(old: list[RetrievedDoc], new: list[RetrievedDoc]) -> list[Retriev
 | 检索片段摘要 + 引用信息、重试次数 | 检索/工具返回的原始大 JSON | 只挑模型真正要看的字段 |
 | 用户 id、租户 id、权限范围 | 明文密钥、access token | 从请求上下文取，别落进 Checkpoint |
 
-**踩坑：** Checkpointer 要序列化整个 State。放进 `AsyncSession` 或 `httpx.AsyncClient`，`MemorySaver` 下"看起来能跑"，一换 `PostgresSaver` 立刻序列化失败。State 里只放 JSON 能表达的东西。
+**踩坑：** Checkpointer 要序列化整个 State。放进 `AsyncSession` 或 `httpx.AsyncClient`，`InMemorySaver` 下"看起来能跑"，一换 `PostgresSaver` 立刻序列化失败。State 里只放 JSON 能表达的东西。
+
+> 命名说明：LangGraph 1.x 文档里的规范名是 `InMemorySaver`，旧文章中的 `MemorySaver` 是它的历史别名，新代码统一用前者。
 
 ### State 膨胀会怎么炸
 
@@ -324,9 +326,9 @@ parent.add_node("order", call_order_flow)
 
 Checkpointer 在**每个节点执行完之后**把 State 快照写下来，于是你免费得到三件事：多轮会话、断点恢复、时间旅行调试。如果你写过后端：它就是把"会话表 + 任务状态表"这套你本来要手写的东西标准化了，而 `thread_id` 是这张表的业务主键。
 
-### MemorySaver vs PostgresSaver
+### InMemorySaver vs PostgresSaver
 
-| 维度 | `MemorySaver` | `PostgresSaver` / `AsyncPostgresSaver` |
+| 维度 | `InMemorySaver` | `PostgresSaver` / `AsyncPostgresSaver` |
 |---|---|---|
 | 存储位置 | 进程内存，重启即丢 | PostgreSQL 表，重启保留 |
 | 多实例部署 | 各实例不共享，续聊会串味 | 共享，任意实例都能续上 |
@@ -452,7 +454,7 @@ from typing import Annotated, Literal
 from typing_extensions import TypedDict
 from pydantic import BaseModel, Field
 from langchain_openai import ChatOpenAI
-from langgraph.checkpoint.memory import MemorySaver
+from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.graph import StateGraph, START, END
 from langgraph.graph.message import add_messages
 
@@ -529,7 +531,7 @@ builder.add_conditional_edges("verify", route_after_verify, {
     "again": "understand",        # 回环：带着 missing 重新改写检索式再检索
     "give_up": "fallback",
 })
-graph = builder.compile(checkpointer=MemorySaver())   # 生产换成 AsyncPostgresSaver
+graph = builder.compile(checkpointer=InMemorySaver())   # 生产换成 AsyncPostgresSaver
 
 async def main():
     config = {"configurable": {"thread_id": "demo-1"}, "recursion_limit": 20}
@@ -631,7 +633,7 @@ print(graph.get_graph().draw_mermaid())   # 导出图结构，贴进 PR 一眼�
 
 - 每个节点后把 State 快照落库，于是免费得到多轮续聊、断点恢复、时间旅行调试。
 - `thread_id` 是一条会话或一次任务的标识，决定这次执行接在谁的历史后面；有 Checkpointer 时必传，且别拿 user_id 当它。
-- `MemorySaver` 只适合单测和本地；生产用 `AsyncPostgresSaver`，多实例才能共享会话。
+- `InMemorySaver` 只适合单测和本地；生产用 `AsyncPostgresSaver`，多实例才能共享会话。
 - 断点恢复：失败后用同一 `thread_id` 调 `ainvoke(None, config)`，从失败节点继续，前面的检索和生成不重跑。
 - 工程细节：图在启动时编译一次复用；Checkpoint 表必须有清理策略。
 

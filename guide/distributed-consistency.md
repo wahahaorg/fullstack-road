@@ -4,7 +4,7 @@ title: 分布式一致性与可靠消息
 
 # 分布式一致性与可靠消息
 
-> 前置：[事务与一致性](./concurrency-transaction)、[锁机制](./locking)、[消息队列](./message-queue)。本章从订单跨服务流转解释可靠性；SQL 默认 MySQL 8.0 / InnoDB，消息确认以 RabbitMQ 为例。SQL 中的 `?` 由应用参数绑定，流程伪代码需要接入项目的数据库和消息客户端。
+> 前置：[事务与一致性](./concurrency-transaction)、[锁机制](./locking)、[消息队列](./message-queue)。本章从订单跨服务流转解释可靠性；SQL 默认 MySQL 8.4 / InnoDB，消息确认以 RabbitMQ 为例。SQL 中的 `?` 由应用参数绑定，流程伪代码需要接入项目的数据库和消息客户端。
 
 ## 先看问题：订单存在，库存却没处理
 

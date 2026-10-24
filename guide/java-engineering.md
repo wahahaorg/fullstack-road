@@ -117,14 +117,14 @@ Maven 用三个坐标唯一确定一个项目：
     <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-web</artifactId>
-        <version>3.2.0</version>
+        <version>4.1.2</version>
     </dependency>
 
     <!-- MySQL 驱动 -->
     <dependency>
         <groupId>com.mysql</groupId>
         <artifactId>mysql-connector-j</artifactId>
-        <version>8.2.0</version>
+        <version>9.7.0</version>
         <scope>runtime</scope>  <!-- 运行时才需要 -->
     </dependency>
 
@@ -132,7 +132,7 @@ Maven 用三个坐标唯一确定一个项目：
     <dependency>
         <groupId>org.projectlombok</groupId>
         <artifactId>lombok</artifactId>
-        <version>1.18.30</version>
+        <version>1.18.48</version>
         <scope>provided</scope>  <!-- 编译时需要，不打入最终包 -->
     </dependency>
 
@@ -140,11 +140,15 @@ Maven 用三个坐标唯一确定一个项目：
     <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-test</artifactId>
-        <version>3.2.0</version>
+        <version>4.1.2</version>
         <scope>test</scope>  <!-- 仅测试时使用 -->
     </dependency>
 </dependencies>
 ```
+
+> **版本由父 POM 管理**：实际项目继承 `spring-boot-starter-parent` 后，Spring Boot、MySQL 驱动、Lombok 和测试依赖的版本都由父 POM 决定，不需要逐个写 `<version>`。上面的写法只是为了让依赖坐标完整可见。
+
+> **Spring Boot 3 → 4 迁移提示**：Boot 4 基于 Spring Framework 7、Jakarta EE 11 和 Jackson 3，starter 做了模块化（如 `spring-boot-starter-webmvc`）。Java 17 仍是最低要求，但新项目建议直接用 21/25 LTS。从 3.x 升级时，MyBatis-Plus 必须换成 `mybatis-plus-spring-boot4-starter`；如果代码里直接 import 了 `com.fasterxml.jackson.*`，要迁移到 Jackson 3 的 `tools.jackson.*`，并跑一遍集成测试再上线。
 
 **对比 npm：**
 

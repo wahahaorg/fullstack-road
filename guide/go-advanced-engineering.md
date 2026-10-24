@@ -716,17 +716,17 @@ func init() {
 // go.mod
 module my-api
 
-go 1.22
+go 1.26
 
 require (
-    github.com/gin-gonic/gin v1.9.1
+    github.com/gin-gonic/gin v1.12.0
 )
 
 // 替换为本地路径（开发用）
 replace github.com/gin-gonic/gin => ../local-gin
 
 // 或替换为 fork
-replace github.com/gin-gonic/gin => github.com/yourname/gin v1.9.1-fixed
+replace github.com/gin-gonic/gin => github.com/yourname/gin v1.12.0-fixed
 ```
 
 **注意：** `replace` 不会提交到上游——CI 环境要确保路径或版本可访问。
@@ -749,7 +749,7 @@ my-project/
 
 ```go
 // go.work
-go 1.22
+go 1.26
 
 // 把本地的模块加入 workspace
 use (
