@@ -79,6 +79,16 @@ export default withMermaid(defineConfig({
         ]
       },
       {
+        text: '面试备战',
+        items: [
+          { text: '学习路线图', link: '/interview/00-学习路线图' },
+          { text: '面试八股文总目录（200+ 题）', link: '/interview/01-面试八股文' },
+          { text: '项目面试问答集（100+ 题）', link: '/interview/06-面试问答集' },
+          { text: '简历模板', link: '/interview/04-简历模板' },
+          { text: 'STAR 面试稿', link: '/interview/05-STAR面试稿' },
+        ]
+      },
+      {
         text: '后端技术栈',
         items: [
           {
@@ -247,6 +257,34 @@ export default withMermaid(defineConfig({
               { text: '17. 项目复盘与求职表达', link: '/guide/agentic-rag-project-career' },
             ]
           },
+        ]
+      },
+      {
+        text: '🎯 AI Agent 面试备战',
+        collapsed: true,
+        items: [
+          { text: '学习路线图（6 阶段）', link: '/interview/00-学习路线图' },
+          {
+            text: '面试八股文（200+ 题）',
+            collapsed: true,
+            items: [
+              { text: '总目录与学习建议', link: '/interview/01-面试八股文' },
+              { text: '01 基础概念', link: '/interview/01-面试八股文/01-基础概念' },
+              { text: '02 核心框架（ReAct 等）', link: '/interview/01-面试八股文/02-核心框架' },
+              { text: '03 RAG 技术', link: '/interview/01-面试八股文/03-RAG技术' },
+              { text: '04 工具调用（MCP）', link: '/interview/01-面试八股文/04-工具调用' },
+              { text: '05 记忆系统', link: '/interview/01-面试八股文/05-记忆系统' },
+              { text: '06 多智能体', link: '/interview/01-面试八股文/06-多智能体' },
+              { text: '07 大模型基础', link: '/interview/01-面试八股文/07-大模型基础' },
+              { text: '08 工程化实践', link: '/interview/01-面试八股文/08-工程化实践' },
+              { text: '09 Prompt 工程', link: '/interview/01-面试八股文/09-Prompt工程' },
+            ]
+          },
+          { text: '企业招聘分析', link: '/interview/02-企业招聘分析' },
+          { text: '开源项目学习笔记', link: '/interview/03-开源项目学习笔记' },
+          { text: '简历模板', link: '/interview/04-简历模板' },
+          { text: 'STAR 面试稿', link: '/interview/05-STAR面试稿' },
+          { text: '项目面试问答集（100+ 题）', link: '/interview/06-面试问答集' },
         ]
       },
       {

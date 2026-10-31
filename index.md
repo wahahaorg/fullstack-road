@@ -75,6 +75,7 @@ features:
 | 让自然语言查询变成可控的 SQL | [Text2SQL 与 Schema Linking](/guide/agent-text2sql) | [Agent 与 RAG 评测方法](/guide/agent-eval) |
 | 从前端转向 Python 后端 | [Python 快速入门](/guide/python-intro) | [FastAPI + MySQL 项目](/guide/fastapi-mysql-project) |
 | 准备 Node.js / NestJS 面试 | [Node.js 运行时](/guide/node-runtime) | [NestJS 架构概览](/guide/nestjs-intro) |
+| 准备 AI Agent 面试 | [面试八股文总目录（200+ 题）](/interview/01-面试八股文) | [项目面试问答集](/interview/06-面试问答集) → [简历模板与 STAR 面试稿](/interview/04-简历模板) |
 | 接手 Java / Spring Boot 项目 | [Java 学习路线](/guide/java-learning-path) | [实战项目（配套工程）](/guide/java-project-practice) → [企业级进阶](/guide/java-enterprise-path) |
 | 处理慢接口、重复任务和并发写入 | [后端思维补齐](/guide/backend-thinking) | [并发、事务与一致性](/guide/concurrency-transaction) |
 | 把服务部署到生产环境 | [Docker 与部署](/guide/docker-deployment) | [Worker 与异步任务](/guide/background-worker) |
